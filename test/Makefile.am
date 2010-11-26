@@ -1,0 +1,10 @@
+doxygentestdir=../
+float3cmpdir=../
+confusetestdir=../
+doxygentest_PROGRAMS=doxygentest 
+doxygentest_SOURCES=doxygentest.c
+float3cmp_PROGRAMS=float3cmp
+float3cmp_SOURCES=float3cmp.c
+confusetest_PROGRAMS=confusetest
+confusetest_SOURCES=confusetest.c
+confusetest_LDFLAGS=-lconfuse

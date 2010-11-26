@@ -1,0 +1,21 @@
+This will be installation instructions
+
+To run automake:
+
+-- This should be performed by developers --
+
+autoscan
+mv configure.scan configure.ac
+aclocal
+autoheader
+automake -ac
+autoconf
+
+-- END --
+
+-- End user should do this --
+To build:
+./configure
+make
+-- END --
+
