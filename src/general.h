@@ -113,31 +113,37 @@ typedef char ts_bool;
  *
  *  ts_vertex holds the data for one single point (bead, vertex) in the space. To understand how to use it
  *  here is a detailed description of the fields in the data structure. */
-struct ts_vertex {
+struct ts_vertex_data {
         ts_uint idx; /**< Represents index of the vertex point. Should become obsolete in C. */        
         ts_double x; /**< The x coordinate of vertex. */        
         ts_double y; /**< The y coordinate of vertex. */
         ts_double z; /**< The z coordinate of vertex. */
         ts_uint neigh_no; /**< The number of neighbours. */
-        struct ts_vertex ***neigh; /**< The pointer that holds neigh_no pointers to this structure. Careful when using pointers to pointers! Also developers do mistakes here.  */
+        struct ts_vertex **neigh; /**< The pointer that holds neigh_no pointers to this structure. Careful when using pointers to pointers! Also developers do mistakes here.  */
         ts_double *bond_length;
         ts_double *bond_length_dual;
         ts_double curvature;
         ts_double energy;
         ts_double energy_h;
         ts_uint tristar_no;
-        struct ts_triangle ***tristar;
-        struct ts_bond ***bond;
+        struct ts_triangle **tristar;
+        struct ts_bond **bond;
         struct ts_cell *cell;
         ts_double xk;
         ts_double c;
         ts_uint id;
 };
+typedef struct ts_vertex_data ts_vertex_data;
+
+struct ts_vertex {
+        ts_uint idx;
+        ts_vertex_data *data;
+};
 typedef struct ts_vertex ts_vertex;
 
 typedef struct {
     ts_uint n;
-    ts_vertex **vtx;
+    ts_vertex *vtx;
 
 } ts_vertex_list;
 
@@ -211,6 +217,7 @@ void fatal(char *text, ts_int errcode);
 
 //ts_uint ts_fprintf(FILE *fd, char *fmt, va_list ap);
 
-#define VTX(vlist,n) &(vlist->vtx[n])
+#define VTX(n) &(vlist->vtx[n])
+#define VTX_DATA(n) vlist->vtx[n].data
 
 #endif

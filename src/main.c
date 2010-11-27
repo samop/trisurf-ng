@@ -16,11 +16,11 @@ ts_bool retval;
 ts_vertex_list *vlist=init_vertex_list(5);
 
 
-retval=vtx_add_neighbour(VTX(vlist,1),VTX(vlist,0));
+retval=vtx_add_neighbour(VTX(1),VTX(0));
 if(retval==TS_FAIL) printf("1. already a member or vertex is null!\n");
-retval=vtx_add_neighbour(VTX(vlist,0),VTX(vlist,1));
+retval=vtx_add_neighbour(VTX(0),VTX(1));
 if(retval==TS_FAIL) printf("2. already a member or vertex is null!\n");
-
+VTX_DATA(1)->x=1.0;
 vtx_list_free(vlist);
 printf("Done.\n");
 return 0; //program finished perfectly ok. We return 0.
