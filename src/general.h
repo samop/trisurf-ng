@@ -135,6 +135,13 @@ struct ts_vertex {
 };
 typedef struct ts_vertex ts_vertex;
 
+typedef struct {
+    ts_uint n;
+    ts_vertex **vtx;
+
+} ts_vertex_list;
+
+
 /** ts_bond is a structure that describes a bond */
 typedef struct {
 	ts_vertex *vtx1;
@@ -203,5 +210,7 @@ void err(char *text);
 void fatal(char *text, ts_int errcode);
 
 //ts_uint ts_fprintf(FILE *fd, char *fmt, va_list ap);
+
+#define VTX(vlist,n) &(vlist->vtx[n])
 
 #endif

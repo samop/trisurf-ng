@@ -5,25 +5,22 @@
 #include "vertex.h"
 #include<stdio.h>
 
-/* Argument je struktura vlist in stevilo vertexov, ki jih zelimo dati v
- * vlist je lahko NULL, N mora biti vecje od 0. Ce vlist obstaja, potem resizamo
- * vlist na stevilo N.
- */
-ts_vertex **init_vertex_list(ts_uint N){	
+ts_vertex_list *init_vertex_list(ts_uint N){	
 	ts_int i;
-    ts_vertex **vlist;
+    ts_vertex_list *vlist=(ts_vertex_list *)malloc(sizeof(ts_vertex_list *));
+    
 	if(N==0){
 		err("Initialized vertex list with zero elements. Pointer set to NULL");
-		vlist=NULL;
-		return NULL;
+        vlist->n=0;
+		vlist->vtx=NULL;
+		return vlist;
 	}
-		vlist=(ts_vertex **)malloc(N*sizeof(ts_vertex *));
-        if(vlist==NULL)
-            fatal("Fatal error reserving memory space for vertex list! Could number of requsted vertices be too large?", 100);
-        
-        for(i=0;i<N;i++){
-               vlist[i]=init_vertex(i); 
-        }
+	
+    vlist->vtx=(ts_vertex **)malloc(N*sizeof(ts_vertex *));
+    if(vlist->vtx==NULL)
+        fatal("Fatal error reserving memory space for vertex list! Could number of requsted vertices be too large?", 100);
+    for(i=0;i<N;i++) vlist->vtx[i]=init_vertex(i);
+    vlist->n=N;
 	return vlist;
 }
 
@@ -87,8 +84,19 @@ ts_bool vtx_free(ts_vertex **vtx){
     return TS_SUCCESS;
 }
 
+ts_bool vtx_list_free(ts_vertex_list *vlist){
+    int i;
+    for(i=0;i<vlist->n;i++){
+        vtx_free(VTX(vlist,i));
+    }
+    free(vlist);
+    return TS_SUCCESS;
+}
 
-inline ts_double vertex_distance_sq(ts_vertex **vtx1, ts_vertex **vtx2){
+
+
+
+inline ts_double vtx_distance_sq(ts_vertex **vtx1, ts_vertex **vtx2){
     ts_double dist;
 #ifdef TS_DOUBLE_DOUBLE
     dist=pow((*vtx1)->x-(*vtx2)->x,2) + pow((*vtx1)->y-(*vtx2)->y,2) + pow((*vtx1)->z-(*vtx2)->z,2);

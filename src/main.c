@@ -12,20 +12,16 @@
 */
 
 int main(int argv, char *argc[]){
-ts_int i;
 ts_bool retval;
-ts_vertex **vlist=init_vertex_list(5);
+ts_vertex_list *vlist=init_vertex_list(5);
 
 
-retval=vtx_add_neighbour(&vlist[0],&vlist[1]);
+retval=vtx_add_neighbour(VTX(vlist,1),VTX(vlist,0));
 if(retval==TS_FAIL) printf("1. already a member or vertex is null!\n");
-retval=vtx_add_neighbour(&vlist[1],&vlist[0]);
+retval=vtx_add_neighbour(VTX(vlist,0),VTX(vlist,1));
 if(retval==TS_FAIL) printf("2. already a member or vertex is null!\n");
 
-for(i=0;i<5;i++){
-vtx_free(&vlist[i]);
-}
-free(vlist);
+vtx_list_free(vlist);
 printf("Done.\n");
 return 0; //program finished perfectly ok. We return 0.
 } 
