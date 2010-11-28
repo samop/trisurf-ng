@@ -192,7 +192,7 @@ struct ts_triangle_list{
     ts_uint n;
     ts_triangle **tria;
 };
-
+typedef struct ts_triangle_list ts_triangle_list;
 
 typedef struct ts_cell {
     ts_uint idx;
