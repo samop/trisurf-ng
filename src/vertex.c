@@ -78,6 +78,42 @@ ts_bool vtx_add_neighbour(ts_vertex *vtx, ts_vertex *nvtx){
     return TS_SUCCESS;
 }
 
+/* TODO: optimize this. test this. */
+ts_bool vtx_remove_neighbour(ts_vertex *vtx, ts_vertex *nvtx){
+/* find a neighbour */
+/* remove it from the list while shifting remaining neighbours up */
+    ts_uint i,j=0;
+    for(i=0;i<vtx->data->neigh_no;i++){
+        if(vtx->data->neigh[i]!=nvtx){
+            vtx->data->neigh[j]=vtx->data->neigh[i];
+            j++;
+        }
+    }
+/* resize memory. potentionally time consuming */
+    vtx->data->neigh_no--;
+    vtx->data->neigh=(ts_vertex **)realloc(vtx->data->neigh,vtx->data->neigh_no*sizeof(ts_vertex *));
+    if(vtx->data->neigh == NULL && vtx->data->neigh_no!=0)
+        fatal("Reallocation of memory failed during removal of vertex neighbour in vtx_remove_neighbour",100);
+
+/* repeat for the neighbour */
+/* find a neighbour */
+/* remove it from the list while shifting remaining neighbours up */
+    for(i=0;i<nvtx->data->neigh_no;i++){
+        if(nvtx->data->neigh[i]!=vtx){
+            nvtx->data->neigh[j]=nvtx->data->neigh[i];
+            j++;
+        }
+    }
+/* resize memory. potentionally time consuming. */
+    nvtx->data->neigh_no--;
+    nvtx->data->neigh=(ts_vertex **)realloc(nvtx->data->neigh,nvtx->data->neigh_no*sizeof(ts_vertex *));
+    if(nvtx->data->neigh == NULL && nvtx->data->neigh_no!=0)
+        fatal("Reallocation of memory failed during removal of vertex neighbour in vtx_remove_neighbour",100);
+
+    return TS_SUCCESS;
+}
+
+
 ts_bool vtx_add_bond(ts_bond_list *blist,ts_vertex *vtx1,ts_vertex *vtx2){
     ts_bond *bond;
     bond=bond_add(blist,vtx1,vtx2);
@@ -100,6 +136,15 @@ ts_bool vtx_add_cneighbour(ts_bond_list *blist, ts_vertex *vtx1, ts_vertex *vtx2
     return retval;
 }
 
+/*TODO: write and optimize this urgently before use! */
+ts_bool vtx_remove_cneighbour(ts_bond_list *blist, ts_vertex *vtx1, ts_vertex
+*vtx2){
+//    ts_bool retval;
+/* remove the bond */
+//retval=vtx_remove_bond(blist,vtx1,vtx2);
+/* remove the vertices */
+    return TS_SUCCESS;
+}
 
 
 
