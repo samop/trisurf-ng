@@ -2,6 +2,7 @@
 #include<math.h>
 #include "general.h"
 #include "vertex.h"
+#include "bond.h"
 //#include "io.h"
 //#include "initial_timestep.h"
 
@@ -14,13 +15,20 @@
 int main(int argv, char *argc[]){
 ts_bool retval;
 ts_vertex_list *vlist=init_vertex_list(5);
+ts_bond_list *blist=init_bond_list();
 
-
-retval=vtx_add_neighbour(VTX(1),VTX(0));
+retval=vtx_add_cneighbour(blist,vlist->vtx[1],vlist->vtx[0]);
 if(retval==TS_FAIL) printf("1. already a member or vertex is null!\n");
-retval=vtx_add_neighbour(VTX(0),VTX(1));
+
+retval=vtx_add_cneighbour(blist,vlist->vtx[0],vlist->vtx[1]);
 if(retval==TS_FAIL) printf("2. already a member or vertex is null!\n");
-VTX_DATA(1)->x=1.0;
+
+vlist->vtx[0]->data->x=1.0;
+vlist->vtx[0]->data->x=1.1;
+
+bond_add(blist, vlist->vtx[1],vlist->vtx[0]);
+
+bond_list_free(blist);
 vtx_list_free(vlist);
 printf("Done.\n");
 return 0; //program finished perfectly ok. We return 0.

@@ -5,7 +5,7 @@
 /** Initialize bond list with zero values
  *	@param *blist is a pointer to a ts_bond_list structure
  */
-ts_bool init_bond_list(ts_bond_list *blist);
+ts_bond_list *init_bond_list();
 
 /** @brief Adds bond in the bond list
  *
@@ -18,9 +18,9 @@ ts_bool init_bond_list(ts_bond_list *blist);
  *  this is considered as fatal error and execution stops, returning error code to the operating
  *  system.
  */
-ts_bool bond_add(ts_bond_list *blist, ts_vertex *vtx1, ts_vertex *vtx2);
+ts_bond *bond_add(ts_bond_list *blist, ts_vertex *vtx1, ts_vertex *vtx2);
 
-
+ts_bool bond_list_free(ts_bond_list *blist);
 
 
 

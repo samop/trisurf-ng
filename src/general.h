@@ -111,24 +111,25 @@ typedef char ts_bool;
 
 /** @brief Data structure of all data connected to a vertex
  *
- *  ts_vertex holds the data for one single point (bead, vertex) in the space. To understand how to use it
+ *  ts_vertex_data holds the data for one single point (bead, vertex). To understand how to use it
  *  here is a detailed description of the fields in the data structure. */
 struct ts_vertex_data {
-        ts_uint idx; /**< Represents index of the vertex point. Should become obsolete in C. */        
-        ts_double x; /**< The x coordinate of vertex. */        
+        ts_uint idx; /**< Represents index of the vertex point. Should become obsolete, since it is also present in ts_vertex structure. */        
+        ts_double x; /**< The x coordinate of vertex. */
         ts_double y; /**< The y coordinate of vertex. */
         ts_double z; /**< The z coordinate of vertex. */
         ts_uint neigh_no; /**< The number of neighbours. */
-        struct ts_vertex **neigh; /**< The pointer that holds neigh_no pointers to this structure. Careful when using pointers to pointers! Also developers do mistakes here.  */
-        ts_double *bond_length;
-        ts_double *bond_length_dual;
+        struct ts_vertex **neigh; /**< The pointer that holds neigh_no pointers to this structure. */
+        ts_double *bond_length; /**< Obsolete! The bond lenght is moved to ts_bond */
+        ts_double *bond_length_dual; /**< Obsolete! Bond length in dual lattice is moved to ts_bond! */
         ts_double curvature;
         ts_double energy;
         ts_double energy_h;
         ts_uint tristar_no;
-        struct ts_triangle **tristar;
-        struct ts_bond **bond;
-        struct ts_cell *cell;
+        struct ts_triangle **tristar; /**< The list of triangles this vertex belongs to. This is an array of pointers to ts_triangle structure of tristar_no length */
+        ts_uint bond_no;
+        struct ts_bond **bond; /**< Array of pointers of lenght bond_no that stores information on bonds. */
+        struct ts_cell *cell; /**< Which cell do we belong to? */
         ts_double xk;
         ts_double c;
         ts_uint id;
@@ -143,20 +144,33 @@ typedef struct ts_vertex ts_vertex;
 
 typedef struct {
     ts_uint n;
-    ts_vertex *vtx;
+    ts_vertex **vtx;
 
 } ts_vertex_list;
 
 
-/** ts_bond is a structure that describes a bond */
+/** ts_bond_data is a structure that describes a bond */
 typedef struct {
 	ts_vertex *vtx1;
 	ts_vertex *vtx2;
     ts_double bond_length;
     ts_double bond_length_dual;
-} ts_bond;
+} ts_bond_data;
 
-struct ts_triangle {
+struct ts_bond {
+    ts_uint idx;
+    ts_bond_data *data;
+};
+typedef struct ts_bond ts_bond;
+
+struct ts_bond_list {
+    ts_uint n;
+    ts_bond **bond;
+};
+typedef struct ts_bond_list ts_bond_list;
+
+/** ts_triangle_data is a structure that describes a triangle */
+struct ts_triangle_data {
 	ts_uint idx;
 	ts_vertex *vertex[3];
 	ts_uint neigh_no;
@@ -166,7 +180,19 @@ struct ts_triangle {
 	ts_double znorm;
 	
 };
+typedef struct ts_triangle_data ts_triangle_data;
+
+struct ts_triangle {
+    ts_uint idx;
+    ts_triangle_data *data;
+};
 typedef struct ts_triangle ts_triangle;
+
+struct ts_triangle_list{
+    ts_uint n;
+    ts_triangle **tria;
+};
+
 
 typedef struct ts_cell {
     ts_uint idx;
@@ -175,15 +201,11 @@ typedef struct ts_cell {
 } ts_cell;
 
 typedef struct {
-	ts_vertex **vlist;
-	ts_bond **blist;
-	ts_triangle **tlist;
-    ts_cell **clist;
+	ts_vertex *vlist;
+	ts_bond *blist;
+	ts_triangle *tlist;
+    ts_cell *clist;
 	ts_uint nshell;
-    ts_uint nvertex;
-    ts_uint nbond;
-    ts_uint ntria;
-    ts_cell ncell;
     ts_double dcell;
     ts_double shift;
     ts_double max_occupancy;

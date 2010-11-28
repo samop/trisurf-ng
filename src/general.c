@@ -3,9 +3,11 @@
 #include "general.h"
 #include<stdarg.h>
 
-ts_uint ts_fprintf(FILE *fd, char *fmt, va_list ap){
+ts_uint ts_fprintf(FILE *fd, char *fmt, ...){
 if(quiet) return TS_SUCCESS;
-fprintf(fd, fmt, ap); /* Call vprintf */
+    va_list ap;
+    va_start(ap,fmt);
+vfprintf(fd, fmt, ap); /* Call vfprintf */
 va_end(ap); /* Cleanup the va_list */
 return TS_SUCCESS;
 }

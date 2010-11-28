@@ -3,11 +3,13 @@
 #include<string.h>
 #include "general.h"
 #include "vertex.h"
+#include "bond.h"
 #include<stdio.h>
 
 ts_vertex_list *init_vertex_list(ts_uint N){	
 	ts_int i;
-    ts_vertex_list *vlist=(ts_vertex_list *)malloc(sizeof(ts_vertex_list *));
+    ts_vertex *tlist;
+    ts_vertex_list *vlist=(ts_vertex_list *)malloc(sizeof(ts_vertex_list));
     
 	if(N==0){
 		err("Initialized vertex list with zero elements. Pointer set to NULL");
@@ -16,17 +18,22 @@ ts_vertex_list *init_vertex_list(ts_uint N){
 		return vlist;
 	}
 	
-    vlist->vtx=(ts_vertex *)malloc(N*sizeof(ts_vertex));
-    if(vlist->vtx==NULL)
+    vlist->vtx=(ts_vertex **)malloc(N*sizeof(ts_vertex *));
+    tlist=(ts_vertex *)malloc(N*sizeof(ts_vertex));
+    if(vlist->vtx==NULL || tlist==NULL)
         fatal("Fatal error reserving memory space for vertex list! Could number of requsted vertices be too large?", 100);
-    for(i=0;i<N;i++) vlist->vtx[i].data=init_vertex_data();
+    for(i=0;i<N;i++) {
+        vlist->vtx[i]=&tlist[i];
+        vlist->vtx[i]->data=init_vertex_data();
+        vlist->vtx[i]->idx=i;
+    }
     vlist->n=N;
 	return vlist;
 }
 
 ts_vertex_data *init_vertex_data(){
     ts_vertex_data *data;
-    data=(ts_vertex_data *)malloc(sizeof(ts_vertex_data));
+    data=(ts_vertex_data *)calloc(1,sizeof(ts_vertex_data));
     if(data==NULL)
         fatal("Fatal error reserving memory space for ts_vertex! Memory full?", 100);
     return data;
@@ -54,24 +61,46 @@ ts_bool vtx_add_neighbour(ts_vertex *vtx, ts_vertex *nvtx){
     for(i=0; i<vtx->data->neigh_no;i++){
         if(vtx->data->neigh[i]==nvtx) return TS_FAIL;
     }
-    ts_uint nn=vtx->data->neigh_no++;
+    ts_uint nn=++vtx->data->neigh_no;
     vtx->data->neigh=(ts_vertex **)realloc(vtx->data->neigh, nn*sizeof(ts_vertex *));
-    vtx->data->neigh[nn]=nvtx;
+    vtx->data->neigh[nn-1]=nvtx;
 
     /* pa se sosedu dodamo vertex */
     /*if it is already a neighbour don't add it to the list */
     for(i=0; i<nvtx->data->neigh_no;i++){
         if(nvtx->data->neigh[i]==vtx) return TS_FAIL;
     } 
-    nn=nvtx->data->neigh_no++;
+    nn=++nvtx->data->neigh_no;
     nvtx->data->neigh=(ts_vertex **)realloc(nvtx->data->neigh, nn*sizeof(ts_vertex *));
-    nvtx->data->neigh[nn]=vtx;
+    nvtx->data->neigh[nn-1]=vtx;
 
-
-/* Ustvari bond in doloci dolzino */
 
     return TS_SUCCESS;
 }
+
+ts_bool vtx_add_bond(ts_bond_list *blist,ts_vertex *vtx1,ts_vertex *vtx2){
+    ts_bond *bond;
+    bond=bond_add(blist,vtx1,vtx2);
+    if(bond==NULL) return TS_FAIL;
+    vtx1->data->bond_no++;
+    vtx2->data->bond_no++;
+
+    vtx1->data->bond=(ts_bond **)realloc(vtx1->data->bond, vtx1->data->bond_no*sizeof(ts_bond *)); 
+    vtx2->data->bond=(ts_bond **)realloc(vtx2->data->bond, vtx2->data->bond_no*sizeof(ts_bond *)); 
+    vtx1->data->bond[vtx1->data->bond_no-1]=bond;
+    vtx2->data->bond[vtx2->data->bond_no-1]=bond;
+    return TS_SUCCESS;
+}
+
+ts_bool vtx_add_cneighbour(ts_bond_list *blist, ts_vertex *vtx1, ts_vertex *vtx2){
+    ts_bool retval;
+    retval=vtx_add_neighbour(vtx1,vtx2);
+    if(retval==TS_SUCCESS)
+    retval=vtx_add_bond(blist,vtx1,vtx2); 
+    return retval;
+}
+
+
 
 
 ts_bool vtx_data_free(ts_vertex_data *data){
@@ -83,6 +112,7 @@ ts_bool vtx_data_free(ts_vertex_data *data){
     return TS_SUCCESS;
 }
 
+/*not usable. can be deleted */
 ts_bool vtx_free(ts_vertex  *vtx){
     vtx_data_free(vtx->data);
     free(vtx);
@@ -92,8 +122,9 @@ ts_bool vtx_free(ts_vertex  *vtx){
 ts_bool vtx_list_free(ts_vertex_list *vlist){
     int i;
     for(i=0;i<vlist->n;i++){
-        vtx_data_free(vlist->vtx[i].data);
+        vtx_data_free(vlist->vtx[i]->data);
     }
+    free(*(vlist->vtx));
     free(vlist->vtx);
     free(vlist);
     return TS_SUCCESS;
