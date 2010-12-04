@@ -5,8 +5,9 @@
 #include "bond.h"
 #include "triangle.h"
 #include "cell.h"
+#include "vesicle.h"
 //#include "io.h"
-//#include "initial_timestep.h"
+#include "initial_distribution.h"
 
 /** Entrance function to the program
   * @param argv is a number of parameters used in program call (including the program name
@@ -20,7 +21,7 @@ ts_vertex_list *vlist=init_vertex_list(5);
 ts_bond_list *blist=init_bond_list();
 ts_triangle_list *tlist=init_triangle_list();
 ts_cell_list *clist=init_cell_list(3,3,3,0.3);
-
+ts_vesicle *vesicle;
 
 retval=vtx_add_cneighbour(blist,vlist->vtx[1],vlist->vtx[0]);
 if(retval==TS_FAIL) printf("1. already a member or vertex is null!\n");
@@ -52,6 +53,11 @@ triangle_list_free(tlist);
 bond_list_free(blist);
 vtx_list_free(vlist);
 cell_list_free(clist);
-printf("Done.\n");
+printf("Tests complete.\n");
+
+vesicle=initial_distribution_dipyramid(7,10,10,10,0.3);
+
+vesicle_free(vesicle);
+
 return 0; //program finished perfectly ok. We return 0.
 } 

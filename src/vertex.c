@@ -39,18 +39,6 @@ ts_vertex_data *init_vertex_data(){
     return data;
 }
 
-/*
-ts_bool vtx_set_global_values(ts_vertex **vlist, ts_vesicle *vesicle){
-    ts_double xk=vesicle->bending_rigidity;
-    ts_uint i;
-    for(i=0;i<vesicle->vlist.n;i++){
-        vlist[i]->xk=xk;
-    }
-    return TS_SUCCESS;
-}
-*/
-
-
 
 ts_bool vtx_add_neighbour(ts_vertex *vtx, ts_vertex *nvtx){
     ts_uint i;
@@ -112,6 +100,7 @@ ts_bool vtx_remove_neighbour(ts_vertex *vtx, ts_vertex *nvtx){
 
     return TS_SUCCESS;
 }
+
 
 
 ts_bool vtx_add_bond(ts_bond_list *blist,ts_vertex *vtx1,ts_vertex *vtx2){
@@ -188,5 +177,40 @@ inline ts_double vtx_distance_sq(ts_vertex *vtx1, ts_vertex *vtx2){
     dist=powf(vd1->x-vd2->x,2) + powf(vd1->y-vd2->y,2) + powf(vd1->z-vd2->z,2);
 #endif
     return(dist);
+}
+
+
+
+ts_bool vtx_set_global_values(ts_vesicle *vesicle){ 
+    ts_double xk=vesicle->bending_rigidity;
+    ts_uint i; 
+    for(i=0;i<vesicle->vlist->n;i++){
+        vesicle->vlist->vtx[i]->data->xk=xk;
+    }
+    return TS_SUCCESS;
+}
+
+inline ts_double vtx_direct(ts_vertex *vtx1, ts_vertex *vtx2, ts_vertex *vtx3){
+    ts_double dX2=vtx2->data->x-vtx1->data->x;
+    ts_double dY2=vtx2->data->y-vtx1->data->y;
+    ts_double dZ2=vtx2->data->z-vtx1->data->z;
+    ts_double dX3=vtx3->data->x-vtx1->data->x;
+    ts_double dY3=vtx3->data->y-vtx1->data->y;
+    ts_double dZ3=vtx3->data->z-vtx1->data->z;
+    ts_double direct=vtx1->data->x*(dY2*dZ3 -dZ2*dY3)+ 
+        vtx1->data->y*(dZ2*dX3-dX2*dZ3)+
+        vtx1->data->z*(dX2*dY3-dY2*dX3);
+    return(direct);    
+}
+
+
+inline ts_bool vertex_add_tristar(ts_vertex *vtx, ts_triangle *tristarmem){
+	vtx->data->tristar_no++;
+	vtx->data->tristar=(ts_triangle **)realloc(vtx->data->tristar,vtx->data->tristar_no*sizeof(ts_triangle *));
+	if(vtx->data->tristar==NULL){
+			fatal("Reallocation of memory while adding tristar failed.",3);
+	}
+	vtx->data->tristar[vtx->data->tristar_no-1]=tristarmem;
+	return TS_SUCCESS;
 }
 

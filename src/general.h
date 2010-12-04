@@ -2,6 +2,7 @@
 #define _GENERAL_H
 
 #include<stdarg.h>
+#include<stdio.h>
 
 /* @brief This is a header file, defining general constants and structures.
   * @file header.h
@@ -247,7 +248,7 @@ void err(char *text);
 */
 void fatal(char *text, ts_int errcode);
 
-//ts_uint ts_fprintf(FILE *fd, char *fmt, va_list ap);
+ts_uint ts_fprintf(FILE *fd, char *fmt, ...);
 
 #define VTX(n) &(vlist->vtx[n])
 #define VTX_DATA(n) vlist->vtx[n].data
