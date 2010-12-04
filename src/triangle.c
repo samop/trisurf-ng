@@ -4,6 +4,21 @@
 #include "triangle.h"
 #include<math.h>
 
+/** @brief Prepares the list for triangles.
+  *
+  * Create empty list for holding the information on triangles. Triangles are
+  * added later on with triangle_add().
+  * Returns pointer to the tlist datastructure it has created. This pointer must
+  * be assigned to some variable or it will be lost.
+  *
+  *
+  * Example of usage:
+  *     ts_triangle_list *tlist;
+  *		tlist=triangle_data_free();
+  *
+  *	    Initalized data structure for holding the information on triangles.
+  *		
+  */
 ts_triangle_list *init_triangle_list(){
     ts_triangle_list *tlist=(ts_triangle_list *)malloc(sizeof(ts_triangle_list));
 	tlist->n = 0;
@@ -11,7 +26,27 @@ ts_triangle_list *init_triangle_list(){
 	return tlist;
 }
 
-
+/** @brief Add the triangle to the triangle list and create necessary data
+ * structures.
+  *
+  * Add the triangle ts_triangle with ts_triangle_data to the ts_triangle_list.
+  * The triangle list is resized, the ts_triangle is allocated and
+  * ts_triangle_data is allocated and zeroed. The function receives 4 arguments:
+  * ts_triangle_list *tlist as list of triangles and 3 ts_vertex *vtx as
+  * vertices that are used to form a triangle. Returns a pointer to newly
+  * created triangle. This pointer doesn't need assigning, since it is
+  * referenced by triangle list.
+  *
+  * WARNING: Function can be accelerated a bit by removing the NULL checks.
+  * However the time gained by removal doesn't justify the time spent by
+  * debugging stupid NULL pointers.
+  *
+  * Example of usage:
+  *		triangle_add(tlist, vlist->vtx[1], vlist->vtx[2], vlist->vtx[3]);
+  *
+  *	    Creates a triangle with given vertices and puts it into the list.
+  *		
+  */
 ts_triangle *triangle_add(ts_triangle_list *tlist, ts_vertex *vtx1, ts_vertex *vtx2, ts_vertex *vtx3){
         if(vtx1==NULL || vtx2==NULL || vtx3==NULL){
             return NULL;
@@ -32,6 +67,27 @@ ts_triangle *triangle_add(ts_triangle_list *tlist, ts_vertex *vtx1, ts_vertex *v
         return tlist->tria[tlist->n-1];
 }
 
+/** @brief Add the neigbour to triangles.
+  *
+  * Add the neigbour to the list of neighbouring triangles. The
+  * neighbouring triangles are those, who share two vertices. Function resizes
+  * the list and adds the pointer to neighbour. It receives two arguments of
+  * ts_triangle type. It then adds eachother to eachother's list. Upon
+  * success it returns TS_SUCCESS, upon detecting NULL pointers 
+  * returns TS_FAIL and it FATALY ends when the data structure
+  * cannot be resized.
+  *
+  *
+  * WARNING: Function can be accelerated a bit by removing the NULL checks.
+  * However the time gained by removal doesn't justify the time spent by
+  * debugging stupid NULL pointers.
+  *
+  * Example of usage:
+  *		triangle_remove_neighbour(tlist->tria[3], tlist->tria[4]);
+  *
+  *	    Triangles 3 and 4 are not neighbours anymore.
+  *		
+  */
 
 ts_bool triangle_add_neighbour(ts_triangle *tria, ts_triangle *ntria){
     if(tria==NULL || ntria==NULL) return TS_FAIL;
@@ -52,7 +108,27 @@ ts_bool triangle_add_neighbour(ts_triangle *tria, ts_triangle *ntria){
 	return TS_SUCCESS;
 }
 
-
+/** @brief Remove the neigbours from triangle.
+  *
+  * Removes the neigbour from the list of neighbouring triangles. The
+  * neighbouring triangles are those, who share two vertices. Function resizes
+  * the list and deletes the pointer to neighbour. It receives two arguments of
+  * ts_triangle type. It then removes eachother form eachother's list. Upon
+  * success it returns TS_SUCCESS, upon failure to find the triangle in the
+  * neighbour list returns TS_FAIL and it FATALY ends when the datastructure
+  * cannot be resized.
+  *
+  * WARNING: The function doesn't check whether the pointer is NULL or invalid. It is the
+  * job of programmer to make sure the pointer is valid.
+  *
+  * WARNING: Function is slow. Do not use it often!
+  *
+  * Example of usage:
+  *		triangle_remove_neighbour(tlist->tria[3], tlist->tria[4]);
+  *
+  *	    Triangles 3 and 4 are not neighbours anymore.
+  *		
+  */
 ts_bool triangle_remove_neighbour(ts_triangle *tria, ts_triangle *ntria){
     ts_uint i,j=0; 
     if(tria==NULL || ntria==NULL) return TS_FAIL;
@@ -91,6 +167,28 @@ ts_bool triangle_remove_neighbour(ts_triangle *tria, ts_triangle *ntria){
     return TS_SUCCESS;
 }
 
+
+/** @brief Calculates normal vector of the triangle.
+
+  *
+  * Calculate normal vector of the triangle (xnorm, ynorm and znorm) and stores
+  * information in underlying ts_triangle_data data_structure.
+  *
+  * Function receives one argument of type ts_triangle. It should be corectly
+  * initialized with underlying data structure of type ts_triangle_data. the
+  * result is stored in triangle->data->xnorm, triangle->data->ynorm,
+  * triangle->data->znorm. Returns TS_SUCCESS on completion. 
+  *
+  * NOTE: Function uses math.h library. pow function implementation is selected
+  * accordind to the setting in genreal.h
+  *
+  * Example of usage:
+  *		triangle_normal_vector(tlist->tria[3]);
+  *
+  *	    Computes normals and stores information into tlist->tria[3]->xnorm,
+  *	    tlist->tria[3]->ynorm, tlist->tria[3]->znorm.
+  *		
+  */
 ts_bool triangle_normal_vector(ts_triangle *tria){
 	ts_double x21,x31,y21,y31,z21,z31,xden;
 	x21=tria->data->vertex[1]->data->x - tria->data->vertex[0]->data->x;
@@ -122,12 +220,57 @@ ts_bool triangle_normal_vector(ts_triangle *tria){
 }
 
 
+
+
+
+/** @brief Frees the memory allocated for data structure of triangle data
+ * (ts_triangle_data)
+  *
+  * Function frees the memory of ts_triangle_data previously allocated. It
+  * accepts one argument, the address of data structure. It destroys all
+  * pointers the structure might have (currently only neigh -- the pointer to
+  * list of neighbouring triangles) and data structure itself. The return value
+  * is always TS_SUCCESS.
+  *
+  * WARNING: The function doesn't check whether the pointer is NULL or invalid. It is the
+  * job of programmer to make sure the pointer is valid.
+  *
+  * Example of usage:
+  *		triangle_data_free(tlist->tria[3]->data);
+  *
+  *	    Clears the data structure with all pointers.
+  *		
+  */
 ts_bool triangle_data_free(ts_triangle_data *data){
     if(data->neigh!=NULL) free(data->neigh);
     free(data);
     return TS_SUCCESS;
 }
 
+/** @brief Frees the memory allocated for data structure of triangle list
+ * (ts_triangle_list)
+  *
+  * Function frees the memory of ts_triangle_list previously allocated. It
+  * accepts one argument, the address of data structure. It destroys all
+  * ts_triangle's in the list with underlying data (by calling
+  * triangle_data_free()), and the list itself.
+  *
+  * Should be used eveytime the deletion of triangle list (created by
+  * init_triangle_list() and altered by add_triangle() or remove_triangle()) is desired.
+  *
+  * WARNING: The function doesn't check whether the pointer is NULL or invalid. It is the
+  * job of programmer to make sure the pointer is valid.
+  *
+  * WARNING: Careful when destroying triangle lists. There could be pointers to
+  * that information remaining in structures like vertex_data. This pointers
+  * will be rendered invalid by this operation and should not be used anymore.
+  *
+  * Example of usage:
+  *		triangle_list_free(tlist);
+  *
+  *	    Clears all the information on triangles.
+  *		
+  */
 ts_bool triangle_list_free(ts_triangle_list *tlist){
     ts_uint i;
     for(i=0;i<tlist->n;i++){

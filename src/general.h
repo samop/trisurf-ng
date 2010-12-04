@@ -194,22 +194,32 @@ struct ts_triangle_list{
 };
 typedef struct ts_triangle_list ts_triangle_list;
 
-typedef struct ts_cell {
-    ts_uint idx;
+typedef struct ts_cell_data {
     ts_vertex **vertex;
     ts_uint nvertex;
-} ts_cell;
+} ts_cell_data;
 
-typedef struct {
-	ts_vertex *vlist;
-	ts_bond *blist;
-	ts_triangle *tlist;
-    ts_cell *clist;
-	ts_uint nshell;
+typedef struct ts_cell {
+    ts_uint idx;
+    ts_cell_data *data;
+} ts_cell; 
+
+typedef struct ts_cell_list{
+    ts_uint ncmax[3];
+    ts_uint cellno;
+    ts_cell **cell;
     ts_double dcell;
     ts_double shift;
     ts_double max_occupancy;
-    ts_uint ncmax[3];
+} ts_cell_list;
+
+
+typedef struct {
+	ts_vertex_list *vlist;
+	ts_bond_list *blist;
+	ts_triangle_list *tlist;
+    ts_cell_list *clist;
+	ts_uint nshell;
     ts_double bending_rigidity;
     ts_double dmax;
     ts_double stepsize;

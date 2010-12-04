@@ -175,20 +175,18 @@ ts_bool vtx_list_free(ts_vertex_list *vlist){
     return TS_SUCCESS;
 }
 
-
-
-/* rewrite for additional structure in chain */
-/*inline ts_double vtx_distance_sq(ts_vertex *vtx1, ts_vertex *vtx2){
+inline ts_double vtx_distance_sq(ts_vertex *vtx1, ts_vertex *vtx2){
     ts_double dist;
+    ts_vertex_data *vd1=vtx1->data, *vd2=vtx2->data;
 #ifdef TS_DOUBLE_DOUBLE
-    dist=pow((*vtx1)->x-(*vtx2)->x,2) + pow((*vtx1)->y-(*vtx2)->y,2) + pow((*vtx1)->z-(*vtx2)->z,2);
+    dist=pow(vd1->x-vd2->x,2) + pow(vd1->y-vd2->y,2) + pow(vd1->z-vd2->z,2);
 #endif
 #ifdef TS_DOUBLE_LONGDOUBLE
-    dist=powl((*vtx1)->x-(*vtx2)->x,2) + powl((*vtx1)->y-(*vtx2)->y,2) + powl((*vtx1)->z-(*vtx2)->z,2);
+    dist=powl(vd1->x-vd2->x,2) + powl(vd1->y-vd2->y,2) + powl(vd1->z-vd2->z,2);
 #endif
 #ifdef TS_DOUBLE_FLOAT
-    dist=powf((*vtx1)->x-(*vtx2)->x,2) + powf((*vtx1)->y-(*vtx2)->y,2) + powf((*vtx1)->z-(*vtx2)->z,2);
+    dist=powf(vd1->x-vd2->x,2) + powf(vd1->y-vd2->y,2) + powf(vd1->z-vd2->z,2);
 #endif
     return(dist);
 }
-*/
+

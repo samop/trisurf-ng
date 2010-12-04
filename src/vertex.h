@@ -22,4 +22,5 @@ ts_bool vtx_remove_neighbour(ts_vertex *vtx, ts_vertex *nvtx);
 ts_bool vtx_data_free(ts_vertex_data *data);
 ts_bool vtx_free(ts_vertex *vtx);
 ts_bool vtx_list_free(ts_vertex_list *vlist);
+inline ts_double vtx_distance_sq(ts_vertex *vtx1, ts_vertex *vtx2);
 #endif
