@@ -6,7 +6,7 @@
 #include "triangle.h"
 #include "cell.h"
 #include "vesicle.h"
-//#include "io.h"
+#include "io.h"
 #include "initial_distribution.h"
 
 /** Entrance function to the program
@@ -56,7 +56,8 @@ cell_list_free(clist);
 printf("Tests complete.\n");
 
 vesicle=initial_distribution_dipyramid(7,10,10,10,0.3);
-
+write_vertex_xml_file(vesicle,0);
+write_master_xml_file("test.pvd");
 vesicle_free(vesicle);
 
 return 0; //program finished perfectly ok. We return 0.
