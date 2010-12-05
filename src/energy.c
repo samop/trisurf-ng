@@ -13,6 +13,7 @@ ts_bool mean_curvature_and_energy(ts_vesicle *vesicle){
 
     for(i=0;i<vlist->n;i++){
         energy_vertex(vtx[i]);
+        
     }
 
     return TS_SUCCESS;
@@ -38,6 +39,7 @@ inline ts_bool energy_vertex(ts_vertex *vtx){
         j=data->neigh[jj-1];
         jp=data->neigh[jjp-1];
         jm=data->neigh[jjm-1];
+//        printf("tristar_no=%u, neigh_no=%u, jj=%u\n",data->tristar_no,data->neigh_no,jj);
         jt=data->tristar[jj-1];
         x1=vtx_distance_sq(vtx,jp); //shouldn't be zero!
         x2=vtx_distance_sq(j,jp); // shouldn't be zero!

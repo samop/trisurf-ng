@@ -27,7 +27,7 @@ ts_bool init_vertex_neighbours(ts_vertex_list *vlist);
 //ts_bool init_vertex_neighbours(ts_vertex_list *vlist);
 
 /** interior sites and their neighbours in circ. order + the triangles they are holding together */
-ts_bool init_sort_neighbours(ts_vertex_list *vlist);
+ts_vertex_list *init_sort_neighbours(ts_bond_list *blist,ts_vertex_list *vlist);
 ts_bool init_vesicle_bonds(ts_vesicle *vesicle);
 ts_bool init_triangles(ts_vesicle *vesicle);
 ts_bool init_triangle_neighbours(ts_vesicle *vesicle);

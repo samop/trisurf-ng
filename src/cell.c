@@ -77,7 +77,7 @@ ts_bool cell_add_vertex(ts_cell *cell, ts_vertex *vtx){
     cell->data->nvertex++;
 	cell->data->vertex=(ts_vertex **)realloc(cell->data->vertex,cell->data->nvertex*sizeof(ts_vertex *));
 		if(vtx->data->neigh == NULL){
-			fatal("Reallocation of memory failed during insertion of vertex neighbour in vertex_add_neighbour",3);
+			fatal("Reallocation of memory failed during insertion of vertex in cell_add_vertex",3);
         }
     cell->data->vertex[cell->data->nvertex-1]=vtx;
     return TS_SUCCESS;

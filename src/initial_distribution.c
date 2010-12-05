@@ -20,8 +20,8 @@ ts_vesicle *initial_distribution_dipyramid(ts_uint nshell, ts_uint ncmax1, ts_ui
     retval = vtx_set_global_values(vesicle);
     retval = pentagonal_dipyramid_vertex_distribution(vesicle->vlist);
     retval = init_vertex_neighbours(vesicle->vlist);
-    retval = init_sort_neighbours(vesicle->vlist);
-    retval = init_vesicle_bonds(vesicle);
+    vesicle->vlist = init_sort_neighbours(vesicle->blist,vesicle->vlist);
+   // retval = init_vesicle_bonds(vesicle); // bonds are created in sort_neigh
     retval = init_triangles(vesicle);
     retval = init_triangle_neighbours(vesicle);
     retval = init_common_vertex_triangle_neighbours(vesicle);
@@ -150,21 +150,21 @@ ts_bool init_vertex_neighbours(ts_vertex_list *vlist){
 	return TS_SUCCESS;
 }
 
-// TODO: with new datastructure can be rewritten.
-ts_bool init_sort_neighbours(ts_vertex_list *vlist){
+// TODO: with new datastructure can be rewritten. Partially it is done, but it is complicated.
+ts_vertex_list *init_sort_neighbours(ts_bond_list *blist,ts_vertex_list *vlist){
 	ts_vertex **vtx=vlist->vtx -1; // take a look at dipyramid function for comment.
 	ts_uint i,l,j,jj,jjj,k=0;   
     ts_double eps=0.001; // Take a look if EPS from math.h can be used
 
 /*lets initialize memory for temporary vertex_list. Should we write a function instead */
-    ts_vertex_list *tvlist=init_vertex_list(vlist->n);
+    ts_vertex_list *tvlist=vertex_list_copy(vlist);
     ts_vertex **tvtx=tvlist->vtx -1;  /* again to compensate for 0-indexing */
 
 	ts_double dist2; // Square of distance of neighbours
     ts_double direct; // Something, dont know what, but could be normal of some kind
 	for(i=1;i<=vlist->n;i++){
 		k++; // WHY i IS NOT GOOD??
-       	vtx_add_neighbour(tvtx[k], tvtx[vtx[i]->data->neigh[0]->idx+1]); //always add 1st
+       	vtx_add_cneighbour(blist,tvtx[k], tvtx[vtx[i]->data->neigh[0]->idx+1]); //always add 1st
        	jjj=1;
        	jj=1;
        	for(l=2;l<=vtx[i]->data->neigh_no;l++){
@@ -172,7 +172,7 @@ ts_bool init_sort_neighbours(ts_vertex_list *vlist){
                	dist2=vtx_distance_sq(vtx[i]->data->neigh[j-1],vtx[i]->data->neigh[jj-1]);
                	direct=vtx_direct(vtx[i],vtx[i]->data->neigh[j-1],vtx[i]->data->neigh[jj-1]);
                	if( (fabs(dist2-A0*A0)<=eps) && (direct>0.0) && (j!=jjj) ){
-           			vtx_add_neighbour(tvtx[k],tvtx[vtx[i]->data->neigh[j-1]->idx+1]);
+           			vtx_add_cneighbour(blist,tvtx[k],tvtx[vtx[i]->data->neigh[j-1]->idx+1]);
            			jjj=jj;
            			jj=j;
            			break;
@@ -180,24 +180,19 @@ ts_bool init_sort_neighbours(ts_vertex_list *vlist){
        		}
        	}	
 	}
-
-    for(i=1;i<=vlist->n;i++){
-        for(j=1;j<=vtx[i]->data->neigh_no;j++){
-            if(vtx[i]->data->neigh_no!=tvtx[i]->data->neigh_no){ //doesn't work with nshell=1!
-//                fprintf(stderr,"data1=%u data2=%u\n",vtx[i]->data->neigh_no,tvtx[i]->data->neigh_no);
-                fatal("Number of neighbours not the same in init_sort_neighbours.",4);
-            }
-            //we must correct the pointers in original to point to their
-            //neighbours according to indexes. Must be sure not to do it any
-            //other way! Also, we need to repair the collection of bonds...
-            vtx[i]->data->neigh[j-1]=vtx[tvtx[i]->data->neigh[j-1]->idx+1];
-        }
+/* We use the temporary vertex for our main vertices and we abandon main
+ * vertices, because their neighbours are not correctly ordered */
+   // tvtx=vlist->vtx;
+   // vlist->vtx=tvtx;
+   // tvlist->vtx=vtx;
+    vtx_list_free(vlist);
+/* Let's make a check if the number of bonds is correct */
+    if((blist->n)!=3*(tvlist->n-2)){
+        ts_fprintf(stderr,"Number of bonds is %u should be %u!\n", blist->n, 3*(tvlist->n-2));
+        fatal("Number of bonds is not 3*(no_vertex-2).",4);
     }
 
-   // Must free memory for temporary vertex array to avoid memory leak! HERE! NOW!
-//    free_vertex(tvlist.vertex,tvlist.n);
-    vtx_list_free(tvlist);
-	return TS_SUCCESS;
+	return tvlist;
 }
 
 
@@ -350,7 +345,10 @@ ts_bool init_common_vertex_triangle_neighbours(ts_vesicle *vesicle){
                 if((vtx[i]==k3 && k1==k4 && k2==k5) ||
                 (vtx[i]==k4 && k1==k5 && k2==k3) ||
                 (vtx[i]==k5 && k1==k3 && k2==k4)){
-          //          ts_fprintf(stderr, "Added to tristar! ");
+
+//TODO: probably something wrong with neighbour distribution.
+//                if(vtx[i]==k3 || vtx[i]==k4 || vtx[i]==k5){
+                    if(i==6) ts_fprintf(stdout, "Vtx[%u] > Added to tristar!\n",i);
                     vertex_add_tristar(vtx[i],tria[k]);
                 }
             }

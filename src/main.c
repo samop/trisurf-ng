@@ -18,6 +18,7 @@
 int main(int argv, char *argc[]){
 ts_bool retval;
 ts_vertex_list *vlist=init_vertex_list(5);
+ts_vertex_list *vlist1;
 ts_bond_list *blist=init_bond_list();
 ts_triangle_list *tlist=init_triangle_list();
 ts_cell_list *clist=init_cell_list(3,3,3,0.3);
@@ -34,7 +35,7 @@ vtx_add_neighbour(vlist->vtx[0],vlist->vtx[1]);
 
 vlist->vtx[0]->data->x=1.0;
 vlist->vtx[0]->data->x=1.1;
-
+vlist1=vertex_list_copy(vlist);
 bond_add(blist, vlist->vtx[1],vlist->vtx[0]);
 triangle_add(tlist,vlist->vtx[1],vlist->vtx[2],vlist->vtx[3]);
 
@@ -53,8 +54,9 @@ triangle_list_free(tlist);
 bond_list_free(blist);
 vtx_list_free(vlist);
 cell_list_free(clist);
-printf("Tests complete.\n");
 
+vtx_list_free(vlist1);
+printf("Tests complete.\n");
 vesicle=initial_distribution_dipyramid(7,10,10,10,0.3);
 write_vertex_xml_file(vesicle,0);
 write_master_xml_file("test.pvd");

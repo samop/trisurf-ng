@@ -10,10 +10,15 @@ ts_bond_list *init_bond_list(){
 }
 
 ts_bond  *bond_add(ts_bond_list *blist, ts_vertex *vtx1, ts_vertex *vtx2){
-    
+    ts_uint i;
     /* no vertices must be null! */
     if(vtx1==NULL || vtx2==NULL) return NULL;
-    /* TODO: Verify if the bond already exists... Don't do multiple bonds */
+    /* Verify if the bond already exists... Don't do multiple bonds */
+    for(i=0;i<blist->n;i++){
+       if((blist->bond[i]->data->vtx1==vtx1 || blist->bond[i]->data->vtx1==vtx2)
+        &&(blist->bond[i]->data->vtx2==vtx1 || blist->bond[i]->data->vtx2==vtx2))
+        return blist->bond[i];
+    }
 	blist->n++;
 	blist->bond=(ts_bond **)realloc(blist->bond,blist->n*sizeof(ts_bond *));
 	if(blist->bond==NULL) fatal("Cannot reallocate memory for additional **ts_bond.",100);

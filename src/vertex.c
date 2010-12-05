@@ -156,7 +156,7 @@ ts_bool vtx_free(ts_vertex  *vtx){
 ts_bool vtx_list_free(ts_vertex_list *vlist){
     int i;
     for(i=0;i<vlist->n;i++){
-        vtx_data_free(vlist->vtx[i]->data);
+        if(vlist->vtx[i]->data!=NULL) vtx_data_free(vlist->vtx[i]->data);
     }
     free(*(vlist->vtx));
     free(vlist->vtx);
@@ -219,8 +219,7 @@ inline ts_bool vertex_add_tristar(ts_vertex *vtx, ts_triangle *tristarmem){
 /* ***** New vertex copy operations. Inherently they are slow.  ***** */
 /* ****************************************************************** */
 
-ts_vertex *vtx_copy(ts_vertex *ovtx){
-    ts_vertex *cvtx=(ts_vertex *)malloc(sizeof(ts_vertex));
+ts_bool vtx_copy(ts_vertex *cvtx, ts_vertex *ovtx){
     memcpy((void *)cvtx,(void *)ovtx,sizeof(ts_vertex));
     cvtx->data=(ts_vertex_data *)malloc(sizeof(ts_vertex_data));
     memcpy((void *)cvtx->data,(void *)ovtx->data,sizeof(ts_vertex_data));
@@ -230,8 +229,8 @@ ts_vertex *vtx_copy(ts_vertex *ovtx){
     cvtx->data->bond_no=0;
     cvtx->data->tristar=NULL;
     cvtx->data->bond=NULL;
-    cvtx->data->cell=NULL; 
-    return cvtx;
+    cvtx->data->cell=NULL;
+    return TS_SUCCESS;
 }
 //TODO: needs to be done
 ts_vertex **vtx_neigh_copy(ts_vertex_list *vlist,ts_vertex *ovtx){
@@ -241,10 +240,17 @@ ts_vertex **vtx_neigh_copy(ts_vertex_list *vlist,ts_vertex *ovtx){
 ts_vertex_list *vertex_list_copy(ts_vertex_list *ovlist){
     ts_uint i;
     ts_vertex_list *vlist=(ts_vertex_list *)malloc(sizeof(ts_vertex_list));
-    memcpy((void *)vlist, (void *)ovlist, sizeof(ts_vertex_list));
+    vlist=memcpy((void *)vlist, (void *)ovlist, sizeof(ts_vertex_list));
     ts_vertex **vtx=(ts_vertex **)malloc(vlist->n*sizeof(ts_vertex *));
-    for(i=0;i<vlist->n;i++){
-        vtx[i]=vtx_copy(ovlist->vtx[i]);
+    ts_vertex *tlist=(ts_vertex *)calloc(vlist->n,sizeof(ts_vertex));
+    vlist->vtx=vtx;
+    if(vlist->vtx==NULL || tlist==NULL)
+        fatal("Fatal error reserving memory space for vertex list! Could number of requsted vertices be too large?", 100);
+    for(i=0;i<vlist->n;i++) {
+        vlist->vtx[i]=&tlist[i];
+        vlist->vtx[i]->idx=i;
+        vtx_copy(vlist->vtx[i],ovlist->vtx[i]);
     }
+
     return vlist;
 }
