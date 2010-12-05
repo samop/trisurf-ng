@@ -1,7 +1,9 @@
-#include<general.h>
+#include "general.h"
 #include<stdio.h>
 #include "io.h"
-#include "confuse.h"
+#include <confuse.h>
+#include "vertex.h"
+#include "bond.h"
 #include<string.h>
 #include<stdlib.h>
 #include <sys/types.h>
@@ -194,6 +196,7 @@ ts_bool write_master_xml_file(ts_char *filename){
             }  
 		}
 	}
+    free(dir);
 	fprintf(fh,"</Collection>\n</VTKFile>\n");
 	fclose(fh);
 	return TS_SUCCESS;
@@ -329,4 +332,50 @@ ts_bool parsetape(ts_vesicle *vesicle,ts_uint *iterations){
 //    fprintf(stderr,"NSHELL=%u\n",vesicle->nshell);
     return TS_SUCCESS;
 
+}
+
+
+ts_bool read_geometry_file(char *fname, ts_vesicle *vesicle){
+	FILE *fh;
+    ts_uint i, nvtx,nedges,ntria;
+    ts_uint vtxi1,vtxi2;
+    float x,y,z;
+    ts_vertex_list *vlist;
+	fh=fopen(fname, "r");
+        if(fh==NULL){
+                err("Cannot open file for reading... Nonexistant file?");
+                return TS_FAIL;
+        }
+	ts_uint retval;
+	retval=fscanf(fh,"%u %u %u",&nvtx, &nedges, &ntria);
+    vesicle->vlist=init_vertex_list(nvtx);
+    vlist=vesicle->vlist;
+    for(i=0;i<nvtx;i++){
+   //     fscanf(fh,"%F %F %F",&vlist->vtx[i]->data->x,&vlist->vtx[i]->data->y,&vlist->vtx[i]->data->z);
+       retval=fscanf(fh,"%F %F %F",&x,&y,&z);
+        vlist->vtx[i]->data->x=x;
+        vlist->vtx[i]->data->y=y;
+        vlist->vtx[i]->data->z=z;
+    }
+    for(i=0;i<nedges;i++){
+        retval=fscanf(fh,"%u %u",&vtxi1,&vtxi2);
+        bond_add(vesicle->blist,vesicle->vlist->vtx[vtxi1-1],vesicle->vlist->vtx[vtxi2-1]);
+    }
+    //TODO: neighbours from bonds,
+    //TODO: triangles from neigbours
+
+//    Don't need to read triangles. Already have enough data
+    /*
+    for(i=0;i<ntria;i++){
+        retval=fscanf(fh,"%u %u %u", &bi1, &bi2, &bi3);
+        vtxi1=vesicle->blist->data->vertex1->idx;
+        vtxi2=vesicle->blist->data->vertex1->idx;
+        
+    }
+    */
+	fclose(fh);	
+
+
+
+    return TS_SUCCESS;
 }

@@ -8,6 +8,7 @@
 #include "vertex.h"
 #include "triangle.h"
 #include "initial_distribution.h"
+#include "energy.h"
 
 ts_vesicle *initial_distribution_dipyramid(ts_uint nshell, ts_uint ncmax1, ts_uint ncmax2, ts_uint ncmax3, ts_double stepsize){
     ts_fprintf(stderr,"Starting initial_distribution on vesicle with %u shells!...\n",nshell);
@@ -24,6 +25,7 @@ ts_vesicle *initial_distribution_dipyramid(ts_uint nshell, ts_uint ncmax1, ts_ui
     retval = init_triangles(vesicle);
     retval = init_triangle_neighbours(vesicle);
     retval = init_common_vertex_triangle_neighbours(vesicle);
+    retval = mean_curvature_and_energy(vesicle);
  ts_fprintf(stderr,"initial_distribution finished!\n");
 	return vesicle;
 } 

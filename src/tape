@@ -21,3 +21,14 @@ iterations=20000
 
 #shut up if we are using cluster!!!
 quiet=false
+
+#what type of multiprocessing? (*none, smp, cluster, distributed, cuda, auto)
+#currently only none makes sense.
+multiprocessing=none
+#how many cores are allowed to process in SMP?
+smp_cores=2
+#how many nodes in cluster?
+cluster_nodes=50
+#max number of processes in distributed (voluntary) environment
+distributed_processes=50
+#cuda options???

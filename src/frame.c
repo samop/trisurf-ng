@@ -1,38 +1,38 @@
 #include<stdlib.h>
 #include "general.h"
 #include "cell.h"
-
+#include "frame.h"
 ts_bool centermass(ts_vesicle *vesicle){
-    ts_uint i;
+    ts_uint i, n=vesicle->vlist->n;
+    ts_vertex **vtx=vesicle->vlist->vtx;
     vesicle->cm[0]=0;
     vesicle->cm[1]=0;
     vesicle->cm[2]=0;
-    for(i=0;i<vesicle->vlist.n;i++){
-        vesicle->cm[0]+=vesicle->vlist.vertex[i].x;
-        vesicle->cm[1]+=vesicle->vlist.vertex[i].y;
-        vesicle->cm[2]+=vesicle->vlist.vertex[i].z; 
+    for(i=0;i<n;i++){
+        vesicle->cm[0]+=vtx[i]->data->x;
+        vesicle->cm[1]+=vtx[i]->data->y;
+        vesicle->cm[2]+=vtx[i]->data->z; 
     } 
-    vesicle->cm[0]/=(float)vesicle->vlist.n;
-    vesicle->cm[1]/=(float)vesicle->vlist.n;
-    vesicle->cm[2]/=(float)vesicle->vlist.n;
+    vesicle->cm[0]/=(float)n;
+    vesicle->cm[1]/=(float)n;
+    vesicle->cm[2]/=(float)n;
     return TS_SUCCESS;
 }
 
-ts_bool cell_ocupation(ts_vesicle *vesicle){
-    ts_uint i,j,cellidx;
+ts_bool cell_occupation(ts_vesicle *vesicle){
+    ts_uint i,cellidx, n=vesicle->vlist->n;
     ts_double shift;
     ts_double dcell;
-    shift=(ts_double) vesicle->clist.ncmax[0]/2;
+    shift=(ts_double) vesicle->clist->ncmax[0]/2;
     dcell=1.0/(1.0 + vesicle->stepsize);
-    ts_uint ncx, ncy,ncz;
 
-    cell_list_cell_ocupation_clear(&vesicle->clist);
-    for(i=0;i<vesicle->vlist.n;i++){
+    cell_list_cell_occupation_clear(vesicle->clist);
+    for(i=0;i<n;i++){
   
-    cellidx=vertex_self_avoidance(vesicle, &vesicle->vlist.vertex[i]);
-    vesicle->vlist.vertex[i].cell=&(vesicle->clist.cell[cellidx]);
+    cellidx=vertex_self_avoidance(vesicle, vesicle->vlist->vtx[i]);
+    vesicle->vlist->vtx[i]->data->cell=vesicle->clist->cell[cellidx];
 
-    cell_add_vertex(&vesicle->clist.cell[cellidx],&vesicle->vlist.vertex[i]);
+    cell_add_vertex(vesicle->clist->cell[cellidx],vesicle->vlist->vtx[i]);
 
   //  if(ncx > vesicle->clist.ncmax[0]) vesicle->clist.ncmax[0]=ncx;
   //  if(ncy > vesicle->clist.ncmax[1]) vesicle->clist.ncmax[1]=ncy;

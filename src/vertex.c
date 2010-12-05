@@ -214,3 +214,37 @@ inline ts_bool vertex_add_tristar(ts_vertex *vtx, ts_triangle *tristarmem){
 	return TS_SUCCESS;
 }
 
+
+/* ****************************************************************** */
+/* ***** New vertex copy operations. Inherently they are slow.  ***** */
+/* ****************************************************************** */
+
+ts_vertex *vtx_copy(ts_vertex *ovtx){
+    ts_vertex *cvtx=(ts_vertex *)malloc(sizeof(ts_vertex));
+    memcpy((void *)cvtx,(void *)ovtx,sizeof(ts_vertex));
+    cvtx->data=(ts_vertex_data *)malloc(sizeof(ts_vertex_data));
+    memcpy((void *)cvtx->data,(void *)ovtx->data,sizeof(ts_vertex_data));
+    cvtx->data->neigh=NULL;
+    cvtx->data->neigh_no=0;
+    cvtx->data->tristar_no=0;
+    cvtx->data->bond_no=0;
+    cvtx->data->tristar=NULL;
+    cvtx->data->bond=NULL;
+    cvtx->data->cell=NULL; 
+    return cvtx;
+}
+//TODO: needs to be done
+ts_vertex **vtx_neigh_copy(ts_vertex_list *vlist,ts_vertex *ovtx){
+        return NULL;
+}
+
+ts_vertex_list *vertex_list_copy(ts_vertex_list *ovlist){
+    ts_uint i;
+    ts_vertex_list *vlist=(ts_vertex_list *)malloc(sizeof(ts_vertex_list));
+    memcpy((void *)vlist, (void *)ovlist, sizeof(ts_vertex_list));
+    ts_vertex **vtx=(ts_vertex **)malloc(vlist->n*sizeof(ts_vertex *));
+    for(i=0;i<vlist->n;i++){
+        vtx[i]=vtx_copy(ovlist->vtx[i]);
+    }
+    return vlist;
+}

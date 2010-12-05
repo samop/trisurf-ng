@@ -26,4 +26,9 @@ inline ts_double vtx_distance_sq(ts_vertex *vtx1, ts_vertex *vtx2);
 ts_bool vtx_set_global_values(ts_vesicle *vesicle);
 inline ts_double vtx_direct(ts_vertex *vtx1, ts_vertex *vtx2, ts_vertex *vtx3);
 inline ts_bool vertex_add_tristar(ts_vertex *vtx, ts_triangle *tristarmem);
+
+ts_vertex *vtx_copy(ts_vertex *ovtx);
+ts_vertex **vtx_neigh_copy(ts_vertex_list *vlist,ts_vertex *ovtx);
+ts_vertex_list *vertex_list_copy(ts_vertex_list *ovlist);
+
 #endif
