@@ -17,7 +17,7 @@
 
 int main(int argv, char *argc[]){
 ts_bool retval;
-ts_vertex_list *vlist=init_vertex_list(5);
+    ts_vertex_list *vlist=init_vertex_list(5);
 ts_vertex_list *vlist1;
 ts_bond_list *blist=init_bond_list();
 ts_triangle_list *tlist=init_triangle_list();
@@ -57,9 +57,10 @@ cell_list_free(clist);
 
 vtx_list_free(vlist1);
 printf("Tests complete.\n");
-vesicle=initial_distribution_dipyramid(7,10,10,10,0.3);
+vesicle=initial_distribution_dipyramid(17,10,10,10,0.15);
 write_vertex_xml_file(vesicle,0);
 write_master_xml_file("test.pvd");
+write_dout_fcompat_file(vesicle,"dout");
 vesicle_free(vesicle);
 
 return 0; //program finished perfectly ok. We return 0.

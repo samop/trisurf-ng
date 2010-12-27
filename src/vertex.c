@@ -52,16 +52,19 @@ ts_bool vtx_add_neighbour(ts_vertex *vtx, ts_vertex *nvtx){
     ts_uint nn=++vtx->data->neigh_no;
     vtx->data->neigh=(ts_vertex **)realloc(vtx->data->neigh, nn*sizeof(ts_vertex *));
     vtx->data->neigh[nn-1]=nvtx;
-
+/* This was a bug in creating DIPYRAMID (the neighbours were not in right
+ * order).
+ */
     /* pa se sosedu dodamo vertex */
     /*if it is already a neighbour don't add it to the list */
+/*
     for(i=0; i<nvtx->data->neigh_no;i++){
         if(nvtx->data->neigh[i]==vtx) return TS_FAIL;
     } 
     nn=++nvtx->data->neigh_no;
     nvtx->data->neigh=(ts_vertex **)realloc(nvtx->data->neigh, nn*sizeof(ts_vertex *));
     nvtx->data->neigh[nn-1]=vtx;
-
+*/
 
     return TS_SUCCESS;
 }
@@ -108,12 +111,12 @@ ts_bool vtx_add_bond(ts_bond_list *blist,ts_vertex *vtx1,ts_vertex *vtx2){
     bond=bond_add(blist,vtx1,vtx2);
     if(bond==NULL) return TS_FAIL;
     vtx1->data->bond_no++;
-    vtx2->data->bond_no++;
+   // vtx2->data->bond_no++;
 
     vtx1->data->bond=(ts_bond **)realloc(vtx1->data->bond, vtx1->data->bond_no*sizeof(ts_bond *)); 
-    vtx2->data->bond=(ts_bond **)realloc(vtx2->data->bond, vtx2->data->bond_no*sizeof(ts_bond *)); 
+   // vtx2->data->bond=(ts_bond **)realloc(vtx2->data->bond, vtx2->data->bond_no*sizeof(ts_bond *)); 
     vtx1->data->bond[vtx1->data->bond_no-1]=bond;
-    vtx2->data->bond[vtx2->data->bond_no-1]=bond;
+   // vtx2->data->bond[vtx2->data->bond_no-1]=bond;
     return TS_SUCCESS;
 }
 

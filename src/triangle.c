@@ -98,13 +98,15 @@ ts_bool triangle_add_neighbour(ts_triangle *tria, ts_triangle *ntria){
 	if(tria->data->neigh == NULL)
 			fatal("Reallocation of memory failed during insertion of triangle neighbour in triangle_add_neighbour",3);
 	tria->data->neigh[tria->data->neigh_no-1]=ntria;
-   
+  
+ 
 /* we repeat the procedure for the neighbour */  
-	ntria->data->neigh_no++;
+/*	ntria->data->neigh_no++;
 	ntria->data->neigh=realloc(ntria->data->neigh,ntria->data->neigh_no*sizeof(ts_triangle *));
 	if(ntria->data->neigh == NULL)
 			fatal("Reallocation of memory failed during insertion of triangle neighbour in triangle_add_neighbour",3);
 	ntria->data->neigh[ntria->data->neigh_no-1]=tria;
+*/
 	return TS_SUCCESS;
 }
 

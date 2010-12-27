@@ -348,7 +348,7 @@ ts_bool init_common_vertex_triangle_neighbours(ts_vesicle *vesicle){
 
 //TODO: probably something wrong with neighbour distribution.
 //                if(vtx[i]==k3 || vtx[i]==k4 || vtx[i]==k5){
-                    if(i==6) ts_fprintf(stdout, "Vtx[%u] > Added to tristar!\n",i);
+//                    if(i==6) ts_fprintf(stdout, "Vtx[%u] > Added to tristar!\n",i);
                     vertex_add_tristar(vtx[i],tria[k]);
                 }
             }
