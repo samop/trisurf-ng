@@ -28,6 +28,7 @@ inline ts_double vtx_direct(ts_vertex *vtx1, ts_vertex *vtx2, ts_vertex *vtx3);
 inline ts_bool vertex_add_tristar(ts_vertex *vtx, ts_triangle *tristarmem);
 
 ts_bool vtx_copy(ts_vertex *cvtx,ts_vertex *ovtx);
+ts_bool vtx_duplicate(ts_vertex *cvtx, ts_vertex *ovtx);
 ts_vertex **vtx_neigh_copy(ts_vertex_list *vlist,ts_vertex *ovtx);
 ts_vertex_list *vertex_list_copy(ts_vertex_list *ovlist);
 

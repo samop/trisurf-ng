@@ -8,6 +8,7 @@
 #include "vesicle.h"
 #include "io.h"
 #include "initial_distribution.h"
+#include "frame.h"
 
 /** Entrance function to the program
   * @param argv is a number of parameters used in program call (including the program name
@@ -57,7 +58,11 @@ cell_list_free(clist);
 
 vtx_list_free(vlist1);
 printf("Tests complete.\n");
-vesicle=initial_distribution_dipyramid(17,10,10,10,0.15);
+vesicle=initial_distribution_dipyramid(17,60,60,60,0.15);
+
+centermass(vesicle);
+cell_occupation(vesicle);
+
 write_vertex_xml_file(vesicle,0);
 write_master_xml_file("test.pvd");
 write_dout_fcompat_file(vesicle,"dout");

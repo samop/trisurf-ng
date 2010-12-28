@@ -118,7 +118,9 @@ inline ts_bool energy_vertex(ts_vertex *vtx){
         data->curvature=-sqrtl(h);
     }
 #endif
-//TODO: MAJOR!!!! What is vtx->data->c?????????????? Here it is 0!
+// What is vtx->data->c?????????????? Here it is 0!
+// c is forced curvature energy for each vertex. Should be set to zero for
+// norman circumstances.
     data->energy=0.5*s*(data->curvature/s-data->c)*(data->curvature/s-data->c);
 
     return TS_SUCCESS;

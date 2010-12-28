@@ -25,6 +25,7 @@ ts_vesicle *initial_distribution_dipyramid(ts_uint nshell, ts_uint ncmax1, ts_ui
     retval = init_triangles(vesicle);
     retval = init_triangle_neighbours(vesicle);
     retval = init_common_vertex_triangle_neighbours(vesicle);
+    retval = init_normal_vectors(vesicle->tlist);
     retval = mean_curvature_and_energy(vesicle);
  ts_fprintf(stderr,"initial_distribution finished!\n");
 	return vesicle;
@@ -348,7 +349,7 @@ ts_bool init_common_vertex_triangle_neighbours(ts_vesicle *vesicle){
 
 //TODO: probably something wrong with neighbour distribution.
 //                if(vtx[i]==k3 || vtx[i]==k4 || vtx[i]==k5){
-//                    if(i==6) ts_fprintf(stdout, "Vtx[%u] > Added to tristar!\n",i);
+    //                    if(i==6) ts_fprintf(stdout, "Vtx[%u] > Added to tristar!\n",i);
                     vertex_add_tristar(vtx[i],tria[k]);
                 }
             }

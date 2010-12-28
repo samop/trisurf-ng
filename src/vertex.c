@@ -144,7 +144,8 @@ ts_bool vtx_data_free(ts_vertex_data *data){
     if(data->neigh!=NULL)   free(data->neigh);
     if(data->tristar!=NULL) free(data->tristar);
     if(data->bond!=NULL)    free(data->bond);
-    if(data->cell!=NULL)    free(data->cell);
+//Cells are freed separately.
+ //   if(data->cell!=NULL)    free(data->cell);
     free(data);
     return TS_SUCCESS;
 }
@@ -235,10 +236,20 @@ ts_bool vtx_copy(ts_vertex *cvtx, ts_vertex *ovtx){
     cvtx->data->cell=NULL;
     return TS_SUCCESS;
 }
+
+ts_bool vtx_duplicate(ts_vertex *cvtx, ts_vertex *ovtx){
+    memcpy((void *)cvtx,(void *)ovtx,sizeof(ts_vertex));
+    cvtx->data=(ts_vertex_data *)malloc(sizeof(ts_vertex_data));
+    memcpy((void *)cvtx->data,(void *)ovtx->data,sizeof(ts_vertex_data));
+    return TS_SUCCESS;
+}
+
 //TODO: needs to be done
 ts_vertex **vtx_neigh_copy(ts_vertex_list *vlist,ts_vertex *ovtx){
         return NULL;
 }
+
+
 
 ts_vertex_list *vertex_list_copy(ts_vertex_list *ovlist){
     ts_uint i;

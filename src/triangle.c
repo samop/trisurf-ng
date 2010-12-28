@@ -72,7 +72,8 @@ ts_triangle *triangle_add(ts_triangle_list *tlist, ts_vertex *vtx1, ts_vertex *v
   * Add the neigbour to the list of neighbouring triangles. The
   * neighbouring triangles are those, who share two vertices. Function resizes
   * the list and adds the pointer to neighbour. It receives two arguments of
-  * ts_triangle type. It then adds eachother to eachother's list. Upon
+  * ts_triangle type. It then adds second triangle to the list of first
+  * triangle, but not the opposite. Upon
   * success it returns TS_SUCCESS, upon detecting NULL pointers 
   * returns TS_FAIL and it FATALY ends when the data structure
   * cannot be resized.

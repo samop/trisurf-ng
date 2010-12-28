@@ -13,9 +13,9 @@ ts_bool centermass(ts_vesicle *vesicle){
         vesicle->cm[1]+=vtx[i]->data->y;
         vesicle->cm[2]+=vtx[i]->data->z; 
     } 
-    vesicle->cm[0]/=(float)n;
-    vesicle->cm[1]/=(float)n;
-    vesicle->cm[2]/=(float)n;
+    vesicle->cm[0]/=(ts_float)n;
+    vesicle->cm[1]/=(ts_float)n;
+    vesicle->cm[2]/=(ts_float)n;
     return TS_SUCCESS;
 }
 
@@ -28,7 +28,6 @@ ts_bool cell_occupation(ts_vesicle *vesicle){
 
     cell_list_cell_occupation_clear(vesicle->clist);
     for(i=0;i<n;i++){
-  
     cellidx=vertex_self_avoidance(vesicle, vesicle->vlist->vtx[i]);
     vesicle->vlist->vtx[i]->data->cell=vesicle->clist->cell[cellidx];
 
@@ -38,6 +37,7 @@ ts_bool cell_occupation(ts_vesicle *vesicle){
   //  if(ncy > vesicle->clist.ncmax[1]) vesicle->clist.ncmax[1]=ncy;
   //  if(ncz > vesicle->clist.ncmax[2]) vesicle->clist.ncmax[2]=ncz;
     }
+    //fprintf(stderr, "Bil sem tu\n"); 
 
 
 /* This was already done in previous for loop.... Have I gained some time? 

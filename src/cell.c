@@ -76,7 +76,7 @@ inline ts_uint vertex_self_avoidance(ts_vesicle *vesicle, ts_vertex *vtx){
 ts_bool cell_add_vertex(ts_cell *cell, ts_vertex *vtx){
     cell->data->nvertex++;
 	cell->data->vertex=(ts_vertex **)realloc(cell->data->vertex,cell->data->nvertex*sizeof(ts_vertex *));
-		if(vtx->data->neigh == NULL){
+		if(cell->data->vertex == NULL){
 			fatal("Reallocation of memory failed during insertion of vertex in cell_add_vertex",3);
         }
     cell->data->vertex[cell->data->nvertex-1]=vtx;
