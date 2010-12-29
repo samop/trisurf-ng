@@ -9,6 +9,7 @@
 #include "io.h"
 #include "initial_distribution.h"
 #include "frame.h"
+#include "timestep.h"
 
 /** Entrance function to the program
   * @param argv is a number of parameters used in program call (including the program name
@@ -18,6 +19,7 @@
 
 int main(int argv, char *argc[]){
 ts_bool retval;
+ts_uint i;
     ts_vertex_list *vlist=init_vertex_list(5);
 ts_vertex_list *vlist1;
 ts_bond_list *blist=init_bond_list();
@@ -62,6 +64,11 @@ vesicle=initial_distribution_dipyramid(17,60,60,60,0.15);
 
 centermass(vesicle);
 cell_occupation(vesicle);
+
+for(i=0;i<100;i++)
+single_timestep(vesicle);
+
+
 
 write_vertex_xml_file(vesicle,0);
 write_master_xml_file("test.pvd");
