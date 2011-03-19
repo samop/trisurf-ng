@@ -64,11 +64,11 @@ ts_double shY(ts_int l,ts_int m,ts_double theta,ts_double fi){
 		fatal("Error using shY function!",1);
 
 	fac1=1.0;
-	for(i=1; i<=l-m;i++){
+	for(i=1; i<=l-abs(m);i++){
 		fac1 *= i;
 	}
 	fac2=1.0;
-	for(i=1; i<=l+m;i++){
+	for(i=1; i<=l+abs(m);i++){
 		fac2 *= i;
 	}
 
@@ -81,9 +81,9 @@ ts_double shY(ts_int l,ts_int m,ts_double theta,ts_double fi){
 	else {
 		//K=pow(-1.0,abs(m))*sqrt(1.0/(2.0*M_PI))*cos(m*fi);
 		if(abs(m)%2==0)
-		K=sqrt(1.0/(M_PI))*sin(m*fi);
+		K=sqrt(1.0/(M_PI))*cos(m*fi);
 		else
-		K=-sqrt(1.0/(M_PI))*sin(m*fi);
+		K=-sqrt(1.0/(M_PI))*cos(m*fi);
 	}
 	
 	return K*sqrt((2.0*l+1.0)/2.0*fac1/fac2)*plgndr(l,abs(m),cos(theta));	

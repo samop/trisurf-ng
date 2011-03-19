@@ -24,14 +24,15 @@ ts_fprintf(stdout,"Tests\n");
 ts_fprintf(stdout,"P(0,0,0.5)=%f (%f)\n",plgndr(0,0,0.5),1.0);
 ts_fprintf(stdout,"P(1,0,0.5)=%f (%f)\n",plgndr(1,0,0.5),0.5);
 ts_fprintf(stdout,"P(2,0,0.5)=%f (%f)\n",plgndr(2,0,0.5),0.5*(3*0.5*0.5-1));
+ts_fprintf(stdout,"P(2,2,0.5)=%f (ni to:%f)\n",plgndr(2,2,0.5),0.5*(3*0.5*0.5-1));
 
 ts_fprintf(stdout,"Y(0,0,pi/6,pi/4)=%f (%f)\n",shY(0,0,M_PI/6,M_PI/4),sqrt(1/(4*M_PI)));
 ts_fprintf(stdout,"Y(1,0,pi/6,pi/4)=%f (%f)\n",shY(1,0,M_PI/6,M_PI/4),sqrt(3/(4*M_PI))*cos(M_PI/6));
 ts_fprintf(stdout,"Y(1,0,4*pi/6,6*pi/4)=%f (%f)\n",shY(1,0,4*M_PI/6,6*M_PI/4),sqrt(3/(4*M_PI))*cos(4*M_PI/6));
-ts_fprintf(stdout,"Y(1,1,pi/6,pi/4)=%f (%f)\n",shY(1,1,M_PI/6,M_PI/4),-sqrt(3/(8*M_PI))*sin(M_PI/6)*sin(M_PI/4));
+ts_fprintf(stdout,"Y(1,1,pi/6,pi/4)=%f (%f)\n",shY(1,1,M_PI/6,M_PI/4),-sqrt(3/(8*M_PI))*sin(M_PI/6)*cos(M_PI/4));
 ts_fprintf(stdout,"Y(2,0,pi/6,pi/4)=%f (%f)\n",shY(2,0,M_PI/6,M_PI/4),sqrt(5/(4*M_PI))*(3.0/2.0*cos(M_PI/6)*cos(M_PI/6)-1.0/2.0));
 ts_fprintf(stdout,"Y(2,-2,pi/6,pi/4)=%f (0)\n",shY(2,-2,M_PI/6,M_PI/4));
-ts_fprintf(stdout,"Y(2,2,pi/6,pi/4)=%f (0)\n",shY(2,2,M_PI/6,M_PI/4));
+ts_fprintf(stdout,"Y(2,2,pi/6,pi/3)=%f (%f)\n",shY(2,2,M_PI/6,M_PI/3), sqrt(15.0/(32.0*M_PI))*sin(M_PI/6)*sin(M_PI/6)*cos(2*M_PI/3));
 	
 	for(j=1;j<argc;j++){
 		l=(int)sqrt(j-1); /* determine l from dataline */
