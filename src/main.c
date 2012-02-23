@@ -60,11 +60,11 @@ cell_list_free(clist);
 
 vtx_list_free(vlist1);
 printf("Tests complete.\n");
-vesicle=initial_distribution_dipyramid(8,60,60,60,0.15);
+vesicle=initial_distribution_dipyramid(17,60,60,60,0.15);
 //parsetape(vesicle,&i);
 
 //these four must come from parsetype!
-vesicle->dmax=1.67;
+vesicle->dmax=1.67*1.67;
 vesicle->stepsize=0.15;
 vesicle->clist->max_occupancy=8;
 vesicle->bending_rigidity=25.0;
