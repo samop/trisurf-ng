@@ -149,18 +149,12 @@ typedef struct {
 
 } ts_vertex_list;
 
-
-/** ts_bond_data is a structure that describes a bond */
-typedef struct {
+struct ts_bond {
+    ts_uint idx;
 	ts_vertex *vtx1;
 	ts_vertex *vtx2;
     ts_double bond_length;
     ts_double bond_length_dual;
-} ts_bond_data;
-
-struct ts_bond {
-    ts_uint idx;
-    ts_bond_data *data;
 };
 typedef struct ts_bond ts_bond;
 

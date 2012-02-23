@@ -108,11 +108,11 @@ ts_bool fprint_vertex_data(FILE *fh,ts_vertex_list *vlist){
         vlist->vtx[i]->data->xk,vlist->vtx[i]->data->c,vlist->vtx[i]->data->energy,
         vlist->vtx[i]->data->energy_h, vlist->vtx[i]->data->curvature, 0);
         for(j=0;j<vlist->vtx[i]->data->neigh_no;j++){
-            fprintf(fh," %.17E", vlist->vtx[i]->data->bond[j]->data->bond_length_dual);
+            fprintf(fh," %.17E", vlist->vtx[i]->data->bond[j]->bond_length_dual);
         }
             fprintf(fh,"\n");
         for(j=0;j<vlist->vtx[i]->data->neigh_no;j++){
-            fprintf(fh," %.17E", vlist->vtx[i]->data->bond[j]->data->bond_length);
+            fprintf(fh," %.17E", vlist->vtx[i]->data->bond[j]->bond_length);
         }
             fprintf(fh,"\n");
     }
@@ -122,9 +122,9 @@ ts_bool fprint_vertex_data(FILE *fh,ts_vertex_list *vlist){
 ts_bool fprint_bonds(FILE *fh,ts_vesicle *vesicle){
     ts_uint i;
     for(i=0;i<vesicle->blist->n;i++){
-        fprintf(fh,"\t%u\t%u\n",(ts_uint)(vesicle->blist->bond[i]->data->vtx1->idx),
+        fprintf(fh,"\t%u\t%u\n",(ts_uint)(vesicle->blist->bond[i]->vtx1->idx),
 //-vesicle->vlist->vtx+1),
-        (ts_uint)(vesicle->blist->bond[i]->data->vtx2->idx));
+        (ts_uint)(vesicle->blist->bond[i]->vtx2->idx));
     //-vesicle->vlist.vtx+1));
     }
     return TS_SUCCESS;
@@ -231,7 +231,7 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 
     fprintf(fh,"</DataArray>\n</Points>\n<Cells>\n<DataArray type=\"Int64\" Name=\"connectivity\" format=\"ascii\">");
 	for(i=0;i<blist->n;i++){
-			fprintf(fh,"%u %u\n",blist->bond[i]->data->vtx1->idx,blist->bond[i]->data->vtx2->idx);
+			fprintf(fh,"%u %u\n",blist->bond[i]->vtx1->idx,blist->bond[i]->vtx2->idx);
 	}
     fprintf(fh,"</DataArray>\n<DataArray type=\"Int64\" Name=\"offsets\" format=\"ascii\">");
     for (i=2;i<blist->n*2+1;i+=2){
@@ -275,7 +275,7 @@ ts_bool write_vertex_vtk_file(ts_vesicle *vesicle,ts_char *filename, ts_char *te
 	
 	fprintf(fh,"CELLS %u %u\n",blist->n,3*blist->n);
 	for(i=0;i<blist->n;i++){
-			fprintf(fh,"2 %u %u\n",blist->bond[i]->data->vtx1->idx,blist->bond[i]->data->vtx2->idx);
+			fprintf(fh,"2 %u %u\n",blist->bond[i]->vtx1->idx,blist->bond[i]->vtx2->idx);
 	}
 	fprintf(fh,"CELL_TYPES %u\n",blist->n);
 	for(i=0;i<blist->n;i++)

@@ -15,8 +15,8 @@ ts_bond  *bond_add(ts_bond_list *blist, ts_vertex *vtx1, ts_vertex *vtx2){
     if(vtx1==NULL || vtx2==NULL) return NULL;
     /* Verify if the bond already exists... Don't do multiple bonds */
     for(i=0;i<blist->n;i++){
-       if((blist->bond[i]->data->vtx1==vtx1 || blist->bond[i]->data->vtx1==vtx2)
-        &&(blist->bond[i]->data->vtx2==vtx1 || blist->bond[i]->data->vtx2==vtx2))
+       if((blist->bond[i]->vtx1==vtx1 || blist->bond[i]->vtx1==vtx2)
+        &&(blist->bond[i]->vtx2==vtx1 || blist->bond[i]->vtx2==vtx2))
         return blist->bond[i];
     }
 	blist->n++;
@@ -24,11 +24,10 @@ ts_bond  *bond_add(ts_bond_list *blist, ts_vertex *vtx1, ts_vertex *vtx2){
 	if(blist->bond==NULL) fatal("Cannot reallocate memory for additional **ts_bond.",100);
     blist->bond[blist->n-1]=(ts_bond *)malloc(sizeof(ts_bond));
     if(blist->bond[blist->n-1]==NULL) fatal("Cannot allocate memory for additional *ts_bond.",100);
-    blist->bond[blist->n-1]->data=(ts_bond_data *)malloc(sizeof(ts_bond_data));
     
 	//NOW insert vertices into data!	
-	blist->bond[blist->n - 1]->data->vtx1=vtx1;	
-	blist->bond[blist->n - 1]->data->vtx2=vtx2;
+	blist->bond[blist->n - 1]->vtx1=vtx1;	
+	blist->bond[blist->n - 1]->vtx2=vtx2;
 
     //Should we calculate bond length NOW?
 	
@@ -38,7 +37,6 @@ ts_bond  *bond_add(ts_bond_list *blist, ts_vertex *vtx1, ts_vertex *vtx2){
 ts_bool bond_list_free(ts_bond_list *blist){
     ts_uint i;
     for(i=0;i<blist->n;i++){
-    free(blist->bond[i]->data);
     free(blist->bond[i]);
     }
     free(blist->bond);

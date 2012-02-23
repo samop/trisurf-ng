@@ -74,16 +74,16 @@ inline ts_bool energy_vertex(ts_vertex *vtx){
         tot=0.5*tot;
         xlen=vtx_distance_sq(j,vtx);
 #ifdef  TS_DOUBLE_DOUBLE 
-        data->bond[jj-1]->data->bond_length=sqrt(xlen); 
+        data->bond[jj-1]->bond_length=sqrt(xlen); 
 #endif
 #ifdef  TS_DOUBLE_FLOAT
-        data->bond[jj-1]->data->bond_length=sqrtf(xlen); 
+        data->bond[jj-1]->bond_length=sqrtf(xlen); 
 #endif
 #ifdef  TS_DOUBLE_LONGDOUBLE 
-        data->bond[jj-1]->data->bond_length=sqrtl(xlen); 
+        data->bond[jj-1]->bond_length=sqrtl(xlen); 
 #endif
 
-        data->bond[jj-1]->data->bond_length_dual=tot*data->bond[jj-1]->data->bond_length;
+        data->bond[jj-1]->bond_length_dual=tot*data->bond[jj-1]->bond_length;
 
         s+=tot*xlen;
         xh+=tot*(j->data->x - data->x);
