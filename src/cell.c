@@ -19,19 +19,15 @@ ts_cell_list  *init_cell_list(ts_uint ncmax1, ts_uint ncmax2, ts_uint ncmax3, ts
     if(clist->cell==NULL) fatal("Error while allocating memory for cell list! ncmax too large?",101);
 
     for(i=0;i<nocells;i++){
-        clist->cell[i]=(ts_cell *)malloc(sizeof(ts_cell));
+        clist->cell[i]=(ts_cell *)calloc(1,sizeof(ts_cell));
         if(clist->cell[i]==NULL) fatal("Error while allocating memory for cell list! ncmax too large?",102);
         clist->cell[i]->idx=i+1; // We enumerate cells! Probably never required!
-        clist->cell[i]->data=(ts_cell_data *)calloc(1,sizeof(ts_cell_data));
     }
     return clist;
 }
 
 ts_bool cell_free(ts_cell* cell){
-    if(cell->data!=NULL){
-        if(cell->data->vertex!=NULL) free(cell->data->vertex);
-        free(cell->data);
-    }
+    if(cell->vertex!=NULL) free(cell->vertex);
     free(cell);
     return TS_SUCCESS;
 }
@@ -74,12 +70,12 @@ inline ts_uint vertex_self_avoidance(ts_vesicle *vesicle, ts_vertex *vtx){
 
 //TODO: looks ok, but debug anyway in the future
 ts_bool cell_add_vertex(ts_cell *cell, ts_vertex *vtx){
-    cell->data->nvertex++;
-	cell->data->vertex=(ts_vertex **)realloc(cell->data->vertex,cell->data->nvertex*sizeof(ts_vertex *));
-		if(cell->data->vertex == NULL){
+    cell->nvertex++;
+	cell->vertex=(ts_vertex **)realloc(cell->vertex,cell->nvertex*sizeof(ts_vertex *));
+		if(cell->vertex == NULL){
 			fatal("Reallocation of memory failed during insertion of vertex in cell_add_vertex",3);
         }
-    cell->data->vertex[cell->data->nvertex-1]=vtx;
+    cell->vertex[cell->nvertex-1]=vtx;
     return TS_SUCCESS;
 }
 
@@ -87,11 +83,11 @@ ts_bool cell_add_vertex(ts_cell *cell, ts_vertex *vtx){
 ts_bool cell_list_cell_occupation_clear(ts_cell_list *clist){
     ts_uint i;
     for(i=0;i<clist->cellno;i++){
-        if(clist->cell[i]->data->vertex != NULL){
-            free(clist->cell[i]->data->vertex);
-            clist->cell[i]->data->vertex=NULL;
+        if(clist->cell[i]->vertex != NULL){
+            free(clist->cell[i]->vertex);
+            clist->cell[i]->vertex=NULL;
         }
-        clist->cell[i]->data->nvertex=0;
+        clist->cell[i]->nvertex=0;
     }
     return TS_SUCCESS;
 }
@@ -112,7 +108,7 @@ ts_bool cell_occupation_number_and_internal_proximity(ts_cell_list *clist, ts_ui
             for(k=ncz-1;k<=ncz+1;k++){
                 neigh_cidx=k+(j-1)*clist->ncmax[2]+(i-1)*clist->ncmax[2]*clist->ncmax[1] -1;
           //      fprintf(stderr,"neigh_cell_index=%i\n",neigh_cidx);
-                cell_occupation=clist->cell[neigh_cidx]->data->nvertex;
+                cell_occupation=clist->cell[neigh_cidx]->nvertex;
           //      fprintf(stderr, "cell_occupation=%i\n",cell_occupation);
                 if(cell_occupation>clist->max_occupancy){
                     fatal("Neighbouring cell occupation more than set max_occupancy value.",2000);
@@ -121,9 +117,9 @@ ts_bool cell_occupation_number_and_internal_proximity(ts_cell_list *clist, ts_ui
 // cell!
                 if(cell_occupation>1){
                     for(l=0;l<cell_occupation;l++){
-                        if(clist->cell[neigh_cidx]->data->vertex[l]!=vtx){
+                        if(clist->cell[neigh_cidx]->vertex[l]!=vtx){
                     //        fprintf(stderr,"calling dist on vertex %i\n",l);
-                           dist=vtx_distance_sq(clist->cell[neigh_cidx]->data->vertex[l],tvtx);
+                           dist=vtx_distance_sq(clist->cell[neigh_cidx]->vertex[l],tvtx);
                     //        fprintf(stderr,"dist was %f\n",dist);
                             if(dist<1) return TS_FAIL;
                         }

@@ -181,14 +181,11 @@ struct ts_triangle_list{
 };
 typedef struct ts_triangle_list ts_triangle_list;
 
-typedef struct ts_cell_data {
-    ts_vertex **vertex;
-    ts_uint nvertex;
-} ts_cell_data;
 
 typedef struct ts_cell {
     ts_uint idx;
-    ts_cell_data *data;
+    ts_vertex **vertex;
+    ts_uint nvertex;
 } ts_cell; 
 
 typedef struct ts_cell_list{

@@ -25,6 +25,7 @@ ts_bool cell_occupation(ts_vesicle *vesicle){
     ts_double dcell;
     shift=(ts_double) vesicle->clist->ncmax[0]/2;
     dcell=1.0/(1.0 + vesicle->stepsize);
+    //`fprintf(stderr, "Bil sem tu\n"); 
 
     cell_list_cell_occupation_clear(vesicle->clist);
     for(i=0;i<n;i++){
@@ -33,25 +34,8 @@ ts_bool cell_occupation(ts_vesicle *vesicle){
 
     cell_add_vertex(vesicle->clist->cell[cellidx],vesicle->vlist->vtx[i]);
 
-  //  if(ncx > vesicle->clist.ncmax[0]) vesicle->clist.ncmax[0]=ncx;
-  //  if(ncy > vesicle->clist.ncmax[1]) vesicle->clist.ncmax[1]=ncy;
-  //  if(ncz > vesicle->clist.ncmax[2]) vesicle->clist.ncmax[2]=ncz;
     }
     //fprintf(stderr, "Bil sem tu\n"); 
-
-
-/* This was already done in previous for loop.... Have I gained some time? 
-
-
-    for(i=0;i<vesicle->clist.ncmax[0]*vesicle->clist.ncmax[1]*vesicle->clist.ncmax[2];i++){
-        vesicle->clist.cell[i].nvertex=0;
-        for(j=0;j<vesicle->vlist.n;j++){
-            //add_vertextocell;
-            //add_vertextomonomer;
-        }
-    }
-
-*/
 	if(dcell);
 	if(shift);
     return TS_SUCCESS;

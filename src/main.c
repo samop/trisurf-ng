@@ -44,12 +44,12 @@ triangle_add(tlist,vlist->vtx[1],vlist->vtx[2],vlist->vtx[3]);
 
 triangle_add(tlist,vlist->vtx[1],vlist->vtx[2],vlist->vtx[3]);
 
-printf("Cell idx=1 has vertices=%u\n",clist->cell[0]->data->nvertex);
+printf("Cell idx=1 has vertices=%u\n",clist->cell[0]->nvertex);
 cell_add_vertex(clist->cell[0], vlist->vtx[0]);
-printf("Cell idx=1 has vertices=%u\n",clist->cell[0]->data->nvertex);
-printf("Cell idx=1 has vertex[0] has x coordinate=%e\n",clist->cell[0]->data->vertex[0]->data->x);
+printf("Cell idx=1 has vertices=%u\n",clist->cell[0]->nvertex);
+printf("Cell idx=1 has vertex[0] has x coordinate=%e\n",clist->cell[0]->vertex[0]->data->x);
 cell_list_cell_occupation_clear(clist);
-printf("Cell idx=1 has vertices=%u\n",clist->cell[0]->data->nvertex);
+printf("Cell idx=1 has vertices=%u\n",clist->cell[0]->nvertex);
 cell_add_vertex(clist->cell[0], vlist->vtx[0]);
 
 
@@ -64,7 +64,6 @@ vesicle=initial_distribution_dipyramid(17,60,60,60,0.15);
 
 centermass(vesicle);
 cell_occupation(vesicle);
-
 for(i=0;i<100;i++){
 single_timestep(vesicle);
 write_vertex_xml_file(vesicle,i);
