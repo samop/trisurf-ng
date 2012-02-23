@@ -8,7 +8,6 @@
 
 ts_vertex_list *init_vertex_list(ts_uint N){	
 	ts_int i;
-    ts_vertex *tlist;
     ts_vertex_list *vlist=(ts_vertex_list *)malloc(sizeof(ts_vertex_list));
     
 	if(N==0){
@@ -18,27 +17,16 @@ ts_vertex_list *init_vertex_list(ts_uint N){
 		return vlist;
 	}
 	
-    vlist->vtx=(ts_vertex **)malloc(N*sizeof(ts_vertex *));
-    tlist=(ts_vertex *)malloc(N*sizeof(ts_vertex));
-    if(vlist->vtx==NULL || tlist==NULL)
+    vlist->vtx=(ts_vertex **)calloc(N,sizeof(ts_vertex *));
+    if(vlist->vtx==NULL)
         fatal("Fatal error reserving memory space for vertex list! Could number of requsted vertices be too large?", 100);
     for(i=0;i<N;i++) {
-        vlist->vtx[i]=&tlist[i];
-        vlist->vtx[i]->data=init_vertex_data();
+        vlist->vtx[i]=(ts_vertex *)calloc(1,sizeof(ts_vertex));
         vlist->vtx[i]->idx=i;
     }
     vlist->n=N;
 	return vlist;
 }
-
-ts_vertex_data *init_vertex_data(){
-    ts_vertex_data *data;
-    data=(ts_vertex_data *)calloc(1,sizeof(ts_vertex_data));
-    if(data==NULL)
-        fatal("Fatal error reserving memory space for ts_vertex! Memory full?", 100);
-    return data;
-}
-
 
 ts_bool vtx_add_neighbour(ts_vertex *vtx, ts_vertex *nvtx){
     ts_uint i;
@@ -46,12 +34,12 @@ ts_bool vtx_add_neighbour(ts_vertex *vtx, ts_vertex *nvtx){
     if(vtx==NULL || nvtx==NULL) return TS_FAIL;
     
     /*if it is already a neighbour don't add it to the list */
-    for(i=0; i<vtx->data->neigh_no;i++){
-        if(vtx->data->neigh[i]==nvtx) return TS_FAIL;
+    for(i=0; i<vtx->neigh_no;i++){
+        if(vtx->neigh[i]==nvtx) return TS_FAIL;
     }
-    ts_uint nn=++vtx->data->neigh_no;
-    vtx->data->neigh=(ts_vertex **)realloc(vtx->data->neigh, nn*sizeof(ts_vertex *));
-    vtx->data->neigh[nn-1]=nvtx;
+    ts_uint nn=++vtx->neigh_no;
+    vtx->neigh=(ts_vertex **)realloc(vtx->neigh, nn*sizeof(ts_vertex *));
+    vtx->neigh[nn-1]=nvtx;
 /* This was a bug in creating DIPYRAMID (the neighbours were not in right
  * order).
  */
@@ -74,31 +62,31 @@ ts_bool vtx_remove_neighbour(ts_vertex *vtx, ts_vertex *nvtx){
 /* find a neighbour */
 /* remove it from the list while shifting remaining neighbours up */
     ts_uint i,j=0;
-    for(i=0;i<vtx->data->neigh_no;i++){
-        if(vtx->data->neigh[i]!=nvtx){
-            vtx->data->neigh[j]=vtx->data->neigh[i];
+    for(i=0;i<vtx->neigh_no;i++){
+        if(vtx->neigh[i]!=nvtx){
+            vtx->neigh[j]=vtx->neigh[i];
             j++;
         }
     }
 /* resize memory. potentionally time consuming */
-    vtx->data->neigh_no--;
-    vtx->data->neigh=(ts_vertex **)realloc(vtx->data->neigh,vtx->data->neigh_no*sizeof(ts_vertex *));
-    if(vtx->data->neigh == NULL && vtx->data->neigh_no!=0)
+    vtx->neigh_no--;
+    vtx->neigh=(ts_vertex **)realloc(vtx->neigh,vtx->neigh_no*sizeof(ts_vertex *));
+    if(vtx->neigh == NULL && vtx->neigh_no!=0)
         fatal("Reallocation of memory failed during removal of vertex neighbour in vtx_remove_neighbour",100);
 
 /* repeat for the neighbour */
 /* find a neighbour */
 /* remove it from the list while shifting remaining neighbours up */
-    for(i=0;i<nvtx->data->neigh_no;i++){
-        if(nvtx->data->neigh[i]!=vtx){
-            nvtx->data->neigh[j]=nvtx->data->neigh[i];
+    for(i=0;i<nvtx->neigh_no;i++){
+        if(nvtx->neigh[i]!=vtx){
+            nvtx->neigh[j]=nvtx->neigh[i];
             j++;
         }
     }
 /* resize memory. potentionally time consuming. */
-    nvtx->data->neigh_no--;
-    nvtx->data->neigh=(ts_vertex **)realloc(nvtx->data->neigh,nvtx->data->neigh_no*sizeof(ts_vertex *));
-    if(nvtx->data->neigh == NULL && nvtx->data->neigh_no!=0)
+    nvtx->neigh_no--;
+    nvtx->neigh=(ts_vertex **)realloc(nvtx->neigh,nvtx->neigh_no*sizeof(ts_vertex *));
+    if(nvtx->neigh == NULL && nvtx->neigh_no!=0)
         fatal("Reallocation of memory failed during removal of vertex neighbour in vtx_remove_neighbour",100);
 
     return TS_SUCCESS;
@@ -110,13 +98,13 @@ ts_bool vtx_add_bond(ts_bond_list *blist,ts_vertex *vtx1,ts_vertex *vtx2){
     ts_bond *bond;
     bond=bond_add(blist,vtx1,vtx2);
     if(bond==NULL) return TS_FAIL;
-    vtx1->data->bond_no++;
+    vtx1->bond_no++;
    // vtx2->data->bond_no++;
 
-    vtx1->data->bond=(ts_bond **)realloc(vtx1->data->bond, vtx1->data->bond_no*sizeof(ts_bond *)); 
+    vtx1->bond=(ts_bond **)realloc(vtx1->bond, vtx1->bond_no*sizeof(ts_bond *)); 
    // vtx2->data->bond=(ts_bond **)realloc(vtx2->data->bond, vtx2->data->bond_no*sizeof(ts_bond *)); 
-    vtx1->data->bond[vtx1->data->bond_no-1]=bond;
-   // vtx2->data->bond[vtx2->data->bond_no-1]=bond;
+    vtx1->bond[vtx1->bond_no-1]=bond;
+   // vtx2->ata->bond[vtx2->data->bond_no-1]=bond;
     return TS_SUCCESS;
 }
 
@@ -139,20 +127,11 @@ ts_bool vtx_remove_cneighbour(ts_bond_list *blist, ts_vertex *vtx1, ts_vertex
 }
 
 
-
-ts_bool vtx_data_free(ts_vertex_data *data){
-    if(data->neigh!=NULL)   free(data->neigh);
-    if(data->tristar!=NULL) free(data->tristar);
-    if(data->bond!=NULL)    free(data->bond);
-//Cells are freed separately.
- //   if(data->cell!=NULL)    free(data->cell);
-    free(data);
-    return TS_SUCCESS;
-}
-
-/*not usable. can be deleted */
 ts_bool vtx_free(ts_vertex  *vtx){
-    vtx_data_free(vtx->data);
+    if(vtx->neigh!=NULL)   free(vtx->neigh);
+    if(vtx->tristar!=NULL) free(vtx->tristar);
+    if(vtx->bond!=NULL)    free(vtx->bond);
+
     free(vtx);
     return TS_SUCCESS;
 }
@@ -160,9 +139,9 @@ ts_bool vtx_free(ts_vertex  *vtx){
 ts_bool vtx_list_free(ts_vertex_list *vlist){
     int i;
     for(i=0;i<vlist->n;i++){
-        if(vlist->vtx[i]->data!=NULL) vtx_data_free(vlist->vtx[i]->data);
+		if(vlist->vtx[i]!=NULL) vtx_free(vlist->vtx[i]);
     }
-    free(*(vlist->vtx));
+    //free(*(vlist->vtx));
     free(vlist->vtx);
     free(vlist);
     return TS_SUCCESS;
@@ -170,15 +149,14 @@ ts_bool vtx_list_free(ts_vertex_list *vlist){
 
 inline ts_double vtx_distance_sq(ts_vertex *vtx1, ts_vertex *vtx2){
     ts_double dist;
-    ts_vertex_data *vd1=vtx1->data, *vd2=vtx2->data;
 #ifdef TS_DOUBLE_DOUBLE
-    dist=pow(vd1->x-vd2->x,2) + pow(vd1->y-vd2->y,2) + pow(vd1->z-vd2->z,2);
+    dist=pow(vtx1->x-vtx2->x,2) + pow(vtx1->y-vtx2->y,2) + pow(vtx1->z-vtx2->z,2);
 #endif
 #ifdef TS_DOUBLE_LONGDOUBLE
-    dist=powl(vd1->x-vd2->x,2) + powl(vd1->y-vd2->y,2) + powl(vd1->z-vd2->z,2);
+    dist=powl(vtx1->x-vtx2->x,2) + powl(vtx1->y-vtx2->y,2) + powl(vtx1->z-vtx2->z,2);
 #endif
 #ifdef TS_DOUBLE_FLOAT
-    dist=powf(vd1->x-vd2->x,2) + powf(vd1->y-vd2->y,2) + powf(vd1->z-vd2->z,2);
+    dist=powf(vtx1->x-vtx2->x,2) + powf(vtx1->y-vtx2->y,2) + powf(vtx1->z-vtx2->z,2);
 #endif
     return(dist);
 }
@@ -189,32 +167,32 @@ ts_bool vtx_set_global_values(ts_vesicle *vesicle){
     ts_double xk=vesicle->bending_rigidity;
     ts_uint i; 
     for(i=0;i<vesicle->vlist->n;i++){
-        vesicle->vlist->vtx[i]->data->xk=xk;
+        vesicle->vlist->vtx[i]->xk=xk;
     }
     return TS_SUCCESS;
 }
 
 inline ts_double vtx_direct(ts_vertex *vtx1, ts_vertex *vtx2, ts_vertex *vtx3){
-    ts_double dX2=vtx2->data->x-vtx1->data->x;
-    ts_double dY2=vtx2->data->y-vtx1->data->y;
-    ts_double dZ2=vtx2->data->z-vtx1->data->z;
-    ts_double dX3=vtx3->data->x-vtx1->data->x;
-    ts_double dY3=vtx3->data->y-vtx1->data->y;
-    ts_double dZ3=vtx3->data->z-vtx1->data->z;
-    ts_double direct=vtx1->data->x*(dY2*dZ3 -dZ2*dY3)+ 
-        vtx1->data->y*(dZ2*dX3-dX2*dZ3)+
-        vtx1->data->z*(dX2*dY3-dY2*dX3);
+    ts_double dX2=vtx2->x-vtx1->x;
+    ts_double dY2=vtx2->y-vtx1->y;
+    ts_double dZ2=vtx2->z-vtx1->z;
+    ts_double dX3=vtx3->x-vtx1->x;
+    ts_double dY3=vtx3->y-vtx1->y;
+    ts_double dZ3=vtx3->z-vtx1->z;
+    ts_double direct=vtx1->x*(dY2*dZ3 -dZ2*dY3)+ 
+        vtx1->y*(dZ2*dX3-dX2*dZ3)+
+        vtx1->z*(dX2*dY3-dY2*dX3);
     return(direct);    
 }
 
 
 inline ts_bool vertex_add_tristar(ts_vertex *vtx, ts_triangle *tristarmem){
-	vtx->data->tristar_no++;
-	vtx->data->tristar=(ts_triangle **)realloc(vtx->data->tristar,vtx->data->tristar_no*sizeof(ts_triangle *));
-	if(vtx->data->tristar==NULL){
+	vtx->tristar_no++;
+	vtx->tristar=(ts_triangle **)realloc(vtx->tristar,vtx->tristar_no*sizeof(ts_triangle *));
+	if(vtx->tristar==NULL){
 			fatal("Reallocation of memory while adding tristar failed.",3);
 	}
-	vtx->data->tristar[vtx->data->tristar_no-1]=tristarmem;
+	vtx->tristar[vtx->tristar_no-1]=tristarmem;
 	return TS_SUCCESS;
 }
 
@@ -225,22 +203,18 @@ inline ts_bool vertex_add_tristar(ts_vertex *vtx, ts_triangle *tristarmem){
 
 ts_bool vtx_copy(ts_vertex *cvtx, ts_vertex *ovtx){
     memcpy((void *)cvtx,(void *)ovtx,sizeof(ts_vertex));
-    cvtx->data=(ts_vertex_data *)malloc(sizeof(ts_vertex_data));
-    memcpy((void *)cvtx->data,(void *)ovtx->data,sizeof(ts_vertex_data));
-    cvtx->data->neigh=NULL;
-    cvtx->data->neigh_no=0;
-    cvtx->data->tristar_no=0;
-    cvtx->data->bond_no=0;
-    cvtx->data->tristar=NULL;
-    cvtx->data->bond=NULL;
-    cvtx->data->cell=NULL;
+    cvtx->neigh=NULL;
+    cvtx->neigh_no=0;
+    cvtx->tristar_no=0;
+    cvtx->bond_no=0;
+    cvtx->tristar=NULL;
+    cvtx->bond=NULL;
+    cvtx->cell=NULL;
     return TS_SUCCESS;
 }
 
 ts_bool vtx_duplicate(ts_vertex *cvtx, ts_vertex *ovtx){
     memcpy((void *)cvtx,(void *)ovtx,sizeof(ts_vertex));
-    cvtx->data=(ts_vertex_data *)malloc(sizeof(ts_vertex_data));
-    memcpy((void *)cvtx->data,(void *)ovtx->data,sizeof(ts_vertex_data));
     return TS_SUCCESS;
 }
 
@@ -256,12 +230,11 @@ ts_vertex_list *vertex_list_copy(ts_vertex_list *ovlist){
     ts_vertex_list *vlist=(ts_vertex_list *)malloc(sizeof(ts_vertex_list));
     vlist=memcpy((void *)vlist, (void *)ovlist, sizeof(ts_vertex_list));
     ts_vertex **vtx=(ts_vertex **)malloc(vlist->n*sizeof(ts_vertex *));
-    ts_vertex *tlist=(ts_vertex *)calloc(vlist->n,sizeof(ts_vertex));
     vlist->vtx=vtx;
-    if(vlist->vtx==NULL || tlist==NULL)
+    if(vlist->vtx==NULL)
         fatal("Fatal error reserving memory space for vertex list! Could number of requsted vertices be too large?", 100);
     for(i=0;i<vlist->n;i++) {
-        vlist->vtx[i]=&tlist[i];
+        vlist->vtx[i]=(ts_vertex *)calloc(1,sizeof(ts_vertex));
         vlist->vtx[i]->idx=i;
         vtx_copy(vlist->vtx[i],ovlist->vtx[i]);
     }

@@ -14,12 +14,10 @@
  *	@returns ts_bool value 1 on success, 0 otherwise
 */
 ts_vertex_list *init_vertex_list(ts_uint N);
-ts_vertex_data *init_vertex_data(void);
 ts_bool vtx_add_neighbour(ts_vertex *vtx, ts_vertex *nvtx);
 ts_bool vtx_add_cneighbour(ts_bond_list *blist,ts_vertex *vtx1,ts_vertex *vtx2);
 ts_bool vtx_add_bond(ts_bond_list *blist,ts_vertex *vtx1,ts_vertex *vtx2);
 ts_bool vtx_remove_neighbour(ts_vertex *vtx, ts_vertex *nvtx);
-ts_bool vtx_data_free(ts_vertex_data *data);
 ts_bool vtx_free(ts_vertex *vtx);
 ts_bool vtx_list_free(ts_vertex_list *vlist);
 inline ts_double vtx_distance_sq(ts_vertex *vtx1, ts_vertex *vtx2);

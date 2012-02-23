@@ -112,10 +112,10 @@ typedef char ts_bool;
 
 /** @brief Data structure of all data connected to a vertex
  *
- *  ts_vertex_data holds the data for one single point (bead, vertex). To understand how to use it
+ *  ts_vertex holds the data for one single point (bead, vertex). To understand how to use it
  *  here is a detailed description of the fields in the data structure. */
-struct ts_vertex_data {
-        ts_uint idx; /**< Represents index of the vertex point. Should become obsolete, since it is also present in ts_vertex structure. */        
+struct ts_vertex {
+        ts_uint idx;
         ts_double x; /**< The x coordinate of vertex. */
         ts_double y; /**< The y coordinate of vertex. */
         ts_double z; /**< The z coordinate of vertex. */
@@ -134,12 +134,6 @@ struct ts_vertex_data {
         ts_double xk;
         ts_double c;
         ts_uint id;
-};
-typedef struct ts_vertex_data ts_vertex_data;
-
-struct ts_vertex {
-        ts_uint idx;
-        ts_vertex_data *data;
 };
 typedef struct ts_vertex ts_vertex;
 

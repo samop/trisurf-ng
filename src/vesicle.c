@@ -21,9 +21,9 @@ ts_bool vesicle_translate(ts_vesicle *vesicle,ts_double x, ts_double y, ts_doubl
 	ts_vertex **vtx=vesicle->vlist->vtx;
 	ts_uint nn=vesicle->vlist->n;
 	for(i=0;i<nn;i++){
-		vtx[i]->data->x+=x;
-		vtx[i]->data->y+=y;
-		vtx[i]->data->z+=z;
+		vtx[i]->x+=x;
+		vtx[i]->y+=y;
+		vtx[i]->z+=z;
 	}
 	return TS_SUCCESS;
 }

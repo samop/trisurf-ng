@@ -49,9 +49,9 @@ inline ts_uint vertex_self_avoidance(ts_vesicle *vesicle, ts_vertex *vtx){
     ts_uint cellidx;
     ts_uint ncx, ncy,ncz;
     ts_cell_list *clist=vesicle->clist;
-    ncx=(ts_uint)((vtx->data->x-vesicle->cm[0])*clist->dcell+clist->shift);
-    ncy=(ts_uint)((vtx->data->y-vesicle->cm[1])*clist->dcell+clist->shift);
-    ncz=(ts_uint)((vtx->data->z-vesicle->cm[2])*clist->dcell+clist->shift);
+    ncx=(ts_uint)((vtx->x-vesicle->cm[0])*clist->dcell+clist->shift);
+    ncy=(ts_uint)((vtx->y-vesicle->cm[1])*clist->dcell+clist->shift);
+    ncz=(ts_uint)((vtx->z-vesicle->cm[2])*clist->dcell+clist->shift);
 
     if(ncx == clist->ncmax[0]-1 || ncx == 2){
         fatal("Vesicle is positioned outside the cell covered area. Coordinate x is the problem.",1500);

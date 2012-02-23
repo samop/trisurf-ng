@@ -42,17 +42,17 @@ ts_fprintf(stdout,"Y(2,2,pi/6,pi/3)=%f (%f)\n",shY(2,2,M_PI/6,M_PI/3), sqrt(15.0
 
 /*we calculate new position of each vertex of vesicle */
 for(i=0;i<n;i++){
-	fi=atan2(vlist->vtx[i]->data->y, vlist->vtx[i]->data->x);
+	fi=atan2(vlist->vtx[i]->y, vlist->vtx[i]->x);
 /*	theta=atan2(
 	    sqrt(vlist->vtx[i]->data->x*vlist->vtx[i]->data->x + 
 		vlist->vtx[i]->data->y*vlist->vtx[i]->data->y),
 		vlist->vtx[i]->data->z 
 	    ); */
 	theta=acos(
-		vlist->vtx[i]->data->z /
-	    sqrt(vlist->vtx[i]->data->x*vlist->vtx[i]->data->x + 
-		vlist->vtx[i]->data->y*vlist->vtx[i]->data->y+
-		vlist->vtx[i]->data->z*vlist->vtx[i]->data->z)
+		vlist->vtx[i]->z /
+	    sqrt(vlist->vtx[i]->x*vlist->vtx[i]->x + 
+		vlist->vtx[i]->y*vlist->vtx[i]->y+
+		vlist->vtx[i]->z*vlist->vtx[i]->z)
 
 		);
 
@@ -67,9 +67,9 @@ for(i=0;i<n;i++){
 		/*ts_fprintf(stdout,"l=%d, m=%d, u=%s\n",l,m,argv[j]);*/
 	}
 
-	vlist->vtx[i]->data->z=fabs(r)*cos(theta);
-	vlist->vtx[i]->data->x=fabs(r)*sin(theta)*cos(fi);
-	vlist->vtx[i]->data->y=fabs(r)*sin(theta)*sin(fi);
+	vlist->vtx[i]->z=fabs(r)*cos(theta);
+	vlist->vtx[i]->x=fabs(r)*sin(theta)*cos(fi);
+	vlist->vtx[i]->y=fabs(r)*sin(theta)*sin(fi);
 }
 
 write_vertex_xml_file(vesicle,0);

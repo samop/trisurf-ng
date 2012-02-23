@@ -194,12 +194,12 @@ ts_bool triangle_remove_neighbour(ts_triangle *tria, ts_triangle *ntria){
   */
 ts_bool triangle_normal_vector(ts_triangle *tria){
 	ts_double x21,x31,y21,y31,z21,z31,xden;
-	x21=tria->vertex[1]->data->x - tria->vertex[0]->data->x;
-	x31=tria->vertex[2]->data->x - tria->vertex[0]->data->x;
-	y21=tria->vertex[1]->data->y - tria->vertex[0]->data->y;
-	y31=tria->vertex[2]->data->y - tria->vertex[0]->data->y;
-	z21=tria->vertex[1]->data->z - tria->vertex[0]->data->z;
-	z31=tria->vertex[2]->data->z - tria->vertex[0]->data->z;
+	x21=tria->vertex[1]->x - tria->vertex[0]->x;
+	x31=tria->vertex[2]->x - tria->vertex[0]->x;
+	y21=tria->vertex[1]->y - tria->vertex[0]->y;
+	y31=tria->vertex[2]->y - tria->vertex[0]->y;
+	z21=tria->vertex[1]->z - tria->vertex[0]->z;
+	z31=tria->vertex[2]->z - tria->vertex[0]->z;
 
 	tria->xnorm=y21*z31 - z21*y31;
 	tria->ynorm=z21*x31 - x21*z31;

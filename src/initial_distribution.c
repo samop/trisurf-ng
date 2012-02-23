@@ -64,40 +64,40 @@ ts_bool pentagonal_dipyramid_vertex_distribution(ts_vertex_list *vlist){
 	ts_double dx,dy; // end loop prereq
 
 	/* topmost vertex */
-	vtx[1]->data->x=0.0;
-	vtx[1]->data->y=0.0;
-	vtx[1]->data->z=z0*(ts_double)nshell;
+	vtx[1]->x=0.0;
+	vtx[1]->y=0.0;
+	vtx[1]->z=z0*(ts_double)nshell;
 	
 	/* starting from to in circular order on pentagrams */	
 	for(i=1;i<=nshell;i++){
 		n0=2+5*i*(i-1)/2; //-1 would be for the reason that C index starts from 0 
-		vtx[n0]->data->x=0.0;
-		vtx[n0]->data->y=(ts_double)i*xl0;
-		vtx[n0+i]->data->x=vtx[n0]->data->y*s1;
-		vtx[n0+i]->data->y=vtx[n0]->data->y*c1;
-		vtx[n0+2*i]->data->x=vtx[n0]->data->y*s2;
-		vtx[n0+2*i]->data->y=vtx[n0]->data->y*c2;
-		vtx[n0+3*i]->data->x=-vtx[n0+2*i]->data->x;
-		vtx[n0+3*i]->data->y=vtx[n0+2*i]->data->y;
-		vtx[n0+4*i]->data->x=-vtx[n0+i]->data->x;
-		vtx[n0+4*i]->data->y=vtx[n0+i]->data->y;
+		vtx[n0]->x=0.0;
+		vtx[n0]->y=(ts_double)i*xl0;
+		vtx[n0+i]->x=vtx[n0]->y*s1;
+		vtx[n0+i]->y=vtx[n0]->y*c1;
+		vtx[n0+2*i]->x=vtx[n0]->y*s2;
+		vtx[n0+2*i]->y=vtx[n0]->y*c2;
+		vtx[n0+3*i]->x=-vtx[n0+2*i]->x;
+		vtx[n0+3*i]->y=vtx[n0+2*i]->y;
+		vtx[n0+4*i]->x=-vtx[n0+i]->x;
+		vtx[n0+4*i]->y=vtx[n0+i]->y;
 	}
 
 	/* vertexes on the faces of the dipyramid */
 	for(i=1;i<=nshell;i++){
 		n0=2+5*i*(i-1)/2; // -1 would be because of C!
 		for(j=1;j<=i-1;j++){
-			dx=(vtx[n0]->data->x-vtx[n0+4*i]->data->x)/(ts_double)i;
-			dy=(vtx[n0]->data->y-vtx[n0+4*i]->data->y)/(ts_double)i;
-			vtx[n0+4*i+j]->data->x=(ts_double)j*dx+vtx[n0+4*i]->data->x;
-			vtx[n0+4*i+j]->data->y=(ts_double)j*dy+vtx[n0+4*i]->data->y;
+			dx=(vtx[n0]->x-vtx[n0+4*i]->x)/(ts_double)i;
+			dy=(vtx[n0]->y-vtx[n0+4*i]->y)/(ts_double)i;
+			vtx[n0+4*i+j]->x=(ts_double)j*dx+vtx[n0+4*i]->x;
+			vtx[n0+4*i+j]->y=(ts_double)j*dy+vtx[n0+4*i]->y;
 		}
 		for(k=0;k<=3;k++){ // I would be worried about zero starting of for
-			dx=(vtx[n0+(k+1)*i]->data->x - vtx[n0+k*i]->data->x)/(ts_double) i;
-			dy=(vtx[n0+(k+1)*i]->data->y - vtx[n0+k*i]->data->y)/(ts_double) i;
+			dx=(vtx[n0+(k+1)*i]->x - vtx[n0+k*i]->x)/(ts_double) i;
+			dy=(vtx[n0+(k+1)*i]->y - vtx[n0+k*i]->y)/(ts_double) i;
 			for(j=1; j<=i-1;j++){
-				vtx[n0+k*i+j]->data->x= (ts_double)j*dx+vtx[n0+k*i]->data->x;
-				vtx[n0+k*i+j]->data->y= (ts_double)j*dy+vtx[n0+k*i]->data->y;
+				vtx[n0+k*i+j]->x= (ts_double)j*dx+vtx[n0+k*i]->x;
+				vtx[n0+k*i+j]->y= (ts_double)j*dy+vtx[n0+k*i]->y;
 			} 
 		} 
 	}
@@ -105,15 +105,15 @@ ts_bool pentagonal_dipyramid_vertex_distribution(ts_vertex_list *vlist){
 	for(i=1;i<=nshell;i++){
 		n0= 2+ 5*i*(i-1)/2;
 		for(j=0;j<=5*i-1;j++){
-		vtx[n0+j]->data->z= z0*(ts_double)(nshell-i);   // I would be worried about zero starting of for
+		vtx[n0+j]->z= z0*(ts_double)(nshell-i);   // I would be worried about zero starting of for
 		}
 	}
 
 /* for botom part of dipyramide we calculate the positions of vertices */
 	for(i=2+5*nshell*(nshell+1)/2;i<=vlist->n;i++){
-		vtx[i]->data->x=vtx[vlist->n - i +1]->data->x;
-		vtx[i]->data->y=vtx[vlist->n - i +1]->data->y;
-		vtx[i]->data->z=-vtx[vlist->n - i +1]->data->z;
+		vtx[i]->x=vtx[vlist->n - i +1]->x;
+		vtx[i]->y=vtx[vlist->n - i +1]->y;
+		vtx[i]->z=-vtx[vlist->n - i +1]->z;
 	}
 
 	for(i=1;i<=vlist->n;i++){
@@ -166,15 +166,16 @@ ts_vertex_list *init_sort_neighbours(ts_bond_list *blist,ts_vertex_list *vlist){
     ts_double direct; // Something, dont know what, but could be normal of some kind
 	for(i=1;i<=vlist->n;i++){
 		k++; // WHY i IS NOT GOOD??
-       	vtx_add_cneighbour(blist,tvtx[k], tvtx[vtx[i]->data->neigh[0]->idx+1]); //always add 1st
+       	vtx_add_cneighbour(blist,tvtx[k], tvtx[vtx[i]->neigh[0]->idx+1]); //always add 1st
        	jjj=1;
        	jj=1;
-       	for(l=2;l<=vtx[i]->data->neigh_no;l++){
-           	for(j=2;j<=vtx[i]->data->neigh_no;j++){
-               	dist2=vtx_distance_sq(vtx[i]->data->neigh[j-1],vtx[i]->data->neigh[jj-1]);
-               	direct=vtx_direct(vtx[i],vtx[i]->data->neigh[j-1],vtx[i]->data->neigh[jj-1]);
+       	for(l=2;l<=vtx[i]->neigh_no;l++){
+           	for(j=2;j<=vtx[i]->neigh_no;j++){
+               	dist2=vtx_distance_sq(vtx[i]->neigh[j-1],vtx[i]->neigh[jj-1]);
+               	direct=vtx_direct(vtx[i],vtx[i]->neigh[j-1],vtx[i]->neigh[jj-1]);
+// TODO: check if fabs can be used with all floating point types!!
                	if( (fabs(dist2-A0*A0)<=eps) && (direct>0.0) && (j!=jjj) ){
-           			vtx_add_cneighbour(blist,tvtx[k],tvtx[vtx[i]->data->neigh[j-1]->idx+1]);
+           			vtx_add_cneighbour(blist,tvtx[k],tvtx[vtx[i]->neigh[j-1]->idx+1]);
            			jjj=jj;
            			jj=j;
            			break;
@@ -206,8 +207,8 @@ ts_bool init_vesicle_bonds(ts_vesicle *vesicle){
 	ts_uint i,j,k;
 	for(i=1;i<=vlist->n;i++){
 		for(j=i+1;j<=vlist->n;j++){
-			for(k=0;k<vtx[i]->data->neigh_no;k++){ // has changed 0 to < instead of 1 and <=
-				if(vtx[i]->data->neigh[k]==vtx[j]){  //if addresses matches it is the same
+			for(k=0;k<vtx[i]->neigh_no;k++){ // has changed 0 to < instead of 1 and <=
+				if(vtx[i]->neigh[k]==vtx[j]){  //if addresses matches it is the same
 					bond_add(blist,vtx[i],vtx[j]);
 					break;
 				}
@@ -232,14 +233,15 @@ ts_bool init_triangles(ts_vesicle *vesicle){
 	ts_double eps=0.001; // can we use EPS from math.h?
 	k=0;
 	for(i=1;i<=vesicle->vlist->n;i++){
-		for(j=1;j<=vtx[i]->data->neigh_no;j++){
-			for(jj=1;jj<=vtx[i]->data->neigh_no;jj++){
+		for(j=1;j<=vtx[i]->neigh_no;j++){
+			for(jj=1;jj<=vtx[i]->neigh_no;jj++){
 		//		ts_fprintf(stderr,"%u: (%u,%u) neigh_no=%u ",i,j,jj,vtx[i].neigh_no);
         //      ts_fprintf(stderr,"%e, %e",vtx[i].neigh[j-1]->x,vtx[i].neigh[jj-1]->x);
-				dist=vtx_distance_sq(vtx[i]->data->neigh[j-1],vtx[i]->data->neigh[jj-1]);
-				direct=vtx_direct(vtx[i],vtx[i]->data->neigh[j-1],vtx[i]->data->neigh[jj-1]);				
-				if(fabs(dist-A0*A0)<=eps && direct < 0.0 && vtx[i]->data->neigh[j-1]->idx+1 > i && vtx[i]->data->neigh[jj-1]->idx+1 >i){
-					triangle_add(tlist,vtx[i],vtx[i]->data->neigh[j-1],vtx[i]->data->neigh[jj-1]);
+				dist=vtx_distance_sq(vtx[i]->neigh[j-1],vtx[i]->neigh[jj-1]);
+				direct=vtx_direct(vtx[i],vtx[i]->neigh[j-1],vtx[i]->neigh[jj-1]);				
+// TODO: same as above				
+				if(fabs(dist-A0*A0)<=eps && direct < 0.0 && vtx[i]->neigh[j-1]->idx+1 > i && vtx[i]->neigh[jj-1]->idx+1 >i){
+					triangle_add(tlist,vtx[i],vtx[i]->neigh[j-1],vtx[i]->neigh[jj-1]);
 				}	
 			}	
 		}
@@ -254,7 +256,7 @@ ts_bool init_triangles(ts_vesicle *vesicle){
             k++;
 		}
             if(k!=3){
-                fatal("Some triangles has less than 3 vertices..",4);
+                fatal("Some triangles have less than 3 vertices..",4);
             }   
 	} 
     if(tlist->n!=2*(vesicle->vlist->n -2)){
@@ -334,11 +336,11 @@ ts_bool init_common_vertex_triangle_neighbours(ts_vesicle *vesicle){
     ts_triangle **tria=tlist->tria -1;
 
     for(i=1;i<=vesicle->vlist->n;i++){
-        for(j=1;j<=vtx[i]->data->neigh_no;j++){
-            k1=vtx[i]->data->neigh[j-1];
+        for(j=1;j<=vtx[i]->neigh_no;j++){
+            k1=vtx[i]->neigh[j-1];
             jp=j+1;
-            if(j == vtx[i]->data->neigh_no) jp=1;
-            k2=vtx[i]->data->neigh[jp-1];
+            if(j == vtx[i]->neigh_no) jp=1;
+            k2=vtx[i]->neigh[jp-1];
             for(k=1;k<=tlist->n;k++){		// VERY NON-OPTIMAL!!! too many loops (vlist.n * vtx.neigh * tlist.n )!
                 k3=tria[k]->vertex[0];
                 k4=tria[k]->vertex[1];

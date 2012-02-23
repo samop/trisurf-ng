@@ -15,7 +15,7 @@ ts_bool print_vertex_list(ts_vertex_list *vlist){
 	printf("Number of vertices: %u\n",vlist->n);
 	for(i=0;i<vlist->n;i++){
 		printf("%u: %f %f %f\n",
-vlist->vtx[i]->idx,vlist->vtx[i]->data->x, vlist->vtx[i]->data->y, vlist->vtx[i]->data->z);
+vlist->vtx[i]->idx,vlist->vtx[i]->x, vlist->vtx[i]->y, vlist->vtx[i]->z);
 	}
 	return TS_SUCCESS;
 }
@@ -25,10 +25,10 @@ ts_bool print_vertex_neighbours(ts_vertex_list *vlist){
 	ts_vertex **vtx=vlist->vtx;
 	printf("Vertex id(neigh no): (neighvertex coord) (neighvertex coord) ...\n");
 	for(i=0;i<vlist->n;i++){
-		printf("%u(%u): ",vtx[i]->idx,vtx[i]->data->neigh_no);
-		for(j=0;j<vtx[i]->data->neigh_no;j++){
-			printf("(%f,%f,%f)",vtx[i]->data->neigh[j]->data->x,
-vtx[i]->data->neigh[j]->data->y,vtx[i]->data->neigh[j]->data->z);
+		printf("%u(%u): ",vtx[i]->idx,vtx[i]->neigh_no);
+		for(j=0;j<vtx[i]->neigh_no;j++){
+			printf("(%f,%f,%f)",vtx[i]->neigh[j]->x,
+vtx[i]->neigh[j]->y,vtx[i]->neigh[j]->z);
 		}
 		printf("\n");
 	}
@@ -47,7 +47,7 @@ ts_bool write_vertex_fcompat_file(ts_vertex_list *vlist,ts_char *filename){
 		return TS_FAIL;
 	}
 	for(i=0;i<vlist->n;i++)
-		fprintf(fh," %E\t%E\t%E\n",vtx[i]->data->x,vtx[i]->data->y, vtx[i]->data->z);
+		fprintf(fh," %E\t%E\t%E\n",vtx[i]->x,vtx[i]->y, vtx[i]->z);
 
 	fclose(fh);
 return TS_SUCCESS;
@@ -57,11 +57,11 @@ return TS_SUCCESS;
 ts_bool fprint_vertex_list(FILE *fh,ts_vertex_list *vlist){
     ts_uint i,j;
 	for(i=0;i<vlist->n;i++){
-		fprintf(fh," %.17E\t%.17E\t%.17E\t%u\n",vlist->vtx[i]->data->x,
-			vlist->vtx[i]->data->y, vlist->vtx[i]->data->z,
-            vlist->vtx[i]->data->neigh_no);
-		for(j=0;j<vlist->vtx[i]->data->neigh_no;j++){
-			fprintf(fh,"\t%u",(ts_uint)(vlist->vtx[i]->data->neigh[j]->idx));
+		fprintf(fh," %.17E\t%.17E\t%.17E\t%u\n",vlist->vtx[i]->x,
+			vlist->vtx[i]->y, vlist->vtx[i]->z,
+            vlist->vtx[i]->neigh_no);
+		for(j=0;j<vlist->vtx[i]->neigh_no;j++){
+			fprintf(fh,"\t%u",(ts_uint)(vlist->vtx[i]->neigh[j]->idx));
         //-vlist->vtx+1));
 		}
 		fprintf(fh,"\n");
@@ -72,9 +72,9 @@ ts_bool fprint_vertex_list(FILE *fh,ts_vertex_list *vlist){
 ts_bool fprint_tristar(FILE *fh, ts_vesicle *vesicle){
     ts_uint i,j;
 	for(i=0;i<vesicle->vlist->n;i++){
-		fprintf(fh,"\t%u",vesicle->vlist->vtx[i]->data->tristar_no);
-		for(j=0;j<vesicle->vlist->vtx[i]->data->tristar_no;j++){
-			fprintf(fh,"\t%u",(ts_uint)(vesicle->vlist->vtx[i]->data->tristar[j]->idx));//-vesicle->tlist->tria+1));
+		fprintf(fh,"\t%u",vesicle->vlist->vtx[i]->tristar_no);
+		for(j=0;j<vesicle->vlist->vtx[i]->tristar_no;j++){
+			fprintf(fh,"\t%u",(ts_uint)(vesicle->vlist->vtx[i]->tristar[j]->idx));//-vesicle->tlist->tria+1));
 		}
 		fprintf(fh,"\n");
 	}
@@ -105,14 +105,14 @@ ts_bool fprint_vertex_data(FILE *fh,ts_vertex_list *vlist){
     ts_uint i,j;
     for(i=0;i<vlist->n;i++){
         fprintf(fh," %.17E\t%.17E\t%.17E\t%.17E\t%.17E\t%u\n",
-        vlist->vtx[i]->data->xk,vlist->vtx[i]->data->c,vlist->vtx[i]->data->energy,
-        vlist->vtx[i]->data->energy_h, vlist->vtx[i]->data->curvature, 0);
-        for(j=0;j<vlist->vtx[i]->data->neigh_no;j++){
-            fprintf(fh," %.17E", vlist->vtx[i]->data->bond[j]->bond_length_dual);
+        vlist->vtx[i]->xk,vlist->vtx[i]->c,vlist->vtx[i]->energy,
+        vlist->vtx[i]->energy_h, vlist->vtx[i]->curvature, 0);
+        for(j=0;j<vlist->vtx[i]->neigh_no;j++){
+            fprintf(fh," %.17E", vlist->vtx[i]->bond[j]->bond_length_dual);
         }
             fprintf(fh,"\n");
-        for(j=0;j<vlist->vtx[i]->data->neigh_no;j++){
-            fprintf(fh," %.17E", vlist->vtx[i]->data->bond[j]->bond_length);
+        for(j=0;j<vlist->vtx[i]->neigh_no;j++){
+            fprintf(fh," %.17E", vlist->vtx[i]->bond[j]->bond_length);
         }
             fprintf(fh,"\n");
     }
@@ -226,7 +226,7 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 
     fprintf(fh,"</DataArray>\n</PointData>\n<CellData>\n</CellData>\n<Points>\n<DataArray type=\"Float64\" Name=\"Koordinate tock\" NumberOfComponents=\"3\" format=\"ascii\">\n");
 	for(i=0;i<vlist->n;i++){
-		fprintf(fh,"%e %e %e\n",vtx[i]->data->x,vtx[i]->data->y, vtx[i]->data->z);
+		fprintf(fh,"%e %e %e\n",vtx[i]->x,vtx[i]->y, vtx[i]->z);
 	}
 
     fprintf(fh,"</DataArray>\n</Points>\n<Cells>\n<DataArray type=\"Int64\" Name=\"connectivity\" format=\"ascii\">");
@@ -270,7 +270,7 @@ ts_bool write_vertex_vtk_file(ts_vesicle *vesicle,ts_char *filename, ts_char *te
 	fprintf(fh,"DATASET UNSTRUCTURED_GRID\n");
 	fprintf(fh,"POINTS %u double\n", vlist->n);
 	for(i=0;i<vlist->n;i++){
-		fprintf(fh,"%e %e %e\n",vtx[i]->data->x,vtx[i]->data->y, vtx[i]->data->z);
+		fprintf(fh,"%e %e %e\n",vtx[i]->x,vtx[i]->y, vtx[i]->z);
 	}
 	
 	fprintf(fh,"CELLS %u %u\n",blist->n,3*blist->n);
@@ -286,7 +286,7 @@ ts_bool write_vertex_vtk_file(ts_vesicle *vesicle,ts_char *filename, ts_char *te
 	fprintf(fh,"LOOKUP_TABLE default\n");
 
 	for(i=0;i<vlist->n;i++)
-		fprintf(fh,"%u\n",vtx[i]->data->idx);
+		fprintf(fh,"%u\n",vtx[i]->idx);
 
 	fclose(fh);
 	return TS_SUCCESS;
@@ -351,11 +351,11 @@ ts_bool read_geometry_file(char *fname, ts_vesicle *vesicle){
     vesicle->vlist=init_vertex_list(nvtx);
     vlist=vesicle->vlist;
     for(i=0;i<nvtx;i++){
-   //     fscanf(fh,"%F %F %F",&vlist->vtx[i]->data->x,&vlist->vtx[i]->data->y,&vlist->vtx[i]->data->z);
+   //     fscanf(fh,"%F %F %F",&vlist->vtx[i]->x,&vlist->vtx[i]->y,&vlist->vtx[i]->z);
        retval=fscanf(fh,"%F %F %F",&x,&y,&z);
-        vlist->vtx[i]->data->x=x;
-        vlist->vtx[i]->data->y=y;
-        vlist->vtx[i]->data->z=z;
+        vlist->vtx[i]->x=x;
+        vlist->vtx[i]->y=y;
+        vlist->vtx[i]->z=z;
     }
     for(i=0;i<nedges;i++){
         retval=fscanf(fh,"%u %u",&vtxi1,&vtxi2);
@@ -368,8 +368,8 @@ ts_bool read_geometry_file(char *fname, ts_vesicle *vesicle){
     /*
     for(i=0;i<ntria;i++){
         retval=fscanf(fh,"%u %u %u", &bi1, &bi2, &bi3);
-        vtxi1=vesicle->blist->data->vertex1->idx;
-        vtxi2=vesicle->blist->data->vertex1->idx;
+        vtxi1=vesicle->blist->vertex1->idx;
+        vtxi2=vesicle->blist->vertex1->idx;
         
     }
     */
