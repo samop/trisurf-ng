@@ -52,5 +52,7 @@ ts_bool cell_occupation(ts_vesicle *vesicle){
     }
 
 */
+	if(dcell);
+	if(shift);
     return TS_SUCCESS;
 }

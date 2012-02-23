@@ -26,7 +26,7 @@ ts_bool single_timestep(ts_vesicle *vesicle){
 //        retval=single_bondflip_timestep(vesicle,&vesicle->blist.bond[i],rnvec);
         
     } 
-
+	if(retval);
     return TS_SUCCESS;
 }
 

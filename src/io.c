@@ -85,17 +85,17 @@ ts_bool fprint_triangle_list(FILE *fh, ts_vesicle *vesicle){
         ts_triangle_list *tlist=vesicle->tlist;
       ts_uint i,j;
 	for(i=0;i<tlist->n;i++){
-        fprintf(fh,"\t%u",tlist->tria[i]->data->neigh_no);
-	    for(j=0;j<tlist->tria[i]->data->neigh_no;j++){
-    		fprintf(fh,"\t%u",(ts_uint)(tlist->tria[i]->data->neigh[j]->idx));//-tlist->tria+1)); 
+        fprintf(fh,"\t%u",tlist->tria[i]->neigh_no);
+	    for(j=0;j<tlist->tria[i]->neigh_no;j++){
+    		fprintf(fh,"\t%u",(ts_uint)(tlist->tria[i]->neigh[j]->idx));//-tlist->tria+1)); 
         }
         fprintf(fh,"\n");
             for(j=0;j<3;j++){
-    		fprintf(fh,"\t%u",(ts_uint)(tlist->tria[i]->data->vertex[j]->idx));//-vesicle->vlist->vtx+1)); 
+    		fprintf(fh,"\t%u",(ts_uint)(tlist->tria[i]->vertex[j]->idx));//-vesicle->vlist->vtx+1)); 
             }
         fprintf(fh,"\n");
-		fprintf(fh,"%.17E\t%.17E\t%.17E\n",tlist->tria[i]->data->xnorm,
-tlist->tria[i]->data->ynorm,tlist->tria[i]->data->znorm);
+		fprintf(fh,"%.17E\t%.17E\t%.17E\n",tlist->tria[i]->xnorm,
+tlist->tria[i]->ynorm,tlist->tria[i]->znorm);
         fprintf(fh,"0.00000000000000000\n0.00000000000000000\n");
     }
     return TS_SUCCESS;
@@ -373,6 +373,7 @@ ts_bool read_geometry_file(char *fname, ts_vesicle *vesicle){
         
     }
     */
+	if(retval);
 	fclose(fh);	
 
 

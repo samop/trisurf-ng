@@ -28,6 +28,7 @@ ts_vesicle *initial_distribution_dipyramid(ts_uint nshell, ts_uint ncmax1, ts_ui
     retval = init_normal_vectors(vesicle->tlist);
     retval = mean_curvature_and_energy(vesicle);
  ts_fprintf(stderr,"initial_distribution finished!\n");
+	if(retval);
 	return vesicle;
 } 
 
@@ -249,7 +250,7 @@ ts_bool init_triangles(ts_vesicle *vesicle){
 	for(i=0;i<tlist->n;i++){
         k=0;
 		for(j=0;j<3;j++){
-			if(tlist->tria[i]->data->vertex[j]!=NULL)
+			if(tlist->tria[i]->vertex[j]!=NULL)
             k++;
 		}
             if(k!=3){
@@ -273,14 +274,14 @@ ts_bool init_triangle_neighbours(ts_vesicle *vesicle){
     ts_triangle **tria=tlist->tria -1;
     nobo=0;
     for(i=1;i<=tlist->n;i++){
-        i1=tria[i]->data->vertex[0]; 
-        i2=tria[i]->data->vertex[1]; 
-        i3=tria[i]->data->vertex[2]; 
+        i1=tria[i]->vertex[0]; 
+        i2=tria[i]->vertex[1]; 
+        i3=tria[i]->vertex[2]; 
         for(j=1;j<=tlist->n;j++){
             if(j==i) continue;
-            j1=tria[j]->data->vertex[0]; 
-            j2=tria[j]->data->vertex[1]; 
-            j3=tria[j]->data->vertex[2]; 
+            j1=tria[j]->vertex[0]; 
+            j2=tria[j]->vertex[1]; 
+            j3=tria[j]->vertex[2]; 
             if((i1==j1 && i3==j2) || (i1==j2 && i3==j3) || (i1==j3 && i3==j1)){
                     triangle_add_neighbour(tria[i],tria[j]);
                     nobo++;
@@ -288,14 +289,14 @@ ts_bool init_triangle_neighbours(ts_vesicle *vesicle){
         }
     }
     for(i=1;i<=tlist->n;i++){
-        i1=tria[i]->data->vertex[0]; 
-        i2=tria[i]->data->vertex[1]; 
-        i3=tria[i]->data->vertex[2]; 
+        i1=tria[i]->vertex[0]; 
+        i2=tria[i]->vertex[1]; 
+        i3=tria[i]->vertex[2]; 
         for(j=1;j<=tlist->n;j++){
             if(j==i) continue;
-            j1=tria[j]->data->vertex[0]; 
-            j2=tria[j]->data->vertex[1]; 
-            j3=tria[j]->data->vertex[2]; 
+            j1=tria[j]->vertex[0]; 
+            j2=tria[j]->vertex[1]; 
+            j3=tria[j]->vertex[2]; 
             if((i1==j1 && i2==j3) || (i1==j3 && i2==j2) || (i1==j2 && i2==j1)){
                 triangle_add_neighbour(tria[i],tria[j]);
                 nobo++;
@@ -303,14 +304,14 @@ ts_bool init_triangle_neighbours(ts_vesicle *vesicle){
         }
     }
     for(i=1;i<=tlist->n;i++){
-        i1=tria[i]->data->vertex[0]; 
-        i2=tria[i]->data->vertex[1]; 
-        i3=tria[i]->data->vertex[2]; 
+        i1=tria[i]->vertex[0]; 
+        i2=tria[i]->vertex[1]; 
+        i3=tria[i]->vertex[2]; 
         for(j=1;j<=tlist->n;j++){
             if(j==i) continue;
-            j1=tria[j]->data->vertex[0]; 
-            j2=tria[j]->data->vertex[1]; 
-            j3=tria[j]->data->vertex[2]; 
+            j1=tria[j]->vertex[0]; 
+            j2=tria[j]->vertex[1]; 
+            j3=tria[j]->vertex[2]; 
             if((i2==j1 && i3==j3) || (i2==j3 && i3==j2) || (i2==j2 && i3==j1)){
                 triangle_add_neighbour(tria[i],tria[j]);
                 nobo++;
@@ -339,9 +340,9 @@ ts_bool init_common_vertex_triangle_neighbours(ts_vesicle *vesicle){
             if(j == vtx[i]->data->neigh_no) jp=1;
             k2=vtx[i]->data->neigh[jp-1];
             for(k=1;k<=tlist->n;k++){		// VERY NON-OPTIMAL!!! too many loops (vlist.n * vtx.neigh * tlist.n )!
-                k3=tria[k]->data->vertex[0];
-                k4=tria[k]->data->vertex[1];
-                k5=tria[k]->data->vertex[2];
+                k3=tria[k]->vertex[0];
+                k4=tria[k]->vertex[1];
+                k5=tria[k]->vertex[2];
 //                ts_fprintf(stderr,"%u %u: k=(%u %u %u)\n",k1,k2,k3,k4,k5);
                 if((vtx[i]==k3 && k1==k4 && k2==k5) ||
                 (vtx[i]==k4 && k1==k5 && k2==k3) ||

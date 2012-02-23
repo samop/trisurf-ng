@@ -89,9 +89,9 @@ inline ts_bool energy_vertex(ts_vertex *vtx){
         xh+=tot*(j->data->x - data->x);
         yh+=tot*(j->data->y - data->y);
         zh+=tot*(j->data->z - data->z);
-        txn+=jt->data->xnorm;
-        tyn+=jt->data->ynorm;
-        tzn+=jt->data->znorm;
+        txn+=jt->xnorm;
+        tyn+=jt->ynorm;
+        tzn+=jt->znorm;
     }
     
     h=xh*xh+yh*yh+zh*zh;

@@ -65,12 +65,10 @@ vesicle=initial_distribution_dipyramid(17,60,60,60,0.15);
 centermass(vesicle);
 cell_occupation(vesicle);
 
-for(i=0;i<100;i++)
+for(i=0;i<100;i++){
 single_timestep(vesicle);
-
-
-
-write_vertex_xml_file(vesicle,0);
+write_vertex_xml_file(vesicle,i);
+}
 write_master_xml_file("test.pvd");
 write_dout_fcompat_file(vesicle,"dout");
 vesicle_free(vesicle);

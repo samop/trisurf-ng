@@ -57,13 +57,13 @@ ts_triangle *triangle_add(ts_triangle_list *tlist, ts_vertex *vtx1, ts_vertex *v
 
         tlist->tria[tlist->n-1]=(ts_triangle *)calloc(1,sizeof(ts_triangle));
         if(tlist->tria[tlist->n-1]==NULL) fatal("Cannot reallocate memory for additional ts_triangle.",5);
-        tlist->tria[tlist->n-1]->data=(ts_triangle_data *)calloc(1,sizeof(ts_triangle_data));
+  //      tlist->tria[tlist->n-1]->data=(ts_triangle_data *)calloc(1,sizeof(ts_triangle_data));
 
         //NOW insert vertices!
         tlist->tria[tlist->n - 1]->idx=tlist->n-1;
-        tlist->tria[tlist->n - 1]->data->vertex[0]=vtx1;
-        tlist->tria[tlist->n - 1]->data->vertex[1]=vtx2;
-        tlist->tria[tlist->n - 1]->data->vertex[2]=vtx3;
+        tlist->tria[tlist->n - 1]->vertex[0]=vtx1;
+        tlist->tria[tlist->n - 1]->vertex[1]=vtx2;
+        tlist->tria[tlist->n - 1]->vertex[2]=vtx3;
         return tlist->tria[tlist->n-1];
 }
 
@@ -94,11 +94,11 @@ ts_bool triangle_add_neighbour(ts_triangle *tria, ts_triangle *ntria){
     if(tria==NULL || ntria==NULL) return TS_FAIL;
 /*TODO: check if the neighbour already exists! Now there is no such check
  * because of the performance issue. */
-	tria->data->neigh_no++;
-	tria->data->neigh=realloc(tria->data->neigh,tria->data->neigh_no*sizeof(ts_triangle *));
-	if(tria->data->neigh == NULL)
+	tria->neigh_no++;
+	tria->neigh=realloc(tria->neigh,tria->neigh_no*sizeof(ts_triangle *));
+	if(tria->neigh == NULL)
 			fatal("Reallocation of memory failed during insertion of triangle neighbour in triangle_add_neighbour",3);
-	tria->data->neigh[tria->data->neigh_no-1]=ntria;
+	tria->neigh[tria->neigh_no-1]=ntria;
   
  
 /* we repeat the procedure for the neighbour */  
@@ -136,9 +136,9 @@ ts_bool triangle_remove_neighbour(ts_triangle *tria, ts_triangle *ntria){
     ts_uint i,j=0; 
     if(tria==NULL || ntria==NULL) return TS_FAIL;
 
-    for(i=0;i<tria->data->neigh_no;i++){
-        if(tria->data->neigh[i]!=ntria){
-            tria->data->neigh[j]=tria->data->neigh[i];
+    for(i=0;i<tria->neigh_no;i++){
+        if(tria->neigh[i]!=ntria){
+            tria->neigh[j]=tria->neigh[i];
             j++;
         } 
     }
@@ -146,15 +146,15 @@ ts_bool triangle_remove_neighbour(ts_triangle *tria, ts_triangle *ntria){
         return TS_FAIL; 
         //fatal("In triangle_remove_neighbour: Specified neighbour does not exist for given triangle",3);
     }
-    tria->data->neigh_no--;
-    tria->data->neigh=(ts_triangle **)realloc(tria->data->neigh,tria->data->neigh_no*sizeof(ts_triangle *));
-	if(tria->data->neigh == NULL){
+    tria->neigh_no--;
+    tria->neigh=(ts_triangle **)realloc(tria->neigh,tria->neigh_no*sizeof(ts_triangle *));
+	if(tria->neigh == NULL){
 		fatal("Reallocation of memory failed during removal of vertex neighbour in triangle_remove_neighbour",100);
 	}
 /* we repeat the procedure for neighbour */
-    for(i=0;i<ntria->data->neigh_no;i++){
-        if(ntria->data->neigh[i]!=tria){
-            ntria->data->neigh[j]=ntria->data->neigh[i];
+    for(i=0;i<ntria->neigh_no;i++){
+        if(ntria->neigh[i]!=tria){
+            ntria->neigh[j]=ntria->neigh[i];
             j++;
         } 
     }
@@ -162,9 +162,9 @@ ts_bool triangle_remove_neighbour(ts_triangle *tria, ts_triangle *ntria){
         return TS_FAIL; 
         //fatal("In triangle_remove_neighbour: Specified neighbour does not exist for given triangle",3);
     }
-    ntria->data->neigh_no--;
-    ntria->data->neigh=(ts_triangle **)realloc(ntria->data->neigh,ntria->data->neigh_no*sizeof(ts_triangle *));
-	if(ntria->data->neigh == NULL){
+    ntria->neigh_no--;
+    ntria->neigh=(ts_triangle **)realloc(ntria->neigh,ntria->neigh_no*sizeof(ts_triangle *));
+	if(ntria->neigh == NULL){
 		fatal("Reallocation of memory failed during removal of vertex neighbour in triangle_remove_neighbour",100);
 	}
     return TS_SUCCESS;
@@ -194,19 +194,19 @@ ts_bool triangle_remove_neighbour(ts_triangle *tria, ts_triangle *ntria){
   */
 ts_bool triangle_normal_vector(ts_triangle *tria){
 	ts_double x21,x31,y21,y31,z21,z31,xden;
-	x21=tria->data->vertex[1]->data->x - tria->data->vertex[0]->data->x;
-	x31=tria->data->vertex[2]->data->x - tria->data->vertex[0]->data->x;
-	y21=tria->data->vertex[1]->data->y - tria->data->vertex[0]->data->y;
-	y31=tria->data->vertex[2]->data->y - tria->data->vertex[0]->data->y;
-	z21=tria->data->vertex[1]->data->z - tria->data->vertex[0]->data->z;
-	z31=tria->data->vertex[2]->data->z - tria->data->vertex[0]->data->z;
+	x21=tria->vertex[1]->data->x - tria->vertex[0]->data->x;
+	x31=tria->vertex[2]->data->x - tria->vertex[0]->data->x;
+	y21=tria->vertex[1]->data->y - tria->vertex[0]->data->y;
+	y31=tria->vertex[2]->data->y - tria->vertex[0]->data->y;
+	z21=tria->vertex[1]->data->z - tria->vertex[0]->data->z;
+	z31=tria->vertex[2]->data->z - tria->vertex[0]->data->z;
 
-	tria->data->xnorm=y21*z31 - z21*y31;
-	tria->data->ynorm=z21*x31 - x21*z31;
-	tria->data->znorm=x21*y31 - y21*x31;
-	xden=tria->data->xnorm*tria->data->xnorm +
-         tria->data->ynorm*tria->data->ynorm + 
-         tria->data->znorm*tria->data->znorm;
+	tria->xnorm=y21*z31 - z21*y31;
+	tria->ynorm=z21*x31 - x21*z31;
+	tria->znorm=x21*y31 - y21*x31;
+	xden=tria->xnorm*tria->xnorm +
+         tria->ynorm*tria->ynorm + 
+         tria->znorm*tria->znorm;
 #ifdef TS_DOUBLE_DOUBLE
 	xden=sqrt(xden);
 #endif
@@ -216,9 +216,9 @@ ts_bool triangle_normal_vector(ts_triangle *tria){
 #ifdef TS_DOUBLE_LONGDOUBLE
 	xden=sqrtl(xden);
 #endif
-	tria->data->xnorm=tria->data->xnorm/xden;
-	tria->data->ynorm=tria->data->ynorm/xden;
-	tria->data->znorm=tria->data->znorm/xden;	
+	tria->xnorm=tria->xnorm/xden;
+	tria->ynorm=tria->ynorm/xden;
+	tria->znorm=tria->znorm/xden;	
 	return TS_SUCCESS;
 }
 
@@ -226,29 +226,6 @@ ts_bool triangle_normal_vector(ts_triangle *tria){
 
 
 
-/** @brief Frees the memory allocated for data structure of triangle data
- * (ts_triangle_data)
-  *
-  * Function frees the memory of ts_triangle_data previously allocated. It
-  * accepts one argument, the address of data structure. It destroys all
-  * pointers the structure might have (currently only neigh -- the pointer to
-  * list of neighbouring triangles) and data structure itself. The return value
-  * is always TS_SUCCESS.
-  *
-  * WARNING: The function doesn't check whether the pointer is NULL or invalid. It is the
-  * job of programmer to make sure the pointer is valid.
-  *
-  * Example of usage:
-  *		triangle_data_free(tlist->tria[3]->data);
-  *
-  *	    Clears the data structure with all pointers.
-  *		
-  */
-ts_bool triangle_data_free(ts_triangle_data *data){
-    if(data->neigh!=NULL) free(data->neigh);
-    free(data);
-    return TS_SUCCESS;
-}
 
 /** @brief Frees the memory allocated for data structure of triangle list
  * (ts_triangle_list)
@@ -277,7 +254,7 @@ ts_bool triangle_data_free(ts_triangle_data *data){
 ts_bool triangle_list_free(ts_triangle_list *tlist){
     ts_uint i;
     for(i=0;i<tlist->n;i++){
-        triangle_data_free(tlist->tria[i]->data);
+    	if(tlist->tria[i]->neigh!=NULL) free(tlist->tria[i]->neigh);
         free(tlist->tria[i]);
     }
     free(tlist->tria);

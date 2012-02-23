@@ -170,22 +170,14 @@ struct ts_bond_list {
 };
 typedef struct ts_bond_list ts_bond_list;
 
-/** ts_triangle_data is a structure that describes a triangle */
-struct ts_triangle_data {
-	ts_uint idx;
+struct ts_triangle {
+    ts_uint idx;
 	ts_vertex *vertex[3];
 	ts_uint neigh_no;
 	struct ts_triangle **neigh;
 	ts_double xnorm;
 	ts_double ynorm;
 	ts_double znorm;
-	
-};
-typedef struct ts_triangle_data ts_triangle_data;
-
-struct ts_triangle {
-    ts_uint idx;
-    ts_triangle_data *data;
 };
 typedef struct ts_triangle ts_triangle;
 
