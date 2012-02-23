@@ -60,13 +60,23 @@ cell_list_free(clist);
 
 vtx_list_free(vlist1);
 printf("Tests complete.\n");
-vesicle=initial_distribution_dipyramid(17,60,60,60,0.15);
+vesicle=initial_distribution_dipyramid(8,60,60,60,0.15);
+//parsetape(vesicle,&i);
+
+//these four must come from parsetype!
+vesicle->dmax=1.67;
+vesicle->stepsize=0.15;
+vesicle->clist->max_occupancy=8;
+vesicle->bending_rigidity=25.0;
+fprintf(stderr,"xk=%f",vesicle->bending_rigidity);
 
 centermass(vesicle);
 cell_occupation(vesicle);
-for(i=0;i<100;i++){
+for(i=0;i<10000;i++){
 single_timestep(vesicle);
-write_vertex_xml_file(vesicle,i);
+if(i%100==0){
+write_vertex_xml_file(vesicle,i/100);
+}
 }
 write_master_xml_file("test.pvd");
 write_dout_fcompat_file(vesicle,"dout");

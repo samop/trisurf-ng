@@ -296,6 +296,8 @@ ts_bool write_vertex_vtk_file(ts_vesicle *vesicle,ts_char *filename, ts_char *te
 
 ts_bool parsetape(ts_vesicle *vesicle,ts_uint *iterations){
     long int nshell=17,ncxmax=60, ncymax=60, nczmax=60;  // THIS IS DUE TO CONFUSE BUG!
+    char buf[255];
+    long int brezveze=1;
     ts_double xk0=25.0, dmax=1.67,stepsize=0.15;
     *iterations=1000;
     cfg_opt_t opts[] = {
@@ -308,6 +310,10 @@ ts_bool parsetape(ts_vesicle *vesicle,ts_uint *iterations){
         CFG_SIMPLE_INT("nzmax", &nczmax),
         CFG_SIMPLE_INT("iterations",iterations),
         CFG_SIMPLE_BOOL("quiet",&quiet),
+        CFG_SIMPLE_STR("multiprocessing",buf),
+        CFG_SIMPLE_INT("smp_cores",&brezveze),
+        CFG_SIMPLE_INT("cluster_nodes",&brezveze),
+        CFG_SIMPLE_INT("distributed_processes",&brezveze),
         CFG_END()
     };
     cfg_t *cfg;    
