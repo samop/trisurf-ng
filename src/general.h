@@ -151,6 +151,7 @@ struct ts_vertex {
         ts_double xk;
         ts_double c;
         ts_uint id;
+        ts_double **Ylm;
         ts_double projArea;
         ts_double relR;
         ts_double solAngle;
@@ -216,9 +217,8 @@ typedef struct ts_cell_list{
 typedef struct {
     ts_uint l;
     ts_uint i;
-    ts_double ***Ylmi;
     ts_double **ulm;
-    ts_uint **co;
+    ts_double **co;
 } ts_spharm;
 
 
