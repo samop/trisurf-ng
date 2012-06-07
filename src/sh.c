@@ -6,20 +6,19 @@
 
 
 ts_spharm *sph_init(ts_vertex_list *vlist, ts_uint l){
-    ts_uint k,j;
+    ts_uint j,i;
     ts_spharm *sph=(ts_spharm *)malloc(sizeof(ts_spharm));
 
-    /* lets initialize Ylm for each vertex. Data is stored in vertices */
-    for(k=0;k<vlist->n;k++){
-            vlist->vtx[k]->Ylm=(ts_double **)calloc(l,sizeof(ts_double *));
+    /* lets initialize Ylm for each vertex. */
+    sph->Ylmi=(ts_double ***)calloc(l,sizeof(ts_double **));
+    for(i=0;i<vlist->n;i++){
+            sph->Ylmi[i]=(ts_double **)calloc(2*l+1,sizeof(ts_double *));
             for(j=0;j<l;j++){
-                vlist->vtx[k]->Ylm[j]=(ts_double *)calloc(2*j+1,sizeof(ts_double));
+                sph->Ylmi[i][j]=(ts_double *)calloc(vlist->n,sizeof(ts_double));
             }
     }
         
-
     /* lets initialize ulm */
-
     sph->ulm=(ts_double **)calloc(l,sizeof(ts_double *));
     for(j=0;j<l;j++){
         sph->ulm[j]=(ts_double *)calloc(2*j+1,sizeof(ts_double));
@@ -27,7 +26,6 @@ ts_spharm *sph_init(ts_vertex_list *vlist, ts_uint l){
 
 
     /* lets initialize co */
-
     sph->co=(ts_double **)calloc(l,sizeof(ts_double *));
     for(j=0;j<l;j++){
         sph->co[j]=(ts_double *)calloc(2*j+1,sizeof(ts_double));
@@ -40,8 +38,8 @@ ts_spharm *sph_init(ts_vertex_list *vlist, ts_uint l){
 }
 
 
-ts_bool sph_free(ts_spharm *sph, ts_vertex_list *vlist){
-    int i,k;
+ts_bool sph_free(ts_spharm *sph){
+    int i,j;
     for(i=0;i<sph->l;i++){
         if(sph->ulm[i]!=NULL) free(sph->ulm[i]);
         if(sph->co[i]!=NULL) free(sph->co[i]);
@@ -49,14 +47,18 @@ ts_bool sph_free(ts_spharm *sph, ts_vertex_list *vlist){
     if(sph->co != NULL) free(sph->co);
     if(sph->ulm !=NULL) free(sph->ulm);
 
-    for(k=0;k<vlist->n;k++){
-        if(vlist->vtx[k]->Ylm!=NULL) {
+        if(sph->Ylmi!=NULL) {
             for(i=0;i<sph->l;i++){
-                if(vlist->vtx[k]->Ylm[i]!=NULL) free(vlist->vtx[k]->Ylm[i]);
+                if(sph->Ylmi[i]!=NULL){
+                    for(j=0;j<sph->l*2+1;j++){
+                        if(sph->Ylmi[i][j]!=NULL) free (sph->Ylmi[i][j]);
+                    }
+                    free(sph->Ylmi[i]);
+                }
             }
-            free(vlist->vtx[k]->Ylm);
+            free(sph->Ylmi);
         }
-    }
+
     free(sph);
     return TS_SUCCESS;
 }
@@ -271,17 +273,17 @@ ts_bool calculateYlmi(ts_vesicle *vesicle){
     ts_vertex *cvtx;
     for(k=0;k<vesicle->vlist->n;k++){
         cvtx=vesicle->vlist->vtx[k];
-        cvtx->Ylm[0][0]=sqrt(1.0/4.0/M_PI);
+        sph->Ylmi[0][0][k]=sqrt(1.0/4.0/M_PI);
         cart2sph(coord,cvtx->x, cvtx->y, cvtx->z);
         fi=coord->e2;
         theta=coord->e3; 
         for(i=0; i<sph->l; i++){
             for(j=0;j<i;j++){
-                cvtx->Ylm[i][j]=sph->co[i][j]*cos((j-i-1)*fi)*pow(-1,j-i-1)*plgndr(i,abs(j-i-1),cos(theta));
+                sph->Ylmi[i][j][k]=sph->co[i][j]*cos((j-i-1)*fi)*pow(-1,j-i-1)*plgndr(i,abs(j-i-1),cos(theta));
             }
-                cvtx->Ylm[i][j+1]=sph->co[i][j+1]*plgndr(i,0,cos(theta));
+                sph->Ylmi[i][j+1][k]=sph->co[i][j+1]*plgndr(i,0,cos(theta));
             for(j=sph->l;j<2*i;j++){
-                cvtx->Ylm[i][j]=sph->co[i][j]*sin((j-i-1)*fi)*plgndr(i,j-i-1,cos(theta));
+                sph->Ylmi[i][j][k]=sph->co[i][j]*sin((j-i-1)*fi)*plgndr(i,j-i-1,cos(theta));
             }
         }
 
@@ -306,7 +308,7 @@ ts_bool calculateUlm(ts_vesicle *vesicle){
         cvtx=vesicle->vlist->vtx[k];
         for(i=0;i<vesicle->sphHarmonics->l;i++){
             for(j=0;j<2*i;j++){
-                vesicle->sphHarmonics->ulm[i][j]+= cvtx->solAngle*cvtx->relR*cvtx->Ylm[i][j];
+                vesicle->sphHarmonics->ulm[i][j]+= cvtx->solAngle*cvtx->relR*vesicle->sphHarmonics->Ylmi[i][j][k];
             }
 
         }
