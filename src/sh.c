@@ -9,11 +9,12 @@ ts_spharm *sph_init(ts_vertex_list *vlist, ts_uint l){
     ts_uint j,i;
     ts_spharm *sph=(ts_spharm *)malloc(sizeof(ts_spharm));
 
+    
     /* lets initialize Ylm for each vertex. */
     sph->Ylmi=(ts_double ***)calloc(l,sizeof(ts_double **));
-    for(i=0;i<vlist->n;i++){
-            sph->Ylmi[i]=(ts_double **)calloc(2*l+1,sizeof(ts_double *));
-            for(j=0;j<l;j++){
+    for(i=0;i<l;i++){
+            sph->Ylmi[i]=(ts_double **)calloc(2*i+1,sizeof(ts_double *));
+            for(j=0;j<(2*i+1);j++){
                 sph->Ylmi[i][j]=(ts_double *)calloc(vlist->n,sizeof(ts_double));
             }
     }
@@ -30,10 +31,12 @@ ts_spharm *sph_init(ts_vertex_list *vlist, ts_uint l){
     for(j=0;j<l;j++){
         sph->co[j]=(ts_double *)calloc(2*j+1,sizeof(ts_double));
     }
-   
-    /* Calculate coefficients that will remain constant during all the simulation */ 
-    precomputeShCoeff(sph);
 
+    sph->l=l;   
+
+    /* Calculate coefficients that will remain constant during all the simulation */ 
+   precomputeShCoeff(sph);
+    
     return sph;
 }
 
@@ -50,7 +53,7 @@ ts_bool sph_free(ts_spharm *sph){
         if(sph->Ylmi!=NULL) {
             for(i=0;i<sph->l;i++){
                 if(sph->Ylmi[i]!=NULL){
-                    for(j=0;j<sph->l*2+1;j++){
+                    for(j=0;j<i*2+1;j++){
                         if(sph->Ylmi[i][j]!=NULL) free (sph->Ylmi[i][j]);
                     }
                     free(sph->Ylmi[i]);

@@ -35,6 +35,7 @@ POST_UNINSTALL = :
 doxygentest_PROGRAMS = doxygentest$(EXEEXT)
 float3cmp_PROGRAMS = float3cmp$(EXEEXT)
 confusetest_PROGRAMS = confusetest$(EXEEXT)
+co_PROGRAMS = co$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -45,10 +46,14 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am__installdirs = "$(DESTDIR)$(confusetestdir)" \
+am__installdirs = "$(DESTDIR)$(codir)" "$(DESTDIR)$(confusetestdir)" \
 	"$(DESTDIR)$(doxygentestdir)" "$(DESTDIR)$(float3cmpdir)"
-PROGRAMS = $(confusetest_PROGRAMS) $(doxygentest_PROGRAMS) \
-	$(float3cmp_PROGRAMS)
+PROGRAMS = $(co_PROGRAMS) $(confusetest_PROGRAMS) \
+	$(doxygentest_PROGRAMS) $(float3cmp_PROGRAMS)
+am_co_OBJECTS = co.$(OBJEXT) sh.$(OBJEXT) general.$(OBJEXT) \
+	vesicle.$(OBJEXT)
+co_OBJECTS = $(am_co_OBJECTS)
+co_LDADD = $(LDADD)
 am_confusetest_OBJECTS = confusetest.$(OBJEXT)
 confusetest_OBJECTS = $(am_confusetest_OBJECTS)
 confusetest_LDADD = $(LDADD)
@@ -68,10 +73,10 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(confusetest_SOURCES) $(doxygentest_SOURCES) \
+SOURCES = $(co_SOURCES) $(confusetest_SOURCES) $(doxygentest_SOURCES) \
 	$(float3cmp_SOURCES)
-DIST_SOURCES = $(confusetest_SOURCES) $(doxygentest_SOURCES) \
-	$(float3cmp_SOURCES)
+DIST_SOURCES = $(co_SOURCES) $(confusetest_SOURCES) \
+	$(doxygentest_SOURCES) $(float3cmp_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -164,10 +169,12 @@ top_srcdir = @top_srcdir@
 doxygentestdir = ../
 float3cmpdir = ../
 confusetestdir = ../
+codir = ../
 doxygentest_SOURCES = doxygentest.c
 float3cmp_SOURCES = float3cmp.c
 confusetest_SOURCES = confusetest.c
 confusetest_LDFLAGS = -lconfuse
+co_SOURCES = co.c ../src/sh.c ../src/general.c ../src/vesicle.c
 all: all-am
 
 .SUFFIXES:
@@ -202,6 +209,43 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+install-coPROGRAMS: $(co_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	test -z "$(codir)" || $(MKDIR_P) "$(DESTDIR)$(codir)"
+	@list='$(co_PROGRAMS)'; test -n "$(codir)" || list=; \
+	for p in $$list; do echo "$$p $$p"; done | \
+	sed 's/$(EXEEXT)$$//' | \
+	while read p p1; do if test -f $$p; \
+	  then echo "$$p"; echo "$$p"; else :; fi; \
+	done | \
+	sed -e 'p;s,.*/,,;n;h' -e 's|.*|.|' \
+	    -e 'p;x;s,.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/' | \
+	sed 'N;N;N;s,\n, ,g' | \
+	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1 } \
+	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
+	    if ($$2 == $$4) files[d] = files[d] " " $$1; \
+	    else { print "f", $$3 "/" $$4, $$1; } } \
+	  END { for (d in files) print "f", d, files[d] }' | \
+	while read type dir files; do \
+	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
+	    test -z "$$files" || { \
+	      echo " $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(codir)$$dir'"; \
+	      $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(codir)$$dir" || exit $$?; \
+	    } \
+	; done
+
+uninstall-coPROGRAMS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(co_PROGRAMS)'; test -n "$(codir)" || list=; \
+	files=`for p in $$list; do echo "$$p"; done | \
+	  sed -e 'h;s,^.*/,,;s/$(EXEEXT)$$//;$(transform)' \
+	      -e 's/$$/$(EXEEXT)/' `; \
+	test -n "$$list" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(codir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(codir)" && rm -f $$files
+
+clean-coPROGRAMS:
+	-test -z "$(co_PROGRAMS)" || rm -f $(co_PROGRAMS)
 install-confusetestPROGRAMS: $(confusetest_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(confusetestdir)" || $(MKDIR_P) "$(DESTDIR)$(confusetestdir)"
@@ -313,6 +357,9 @@ uninstall-float3cmpPROGRAMS:
 
 clean-float3cmpPROGRAMS:
 	-test -z "$(float3cmp_PROGRAMS)" || rm -f $(float3cmp_PROGRAMS)
+co$(EXEEXT): $(co_OBJECTS) $(co_DEPENDENCIES) $(EXTRA_co_DEPENDENCIES) 
+	@rm -f co$(EXEEXT)
+	$(LINK) $(co_OBJECTS) $(co_LDADD) $(LIBS)
 confusetest$(EXEEXT): $(confusetest_OBJECTS) $(confusetest_DEPENDENCIES) $(EXTRA_confusetest_DEPENDENCIES) 
 	@rm -f confusetest$(EXEEXT)
 	$(confusetest_LINK) $(confusetest_OBJECTS) $(confusetest_LDADD) $(LIBS)
@@ -329,9 +376,13 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/co.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/confusetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/doxygentest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/float3cmp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/general.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sh.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vesicle.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -346,6 +397,48 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+sh.o: ../src/sh.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sh.o -MD -MP -MF $(DEPDIR)/sh.Tpo -c -o sh.o `test -f '../src/sh.c' || echo '$(srcdir)/'`../src/sh.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sh.Tpo $(DEPDIR)/sh.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/sh.c' object='sh.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sh.o `test -f '../src/sh.c' || echo '$(srcdir)/'`../src/sh.c
+
+sh.obj: ../src/sh.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sh.obj -MD -MP -MF $(DEPDIR)/sh.Tpo -c -o sh.obj `if test -f '../src/sh.c'; then $(CYGPATH_W) '../src/sh.c'; else $(CYGPATH_W) '$(srcdir)/../src/sh.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sh.Tpo $(DEPDIR)/sh.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/sh.c' object='sh.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sh.obj `if test -f '../src/sh.c'; then $(CYGPATH_W) '../src/sh.c'; else $(CYGPATH_W) '$(srcdir)/../src/sh.c'; fi`
+
+general.o: ../src/general.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT general.o -MD -MP -MF $(DEPDIR)/general.Tpo -c -o general.o `test -f '../src/general.c' || echo '$(srcdir)/'`../src/general.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/general.Tpo $(DEPDIR)/general.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/general.c' object='general.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o general.o `test -f '../src/general.c' || echo '$(srcdir)/'`../src/general.c
+
+general.obj: ../src/general.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT general.obj -MD -MP -MF $(DEPDIR)/general.Tpo -c -o general.obj `if test -f '../src/general.c'; then $(CYGPATH_W) '../src/general.c'; else $(CYGPATH_W) '$(srcdir)/../src/general.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/general.Tpo $(DEPDIR)/general.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/general.c' object='general.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o general.obj `if test -f '../src/general.c'; then $(CYGPATH_W) '../src/general.c'; else $(CYGPATH_W) '$(srcdir)/../src/general.c'; fi`
+
+vesicle.o: ../src/vesicle.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT vesicle.o -MD -MP -MF $(DEPDIR)/vesicle.Tpo -c -o vesicle.o `test -f '../src/vesicle.c' || echo '$(srcdir)/'`../src/vesicle.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/vesicle.Tpo $(DEPDIR)/vesicle.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/vesicle.c' object='vesicle.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o vesicle.o `test -f '../src/vesicle.c' || echo '$(srcdir)/'`../src/vesicle.c
+
+vesicle.obj: ../src/vesicle.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT vesicle.obj -MD -MP -MF $(DEPDIR)/vesicle.Tpo -c -o vesicle.obj `if test -f '../src/vesicle.c'; then $(CYGPATH_W) '../src/vesicle.c'; else $(CYGPATH_W) '$(srcdir)/../src/vesicle.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/vesicle.Tpo $(DEPDIR)/vesicle.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/vesicle.c' object='vesicle.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o vesicle.obj `if test -f '../src/vesicle.c'; then $(CYGPATH_W) '../src/vesicle.c'; else $(CYGPATH_W) '$(srcdir)/../src/vesicle.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -433,7 +526,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(PROGRAMS)
 installdirs:
-	for dir in "$(DESTDIR)$(confusetestdir)" "$(DESTDIR)$(doxygentestdir)" "$(DESTDIR)$(float3cmpdir)"; do \
+	for dir in "$(DESTDIR)$(codir)" "$(DESTDIR)$(confusetestdir)" "$(DESTDIR)$(doxygentestdir)" "$(DESTDIR)$(float3cmpdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -468,8 +561,9 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-confusetestPROGRAMS clean-doxygentestPROGRAMS \
-	clean-float3cmpPROGRAMS clean-generic mostlyclean-am
+clean-am: clean-coPROGRAMS clean-confusetestPROGRAMS \
+	clean-doxygentestPROGRAMS clean-float3cmpPROGRAMS \
+	clean-generic mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -489,7 +583,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-confusetestPROGRAMS \
+install-data-am: install-coPROGRAMS install-confusetestPROGRAMS \
 	install-doxygentestPROGRAMS install-float3cmpPROGRAMS
 
 install-dvi: install-dvi-am
@@ -535,25 +629,26 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-confusetestPROGRAMS \
+uninstall-am: uninstall-coPROGRAMS uninstall-confusetestPROGRAMS \
 	uninstall-doxygentestPROGRAMS uninstall-float3cmpPROGRAMS
 
 .MAKE: install-am install-strip
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean \
+.PHONY: CTAGS GTAGS all all-am check check-am clean clean-coPROGRAMS \
 	clean-confusetestPROGRAMS clean-doxygentestPROGRAMS \
 	clean-float3cmpPROGRAMS clean-generic ctags distclean \
 	distclean-compile distclean-generic distclean-tags distdir dvi \
 	dvi-am html html-am info info-am install install-am \
-	install-confusetestPROGRAMS install-data install-data-am \
-	install-doxygentestPROGRAMS install-dvi install-dvi-am \
-	install-exec install-exec-am install-float3cmpPROGRAMS \
-	install-html install-html-am install-info install-info-am \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic pdf pdf-am \
-	ps ps-am tags uninstall uninstall-am \
+	install-coPROGRAMS install-confusetestPROGRAMS install-data \
+	install-data-am install-doxygentestPROGRAMS install-dvi \
+	install-dvi-am install-exec install-exec-am \
+	install-float3cmpPROGRAMS install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
+	uninstall-am uninstall-coPROGRAMS \
 	uninstall-confusetestPROGRAMS uninstall-doxygentestPROGRAMS \
 	uninstall-float3cmpPROGRAMS
 

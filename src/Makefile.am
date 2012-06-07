@@ -6,3 +6,6 @@ shdiscoverdir=../
 shdiscover_PROGRAMS= shdiscover
 shdiscover_SOURCES= general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c energy.c sh.c shdiscover.c
 AM_CFLAGS = -Wall -Werror
+co_testdir=../
+co_test_PROGRAMS=co_test
+co_test_SOURCES= general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c energy.c sh.c co_test.c

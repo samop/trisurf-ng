@@ -34,6 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 trisurf_PROGRAMS = trisurf$(EXEEXT)
 shdiscover_PROGRAMS = shdiscover$(EXEEXT)
+co_test_PROGRAMS = co_test$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -44,9 +45,16 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am__installdirs = "$(DESTDIR)$(shdiscoverdir)" \
-	"$(DESTDIR)$(trisurfdir)"
-PROGRAMS = $(shdiscover_PROGRAMS) $(trisurf_PROGRAMS)
+am__installdirs = "$(DESTDIR)$(co_testdir)" \
+	"$(DESTDIR)$(shdiscoverdir)" "$(DESTDIR)$(trisurfdir)"
+PROGRAMS = $(co_test_PROGRAMS) $(shdiscover_PROGRAMS) \
+	$(trisurf_PROGRAMS)
+am_co_test_OBJECTS = general.$(OBJEXT) vertex.$(OBJEXT) bond.$(OBJEXT) \
+	triangle.$(OBJEXT) cell.$(OBJEXT) vesicle.$(OBJEXT) \
+	initial_distribution.$(OBJEXT) io.$(OBJEXT) energy.$(OBJEXT) \
+	sh.$(OBJEXT) co_test.$(OBJEXT)
+co_test_OBJECTS = $(am_co_test_OBJECTS)
+co_test_LDADD = $(LDADD)
 am_shdiscover_OBJECTS = general.$(OBJEXT) vertex.$(OBJEXT) \
 	bond.$(OBJEXT) triangle.$(OBJEXT) cell.$(OBJEXT) \
 	vesicle.$(OBJEXT) initial_distribution.$(OBJEXT) io.$(OBJEXT) \
@@ -68,8 +76,9 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(shdiscover_SOURCES) $(trisurf_SOURCES)
-DIST_SOURCES = $(shdiscover_SOURCES) $(trisurf_SOURCES)
+SOURCES = $(co_test_SOURCES) $(shdiscover_SOURCES) $(trisurf_SOURCES)
+DIST_SOURCES = $(co_test_SOURCES) $(shdiscover_SOURCES) \
+	$(trisurf_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -165,6 +174,8 @@ trisurf_SOURCES = general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_
 shdiscoverdir = ../
 shdiscover_SOURCES = general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c energy.c sh.c shdiscover.c
 AM_CFLAGS = -Wall -Werror
+co_testdir = ../
+co_test_SOURCES = general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c energy.c sh.c co_test.c
 all: all-am
 
 .SUFFIXES:
@@ -199,6 +210,43 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+install-co_testPROGRAMS: $(co_test_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	test -z "$(co_testdir)" || $(MKDIR_P) "$(DESTDIR)$(co_testdir)"
+	@list='$(co_test_PROGRAMS)'; test -n "$(co_testdir)" || list=; \
+	for p in $$list; do echo "$$p $$p"; done | \
+	sed 's/$(EXEEXT)$$//' | \
+	while read p p1; do if test -f $$p; \
+	  then echo "$$p"; echo "$$p"; else :; fi; \
+	done | \
+	sed -e 'p;s,.*/,,;n;h' -e 's|.*|.|' \
+	    -e 'p;x;s,.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/' | \
+	sed 'N;N;N;s,\n, ,g' | \
+	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1 } \
+	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
+	    if ($$2 == $$4) files[d] = files[d] " " $$1; \
+	    else { print "f", $$3 "/" $$4, $$1; } } \
+	  END { for (d in files) print "f", d, files[d] }' | \
+	while read type dir files; do \
+	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
+	    test -z "$$files" || { \
+	      echo " $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(co_testdir)$$dir'"; \
+	      $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(co_testdir)$$dir" || exit $$?; \
+	    } \
+	; done
+
+uninstall-co_testPROGRAMS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(co_test_PROGRAMS)'; test -n "$(co_testdir)" || list=; \
+	files=`for p in $$list; do echo "$$p"; done | \
+	  sed -e 'h;s,^.*/,,;s/$(EXEEXT)$$//;$(transform)' \
+	      -e 's/$$/$(EXEEXT)/' `; \
+	test -n "$$list" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(co_testdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(co_testdir)" && rm -f $$files
+
+clean-co_testPROGRAMS:
+	-test -z "$(co_test_PROGRAMS)" || rm -f $(co_test_PROGRAMS)
 install-shdiscoverPROGRAMS: $(shdiscover_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(shdiscoverdir)" || $(MKDIR_P) "$(DESTDIR)$(shdiscoverdir)"
@@ -273,6 +321,9 @@ uninstall-trisurfPROGRAMS:
 
 clean-trisurfPROGRAMS:
 	-test -z "$(trisurf_PROGRAMS)" || rm -f $(trisurf_PROGRAMS)
+co_test$(EXEEXT): $(co_test_OBJECTS) $(co_test_DEPENDENCIES) $(EXTRA_co_test_DEPENDENCIES) 
+	@rm -f co_test$(EXEEXT)
+	$(LINK) $(co_test_OBJECTS) $(co_test_LDADD) $(LIBS)
 shdiscover$(EXEEXT): $(shdiscover_OBJECTS) $(shdiscover_DEPENDENCIES) $(EXTRA_shdiscover_DEPENDENCIES) 
 	@rm -f shdiscover$(EXEEXT)
 	$(LINK) $(shdiscover_OBJECTS) $(shdiscover_LDADD) $(LIBS)
@@ -288,6 +339,7 @@ distclean-compile:
 
 include ./$(DEPDIR)/bond.Po
 include ./$(DEPDIR)/cell.Po
+include ./$(DEPDIR)/co_test.Po
 include ./$(DEPDIR)/energy.Po
 include ./$(DEPDIR)/frame.Po
 include ./$(DEPDIR)/general.Po
@@ -402,7 +454,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(PROGRAMS)
 installdirs:
-	for dir in "$(DESTDIR)$(shdiscoverdir)" "$(DESTDIR)$(trisurfdir)"; do \
+	for dir in "$(DESTDIR)$(co_testdir)" "$(DESTDIR)$(shdiscoverdir)" "$(DESTDIR)$(trisurfdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -437,8 +489,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-shdiscoverPROGRAMS clean-trisurfPROGRAMS \
-	mostlyclean-am
+clean-am: clean-co_testPROGRAMS clean-generic clean-shdiscoverPROGRAMS \
+	clean-trisurfPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -458,7 +510,8 @@ info: info-am
 
 info-am:
 
-install-data-am: install-shdiscoverPROGRAMS install-trisurfPROGRAMS
+install-data-am: install-co_testPROGRAMS install-shdiscoverPROGRAMS \
+	install-trisurfPROGRAMS
 
 install-dvi: install-dvi-am
 
@@ -503,23 +556,25 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-shdiscoverPROGRAMS uninstall-trisurfPROGRAMS
+uninstall-am: uninstall-co_testPROGRAMS uninstall-shdiscoverPROGRAMS \
+	uninstall-trisurfPROGRAMS
 
 .MAKE: install-am install-strip
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-shdiscoverPROGRAMS clean-trisurfPROGRAMS ctags distclean \
-	distclean-compile distclean-generic distclean-tags distdir dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am \
-	install-shdiscoverPROGRAMS install-strip \
+.PHONY: CTAGS GTAGS all all-am check check-am clean \
+	clean-co_testPROGRAMS clean-generic clean-shdiscoverPROGRAMS \
+	clean-trisurfPROGRAMS ctags distclean distclean-compile \
+	distclean-generic distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am \
+	install-co_testPROGRAMS install-data install-data-am \
+	install-dvi install-dvi-am install-exec install-exec-am \
+	install-html install-html-am install-info install-info-am \
+	install-man install-pdf install-pdf-am install-ps \
+	install-ps-am install-shdiscoverPROGRAMS install-strip \
 	install-trisurfPROGRAMS installcheck installcheck-am \
 	installdirs maintainer-clean maintainer-clean-generic \
 	mostlyclean mostlyclean-compile mostlyclean-generic pdf pdf-am \
-	ps ps-am tags uninstall uninstall-am \
+	ps ps-am tags uninstall uninstall-am uninstall-co_testPROGRAMS \
 	uninstall-shdiscoverPROGRAMS uninstall-trisurfPROGRAMS
 
 
