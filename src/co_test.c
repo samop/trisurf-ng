@@ -2,6 +2,7 @@
 #include "sh.h"
 #include "vesicle.h"
 #include "initial_distribution.h"
+#include <math.h>
 
 int main(){
 ts_vesicle *vesicle=initial_distribution_dipyramid(4,60,60,60,0.15);
@@ -21,9 +22,15 @@ for(i=1;i<=vesicle->sphHarmonics->l;i++){
     fprintf(stderr,"co(%d,%d)=%e\n",i,j,vesicle->sphHarmonics->co[i][j]);
     }
 }
-
+ts_double r0;
+vesicle_volume(vesicle);
+fprintf(stderr,"Volume=%e\n",vesicle->volume);
+r0=getR0(vesicle);
+fprintf(stderr,"r0=%e\n",r0);
+preparationSh(vesicle,r0);
+calculateYlmi(vesicle);
 
 sph_free(vesicle->sphHarmonics);
-//vesicle_free(vesicle);
+vesicle_free(vesicle);
 return 0;
 }

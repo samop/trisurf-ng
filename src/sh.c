@@ -120,7 +120,9 @@ ts_double plgndr(ts_int l, ts_int m, ts_float x){
 }
 
 
+/** @brief: Precomputes coefficients that are required for spherical harmonics computations.
 
+*/
 ts_bool precomputeShCoeff(ts_spharm *sph){
     ts_int i,j,al,am;
     ts_double **co=sph->co;

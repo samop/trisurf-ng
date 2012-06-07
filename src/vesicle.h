@@ -4,6 +4,6 @@
 ts_vesicle *init_vesicle(ts_uint N, ts_uint ncmax1, ts_uint ncmax2, ts_uint ncmax3, ts_double stepsize);
 ts_bool vesicle_translate(ts_vesicle *vesicle,ts_double x, ts_double y, ts_double z);
 ts_bool vesicle_free(ts_vesicle *vesicle);
-
+ts_bool vesicle_volume(ts_vesicle *vesicle);
 
 #endif
