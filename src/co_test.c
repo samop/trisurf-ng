@@ -29,6 +29,15 @@ r0=getR0(vesicle);
 fprintf(stderr,"r0=%e\n",r0);
 preparationSh(vesicle,r0);
 calculateYlmi(vesicle);
+calculateUlm(vesicle);
+
+for(i=0;i<vesicle->sphHarmonics->l;i++){
+    for(j=0;j<2*i+1;j++){
+    fprintf(stderr,"ulm(%d,%d)=%e\n",i,j+1,vesicle->sphHarmonics->ulm[i][j]);
+    }
+}
+
+
 
 sph_free(vesicle->sphHarmonics);
 vesicle_free(vesicle);

@@ -277,6 +277,7 @@ ts_bool calculateYlmi(ts_vesicle *vesicle){
     ts_spharm *sph=vesicle->sphHarmonics;
     ts_coord *coord=(ts_coord *)malloc(sizeof(ts_coord));
     ts_double fi, theta;
+	ts_int m;
     ts_vertex *cvtx;
     for(k=0;k<vesicle->vlist->n;k++){
         cvtx=vesicle->vlist->vtx[k];
@@ -284,13 +285,15 @@ ts_bool calculateYlmi(ts_vesicle *vesicle){
         cart2sph(coord,cvtx->x, cvtx->y, cvtx->z);
         fi=coord->e2;
         theta=coord->e3; 
-        for(i=0; i<sph->l; i++){
+        for(i=1; i<sph->l; i++){
             for(j=0;j<i;j++){
-                sph->Ylmi[i][j][k]=sph->co[i][j]*cos((j-i-1)*fi)*pow(-1,j-i-1)*plgndr(i,abs(j-i-1),cos(theta));
+			m=j+1;
+                sph->Ylmi[i][j][k]=sph->co[i][m]*cos((m-i-1)*fi)*pow(-1,m-i-1)*plgndr(i,abs(m-i-1),cos(theta));
             }
-                sph->Ylmi[i][j+1][k]=sph->co[i][j+1]*plgndr(i,0,cos(theta));
-            for(j=sph->l;j<2*i;j++){
-                sph->Ylmi[i][j][k]=sph->co[i][j]*sin((j-i-1)*fi)*plgndr(i,j-i-1,cos(theta));
+                sph->Ylmi[i][j+1][k]=sph->co[i][m+1]*plgndr(i,0,cos(theta));
+            for(j=i+1;j<2*i;j++){
+			m=j+1;
+                sph->Ylmi[i][j][k]=sph->co[i][m]*sin((m-i-1)*fi)*plgndr(i,m-i-1,cos(theta));
             }
         }
 
