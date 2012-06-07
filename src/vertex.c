@@ -23,6 +23,17 @@ ts_vertex_list *init_vertex_list(ts_uint N){
     for(i=0;i<N;i++) {
         vlist->vtx[i]=(ts_vertex *)calloc(1,sizeof(ts_vertex));
         vlist->vtx[i]->idx=i;
+
+    /* initialize Ylm for spherical hamonics DONE in sh.c */
+/*    for(i=0;i<l;i++){
+        vlist->vtx[i]->Ylm[i]=(ts_double **)calloc(2*i+1,sizeof(ts_double *));
+        for(j=0;j<(2*i+1);j++){
+            clist->vtx[i]->Ylm[i][j]=(ts_double *)calloc(sizeof(ts_double));
+        }
+    }
+*/
+
+
     }
     vlist->n=N;
 	return vlist;
@@ -131,7 +142,6 @@ ts_bool vtx_free(ts_vertex  *vtx){
     if(vtx->neigh!=NULL)   free(vtx->neigh);
     if(vtx->tristar!=NULL) free(vtx->tristar);
     if(vtx->bond!=NULL)    free(vtx->bond);
-
     free(vtx);
     return TS_SUCCESS;
 }

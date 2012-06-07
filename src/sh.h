@@ -6,4 +6,6 @@ ts_double plgndr(ts_int l, ts_int m, ts_float x);
 ts_double shY(ts_int l,ts_int m,ts_double theta,ts_double fi);
 
 
+ts_bool precomputeShCoeff(ts_spharm *sph);
+
 #endif

@@ -3,6 +3,64 @@
 #include "general.h"
 #include "sh.h"
 
+
+
+ts_spharm *sph_init(ts_vertex_list *vlist, ts_uint l){
+    ts_uint k,j;
+    ts_spharm *sph=(ts_spharm *)malloc(sizeof(ts_spharm));
+
+    /* lets initialize Ylm for each vertex. Data is stored in vertices */
+    for(k=0;k<vlist->n;k++){
+            vlist->vtx[k]->Ylm=(ts_double **)calloc(l,sizeof(ts_double *));
+            for(j=0;j<l;j++){
+                vlist->vtx[k]->Ylm[j]=(ts_double *)calloc(2*j+1,sizeof(ts_double));
+            }
+    }
+        
+
+    /* lets initialize ulm */
+
+    sph->ulm=(ts_double **)calloc(l,sizeof(ts_double *));
+    for(j=0;j<l;j++){
+        sph->ulm[j]=(ts_double *)calloc(2*j+1,sizeof(ts_double));
+    }
+
+
+    /* lets initialize co */
+
+    sph->co=(ts_double **)calloc(l,sizeof(ts_double *));
+    for(j=0;j<l;j++){
+        sph->co[j]=(ts_double *)calloc(2*j+1,sizeof(ts_double));
+    }
+   
+    /* Calculate coefficients that will remain constant during all the simulation */ 
+    precomputeShCoeff(sph);
+
+    return sph;
+}
+
+
+ts_bool sph_free(ts_spharm *sph, ts_vertex_list *vlist){
+    int i,k;
+    for(i=0;i<sph->l;i++){
+        if(sph->ulm[i]!=NULL) free(sph->ulm[i]);
+        if(sph->co[i]!=NULL) free(sph->co[i]);
+    }
+    if(sph->co != NULL) free(sph->co);
+    if(sph->ulm !=NULL) free(sph->ulm);
+
+    for(k=0;k<vlist->n;k++){
+        if(vlist->vtx[k]->Ylm!=NULL) {
+            for(i=0;i<sph->l;i++){
+                if(vlist->vtx[k]->Ylm[i]!=NULL) free(vlist->vtx[k]->Ylm[i]);
+            }
+            free(vlist->vtx[k]->Ylm);
+        }
+    }
+    free(sph);
+    return TS_SUCCESS;
+}
+
 /* Gives you legendre polynomials. Taken from NR, p. 254 */
 ts_double plgndr(ts_int l, ts_int m, ts_float x){
 	ts_double fact, pll, pmm, pmmp1, somx2;
@@ -57,12 +115,19 @@ ts_double plgndr(ts_int l, ts_int m, ts_float x){
 
 
 ts_bool precomputeShCoeff(ts_spharm *sph){
-    ts_uint i,j;
+    ts_int i,j,al,am;
+    ts_double **co=sph->co;
     for(i=0;i<sph->l;i++){
-        sph->co[i][i]=sqrt((2.0*i+1.0)/2.0/M_PI);
-        for(j=0;j<i-1;j++){
-            
+        al=i+1;
+        sph->co[i][i+1]=sqrt((2.0*al+1.0)/2.0/M_PI);
+        for(j=0;j<al;j++){
+            am=j+1;
+            sph->co[i][i+1+j]=co[i][i+j]*sqrt(1.0/(al-am+1)/(al+am));
+            sph->co[i][i+1-j]=co[i][i+1+j];
         }
+        co[i][2*i]=co[i][2*i]*sqrt(1.0/(2.0*al));
+        co[i][0]=co[i][2*i+1];
+        co[i][i+1]=sqrt((2.0*al+1.0)/4.0/M_PI);
     }
     return TS_SUCCESS;
 
@@ -203,18 +268,20 @@ ts_bool calculateYlmi(ts_vesicle *vesicle){
     ts_spharm *sph=vesicle->sphHarmonics;
     ts_coord *coord=(ts_coord *)malloc(sizeof(ts_coord));
     ts_double fi, theta;
+    ts_vertex *cvtx;
     for(k=0;k<vesicle->vlist->n;k++){
-        sph->Ylmi[0][0][k]=sqrt(1.0/4.0/M_PI);
-        cart2sph(coord,vesicle->vlist->vtx[k]->x, vesicle->vlist->vtx[k]->y, vesicle->vlist->vtx[k]->z);
+        cvtx=vesicle->vlist->vtx[k];
+        cvtx->Ylm[0][0]=sqrt(1.0/4.0/M_PI);
+        cart2sph(coord,cvtx->x, cvtx->y, cvtx->z);
         fi=coord->e2;
         theta=coord->e3; 
         for(i=0; i<sph->l; i++){
             for(j=0;j<i;j++){
-                sph->Ylmi[i][j][k]=sph->co[i][j]*cos((j-i-1)*fi)*pow(-1,j-i-1)*plgndr(i,abs(j-i-1),cos(theta));
+                cvtx->Ylm[i][j]=sph->co[i][j]*cos((j-i-1)*fi)*pow(-1,j-i-1)*plgndr(i,abs(j-i-1),cos(theta));
             }
-                sph->Ylmi[i][j+1][k]=sph->co[i][j+1]*plgndr(i,0,cos(theta));
+                cvtx->Ylm[i][j+1]=sph->co[i][j+1]*plgndr(i,0,cos(theta));
             for(j=sph->l;j<2*i;j++){
-                sph->Ylmi[i][j][k]=sph->co[i][j]*sin((j-i-1)*fi)*plgndr(i,j-i-1,cos(theta));
+                cvtx->Ylm[i][j]=sph->co[i][j]*sin((j-i-1)*fi)*plgndr(i,j-i-1,cos(theta));
             }
         }
 
@@ -239,7 +306,7 @@ ts_bool calculateUlm(ts_vesicle *vesicle){
         cvtx=vesicle->vlist->vtx[k];
         for(i=0;i<vesicle->sphHarmonics->l;i++){
             for(j=0;j<2*i;j++){
-                vesicle->sphHarmonics->ulm[i][j]+= cvtx->solAngle*cvtx->relR*vesicle->sphHarmonics->Ylmi[i][j][k];
+                vesicle->sphHarmonics->ulm[i][j]+= cvtx->solAngle*cvtx->relR*cvtx->Ylm[i][j];
             }
 
         }
