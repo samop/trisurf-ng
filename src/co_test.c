@@ -16,9 +16,9 @@ fprintf(stderr,"xk=%f\n",vesicle->bending_rigidity);
 
 vesicle->sphHarmonics=sph_init(vesicle->vlist, 10);
 int i,j;
-for(i=0;i<vesicle->sphHarmonics->l;i++){
-    for(j=0;j<2*i+1;j++){
-    fprintf(stderr,"co(%d,%d)=%f\n",i,j,vesicle->sphHarmonics->co[i][j]);
+for(i=1;i<=vesicle->sphHarmonics->l;i++){
+    for(j=1;j<=2*i+1;j++){
+    fprintf(stderr,"co(%d,%d)=%e\n",i,j,vesicle->sphHarmonics->co[i][j]);
     }
 }
 

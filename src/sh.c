@@ -27,9 +27,10 @@ ts_spharm *sph_init(ts_vertex_list *vlist, ts_uint l){
 
 
     /* lets initialize co */
-    sph->co=(ts_double **)calloc(l,sizeof(ts_double *));
-    for(j=0;j<l;j++){
-        sph->co[j]=(ts_double *)calloc(2*j+1,sizeof(ts_double));
+//NOTE: C is has zero based indexing. Code is imported from fortran and to comply with original indexes we actually generate one index more. Also second dimension is 2*j+2 instead of 2*j+2. elements starting with 0 are useles and should be ignored!
+    sph->co=(ts_double **)calloc(l+1,sizeof(ts_double *));
+    for(j=0;j<=l;j++){
+        sph->co[j]=(ts_double *)calloc(2*j+2,sizeof(ts_double));
     }
 
     sph->l=l;   
@@ -47,6 +48,7 @@ ts_bool sph_free(ts_spharm *sph){
         if(sph->ulm[i]!=NULL) free(sph->ulm[i]);
         if(sph->co[i]!=NULL) free(sph->co[i]);
     }
+        if(sph->co[sph->l]!=NULL) free(sph->co[sph->l]);
     if(sph->co != NULL) free(sph->co);
     if(sph->ulm !=NULL) free(sph->ulm);
 
@@ -122,16 +124,16 @@ ts_double plgndr(ts_int l, ts_int m, ts_float x){
 ts_bool precomputeShCoeff(ts_spharm *sph){
     ts_int i,j,al,am;
     ts_double **co=sph->co;
-    for(i=0;i<sph->l;i++){
-        al=i+1;
+    for(i=1;i<=sph->l;i++){
+        al=i;
         sph->co[i][i+1]=sqrt((2.0*al+1.0)/2.0/M_PI);
-        for(j=0;j<i;j++){
-            am=j+1;
+        for(j=1;j<=i-1;j++){
+            am=j;
             sph->co[i][i+1+j]=co[i][i+j]*sqrt(1.0/(al-am+1.0)/(al+am));
             sph->co[i][i+1-j]=co[i][i+1+j];
         }
-        co[i][2*i]=co[i][2*i]*sqrt(1.0/(2.0*al));
-        co[i][0]=co[i][2*i+1];
+        co[i][2*i+1]=co[i][2*i]*sqrt(1.0/(2.0*al));
+        co[i][1]=co[i][2*i+1];
         co[i][i+1]=sqrt((2.0*al+1.0)/4.0/M_PI);
     }
     return TS_SUCCESS;

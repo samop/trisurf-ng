@@ -9,5 +9,3 @@ float3cmp_SOURCES=float3cmp.c
 confusetest_PROGRAMS=confusetest
 confusetest_SOURCES=confusetest.c
 confusetest_LDFLAGS=-lconfuse
-co_PROGRAMS=co
-co_SOURCES=co.c ../src/sh.c ../src/general.c ../src/vesicle.c
