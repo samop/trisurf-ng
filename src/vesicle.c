@@ -36,3 +36,21 @@ ts_bool vesicle_free(ts_vesicle *vesicle){
     free(vesicle);
     return TS_SUCCESS;
 }
+
+ts_bool vesicle_volume(ts_vesicle *vesicle){
+    ts_double volume;
+    ts_double vol;
+    ts_uint i;
+    ts_triangle **tria=vesicle->tlist->tria;
+    volume=0;
+    for(i=0; i<vesicle->tlist->n;i++){
+        vol=(tria[i]->vertex[0]->x+ tria[i]->vertex[1]->x + tria[i]->vertex[2]->x) * tria[i]->xnorm + 
+       (tria[i]->vertex[0]->y+ tria[i]->vertex[1]->y + tria[i]->vertex[2]->y) * tria[i]->ynorm + 
+    (tria[i]->vertex[0]->z+ tria[i]->vertex[1]->z + tria[i]->vertex[2]->z) *
+tria[i]->znorm;
+    volume=volume-vol/18.0;
+    }
+
+    vesicle->volume=volume;
+    return TS_SUCCESS;
+}

@@ -110,6 +110,23 @@ typedef char ts_bool;
 
 /* STRUCTURES */
 
+
+/** @brief Data structure for keeping the coordinates in selected coordinate
+ * system
+ */
+#define TS_COORD_CARTESIAN 0
+#define TS_COORD_SPHERICAL 1
+#define TS_COORD_CYLINDRICAL 2
+
+typedef struct {
+    ts_double e1;
+    ts_double e2;
+    ts_double e3;
+    ts_uint coord_type;
+} ts_coord;
+
+
+
 /** @brief Data structure of all data connected to a vertex
  *
  *  ts_vertex holds the data for one single point (bead, vertex). To understand how to use it
@@ -134,6 +151,9 @@ struct ts_vertex {
         ts_double xk;
         ts_double c;
         ts_uint id;
+        ts_double projArea;
+        ts_double relR;
+        ts_double solAngle;
 };
 typedef struct ts_vertex ts_vertex;
 
@@ -166,6 +186,7 @@ struct ts_triangle {
 	ts_double xnorm;
 	ts_double ynorm;
 	ts_double znorm;
+    ts_double area; // firstly needed for sh.c
 };
 typedef struct ts_triangle ts_triangle;
 
@@ -193,6 +214,16 @@ typedef struct ts_cell_list{
 
 
 typedef struct {
+    ts_uint l;
+    ts_uint i;
+    ts_double ***Ylmi;
+    ts_double **ulm;
+    ts_uint **co;
+} ts_spharm;
+
+
+
+typedef struct {
 	ts_vertex_list *vlist;
 	ts_bond_list *blist;
 	ts_triangle_list *tlist;
@@ -202,7 +233,11 @@ typedef struct {
     ts_double dmax;
     ts_double stepsize;
     ts_double cm[3];
+    ts_double volume;
+    ts_spharm *sphHarmonics;
 } ts_vesicle;
+
+
 
 
 /* GLOBAL VARIABLES */

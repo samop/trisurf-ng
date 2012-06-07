@@ -55,6 +55,20 @@ ts_double plgndr(ts_int l, ts_int m, ts_float x){
 }
 
 
+
+ts_bool precomputeShCoeff(ts_spharm *sph){
+    ts_uint i,j;
+    for(i=0;i<sph->l;i++){
+        sph->co[i][i]=sqrt((2.0*i+1.0)/2.0/M_PI);
+        for(j=0;j<i-1;j++){
+            
+        }
+    }
+    return TS_SUCCESS;
+
+}
+
+
 /*Computes Y(l,m,theta,fi) (Miha's definition that is different from common definition for  factor srqt(1/(2*pi)) */
 ts_double shY(ts_int l,ts_int m,ts_double theta,ts_double fi){
 	ts_double fac1, fac2, K;
@@ -87,4 +101,149 @@ ts_double shY(ts_int l,ts_int m,ts_double theta,ts_double fi){
 	}
 	
 	return K*sqrt((2.0*l+1.0)/2.0*fac1/fac2)*plgndr(l,abs(m),cos(theta));	
+}
+
+
+/* Function transforms coordinates from cartesian to spherical coordinates
+ * (r,phi, theta). */
+ts_bool *cart2sph(ts_coord *coord, ts_double x, ts_double y, ts_double z){
+    coord->coord_type=TS_COORD_SPHERICAL;
+#ifdef TS_DOUBLE_DOUBLE
+    coord->e1=sqrt(x*x+y*y+z*z);
+    if(z==0) coord->e3=M_PI/2.0;
+    else coord->e3=atan(sqrt(x*x+y*y)/z);
+    coord->e2=atan2(y,x);
+#endif
+#ifdef TS_DOUBLE_FLOAT
+    coord->e1=sqrtf(x*x+y*y+z*z);
+    if(z==0) coord->e3=M_PI/2.0;
+    else coord->e3=atanf(sqrtf(x*x+y*y)/z);
+    coord->e2=atan2f(y,x);
+#endif
+#ifdef TS_DOUBLE_LONGDOUBLE
+    coord->e1=sqrtl(x*x+y*y+z*z);
+    if(z==0) coord->e3=M_PI/2.0;
+    else coord->e3=atanl(sqrtl(x*x+y*y)/z);
+    coord->e2=atan2l(y,x);
+#endif
+
+    return TS_SUCCESS;
+}
+
+/* Function returns radius of the sphere with the same volume as vesicle (r0) */
+ts_double getR0(ts_vesicle *vesicle){
+    ts_double r0;
+ #ifdef TS_DOUBLE_DOUBLE
+   r0=pow(vesicle->volume*3.0/4.0/M_PI,1.0/3.0);
+#endif
+#ifdef TS_DOUBLE_FLOAT
+   r0=powf(vesicle->volume*3.0/4.0/M_PI,1.0/3.0);
+#endif
+#ifdef TS_DOUBLE_LONGDOUBLE
+   r0=powl(vesicle->volume*3.0/4.0/M_PI,1.0/3.0);
+#endif
+    return r0;
+}
+
+
+ts_bool preparationSh(ts_vesicle *vesicle, ts_double r0){
+//TODO: before calling or during the call calculate area of each triangle! Can
+//be also done after vertexmove and bondflip //
+    ts_uint i,j;
+    ts_vertex **vtx=vesicle->vlist->vtx;
+    ts_vertex *cvtx;
+    ts_triangle *ctri;
+    ts_double centroid[3];
+    ts_double r;
+    for (i=0;  i<vesicle->vlist->n; i++){
+        cvtx=vtx[i];
+        //cvtx->projArea=4.0*M_PI/1447.0*(cvtx->x*cvtx->x+cvtx->y*cvtx->y+cvtx->z*cvtx->z)/r0/r0;
+        cvtx->projArea=0.0;
+
+        /* go over all triangles that have a common vertex i */
+        for(j=0; j<cvtx->tristar_no; j++){
+            ctri=cvtx->tristar[j];
+            centroid[0]=(ctri->vertex[0]->x + ctri->vertex[1]->x + ctri->vertex[2]->x)/3.0;
+            centroid[1]=(ctri->vertex[0]->y + ctri->vertex[1]->y + ctri->vertex[2]->y)/3.0;
+            centroid[2]=(ctri->vertex[0]->z + ctri->vertex[1]->z + ctri->vertex[2]->z)/3.0;
+        /* calculating projArea+= area(triangle)*cos(theta) */
+#ifdef TS_DOUBLE_DOUBLE
+            cvtx->projArea = cvtx->projArea + ctri->area*(-centroid[0]*ctri->xnorm - centroid[1]*ctri->ynorm - centroid[2]*ctri->znorm)/ sqrt(centroid[0]*centroid[0]+centroid[1]*centroid[1]+centroid[2]*centroid[2]);
+#endif
+#ifdef TS_DOUBLE_FLOAT
+            cvtx->projArea = cvtx->projArea + ctri->area*(-centroid[0]*ctri->xnorm - centroid[1]*ctri->ynorm - centroid[2]*ctri->znorm)/ sqrtf(centroid[0]*centroid[0]+centroid[1]*centroid[1]+centroid[2]*centroid[2]);
+#endif
+#ifdef TS_DOUBLE_LONGDOUBLE
+            cvtx->projArea = cvtx->projArea + ctri->area*(-centroid[0]*ctri->xnorm - centroid[1]*ctri->ynorm - centroid[2]*ctri->znorm)/ sqrtl(centroid[0]*centroid[0]+centroid[1]*centroid[1]+centroid[2]*centroid[2]);
+#endif
+        }
+
+    cvtx->projArea=cvtx->projArea/3.0;
+        //we dont store spherical coordinates of vertex, so we have to calculate
+        //r(i) at this point.
+#ifdef TS_DOUBLE_DOUBLE
+    r=sqrt(cvtx->x*cvtx->x+cvtx->y*cvtx->y+cvtx->z*cvtx->z);
+#endif
+#ifdef TS_DOUBLE_FLOAT
+    r=sqrtf(cvtx->x*cvtx->x+cvtx->y*cvtx->y+cvtx->z*cvtx->z);
+#endif
+#ifdef TS_DOUBLE_LONGDOUBLE
+    r=sqrtl(cvtx->x*cvtx->x+cvtx->y*cvtx->y+cvtx->z*cvtx->z);
+#endif
+    cvtx->relR=(r-r0)/r0;
+    cvtx->solAngle=cvtx->projArea/cvtx->relR * cvtx->projArea/cvtx->relR;
+    }
+    return TS_SUCCESS;
+}
+
+
+
+ts_bool calculateYlmi(ts_vesicle *vesicle){
+    ts_uint i,j,k;
+    ts_spharm *sph=vesicle->sphHarmonics;
+    ts_coord *coord=(ts_coord *)malloc(sizeof(ts_coord));
+    ts_double fi, theta;
+    for(k=0;k<vesicle->vlist->n;k++){
+        sph->Ylmi[0][0][k]=sqrt(1.0/4.0/M_PI);
+        cart2sph(coord,vesicle->vlist->vtx[k]->x, vesicle->vlist->vtx[k]->y, vesicle->vlist->vtx[k]->z);
+        fi=coord->e2;
+        theta=coord->e3; 
+        for(i=0; i<sph->l; i++){
+            for(j=0;j<i;j++){
+                sph->Ylmi[i][j][k]=sph->co[i][j]*cos((j-i-1)*fi)*pow(-1,j-i-1)*plgndr(i,abs(j-i-1),cos(theta));
+            }
+                sph->Ylmi[i][j+1][k]=sph->co[i][j+1]*plgndr(i,0,cos(theta));
+            for(j=sph->l;j<2*i;j++){
+                sph->Ylmi[i][j][k]=sph->co[i][j]*sin((j-i-1)*fi)*plgndr(i,j-i-1,cos(theta));
+            }
+        }
+
+    }
+    free(coord);
+    return TS_SUCCESS;
+}
+
+
+
+ts_bool calculateUlm(ts_vesicle *vesicle){
+    ts_uint i,j,k;
+    ts_vertex *cvtx;
+    for(i=0;i<vesicle->sphHarmonics->l;i++){
+        for(j=0;j<2*i;j++) vesicle->sphHarmonics->ulm[i][j]=0.0;
+    }
+
+//TODO: call calculateYlmi !!!
+
+
+    for(k=0;k<vesicle->vlist->n; k++){
+        cvtx=vesicle->vlist->vtx[k];
+        for(i=0;i<vesicle->sphHarmonics->l;i++){
+            for(j=0;j<2*i;j++){
+                vesicle->sphHarmonics->ulm[i][j]+= cvtx->solAngle*cvtx->relR*vesicle->sphHarmonics->Ylmi[i][j][k];
+            }
+
+        }
+    }
+
+    return TS_SUCCESS;
 }
