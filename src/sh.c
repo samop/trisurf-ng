@@ -125,9 +125,9 @@ ts_bool precomputeShCoeff(ts_spharm *sph){
     for(i=0;i<sph->l;i++){
         al=i+1;
         sph->co[i][i+1]=sqrt((2.0*al+1.0)/2.0/M_PI);
-        for(j=0;j<al;j++){
+        for(j=0;j<i;j++){
             am=j+1;
-            sph->co[i][i+1+j]=co[i][i+j]*sqrt(1.0/(al-am+1)/(al+am));
+            sph->co[i][i+1+j]=co[i][i+j]*sqrt(1.0/(al-am+1.0)/(al+am));
             sph->co[i][i+1-j]=co[i][i+1+j];
         }
         co[i][2*i]=co[i][2*i]*sqrt(1.0/(2.0*al));
