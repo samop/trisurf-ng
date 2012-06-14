@@ -219,6 +219,18 @@ ts_bool triangle_normal_vector(ts_triangle *tria){
 	tria->xnorm=tria->xnorm/xden;
 	tria->ynorm=tria->ynorm/xden;
 	tria->znorm=tria->znorm/xden;	
+
+/*  Here it is an excellent point to recalculate volume of the triangle and
+ *  store it into datastructure. Volume is required at least by constant volume
+ *  calculation of vertex move and bondflip and spherical harmonics. */
+    tria->volume=(tria->vertex[0]->x+ tria->vertex[1]->x + tria->vertex[2]->x) * tria->xnorm + 
+       (tria->vertex[0]->y+ tria->vertex[1]->y + tria->vertex[2]->y) * tria->ynorm + 
+    (tria->vertex[0]->z+ tria->vertex[1]->z + tria->vertex[2]->z) * tria->znorm;
+    tria->volume=-xden*tria->volume/18.0;
+/*  Also, area can be calculated in each triangle */
+    tria->area=xden/2;
+
+
 	return TS_SUCCESS;
 }
 

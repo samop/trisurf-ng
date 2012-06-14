@@ -187,6 +187,7 @@ struct ts_triangle {
 	ts_double ynorm;
 	ts_double znorm;
     ts_double area; // firstly needed for sh.c
+    ts_double volume; // firstly needed for sh.c
 };
 typedef struct ts_triangle ts_triangle;
 

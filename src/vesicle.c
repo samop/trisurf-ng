@@ -37,20 +37,21 @@ ts_bool vesicle_free(ts_vesicle *vesicle){
     return TS_SUCCESS;
 }
 
+/* @brief Function makes a sum of partial volumes of each triangle. Volumes of
+ *
+ * Partial volumes are calculated when we calculate normals of triangles. It is
+ * relatively easy to calculate the volume of vesicle if we take into account
+ * that the volume of the whole vertex is simply sum of all partial volumes of
+ * all the triangles.
+ */
 ts_bool vesicle_volume(ts_vesicle *vesicle){
     ts_double volume;
-    ts_double vol;
     ts_uint i;
     ts_triangle **tria=vesicle->tlist->tria;
     volume=0;
     for(i=0; i<vesicle->tlist->n;i++){
-        vol=(tria[i]->vertex[0]->x+ tria[i]->vertex[1]->x + tria[i]->vertex[2]->x) * tria[i]->xnorm + 
-       (tria[i]->vertex[0]->y+ tria[i]->vertex[1]->y + tria[i]->vertex[2]->y) * tria[i]->ynorm + 
-    (tria[i]->vertex[0]->z+ tria[i]->vertex[1]->z + tria[i]->vertex[2]->z) *
-tria[i]->znorm;
-    volume=volume-vol/18.0;
+    volume=volume+tria[i]->volume;
     }
-
     vesicle->volume=volume;
     return TS_SUCCESS;
 }

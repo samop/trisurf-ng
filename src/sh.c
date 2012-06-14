@@ -143,7 +143,16 @@ ts_bool precomputeShCoeff(ts_spharm *sph){
 }
 
 
-/*Computes Y(l,m,theta,fi) (Miha's definition that is different from common definition for  factor srqt(1/(2*pi)) */
+/** @brief: Computes Y(l,m,theta,fi) 
+ *
+ * Function calculates Y^l_m for vertex with given (\theta, \fi) coordinates in
+ * spherical coordinate system.
+ * @param l is an ts_int argument.
+ * @param m is an ts_int argument.
+ * @param theta is ts_double argument.
+ * @param fi is a ts_double argument.
+ *
+ * (Miha's definition that is different from common definition for  factor srqt(1/(2*pi)) */
 ts_double shY(ts_int l,ts_int m,ts_double theta,ts_double fi){
 	ts_double fac1, fac2, K;
 	int i;
