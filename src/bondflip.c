@@ -8,6 +8,7 @@
 #include "energy.h"
 #include "timestep.h"
 #include "cell.h"
+#include "bondflip.h"
 //#include "io.h"
 #include<stdio.h>
 
@@ -27,7 +28,7 @@ c
     ts_vertex *it=bond->vtx1;
     ts_vertex *k=bond->vtx2;
     ts_uint nei,neip,neim;
-    ts_uint i,j;
+    ts_uint i; //j;
     ts_double oldenergy, delta_energy;
  //   ts_triangle *lm=NULL,*lp=NULL, *lp1=NULL, *lp2=NULL, *lm1=NULL, *lm2=NULL;
 
@@ -39,7 +40,7 @@ c
         fatal("In bondflip, number of neighbours of k or it is less than 3!",999);
     }
 
-
+    nei=0;
     for(i=0;i<it->neigh_no;i++){ // Finds the nn of it, that is k 
         if(it->neigh[i]==k){
             nei=i;
@@ -68,7 +69,7 @@ there the neim is never <0 !!! */
     }
  //   fprintf(stderr,"Membrane didn't wrap too much.. Continue.\n");
 /* if bond would be too long, return... */
-    if(vertex_distance_sq(km,kp) > vesicle->dmax ) return TS_FAIL;
+    if(vtx_distance_sq(km,kp) > vesicle->dmax ) return TS_FAIL;
  //   fprintf(stderr,"Bond will not be too long.. Continue.\n");
 
 /* we make a bond flip. this is different than in original fortran */
@@ -174,7 +175,7 @@ ts_bool ts_flip_bond(ts_vertex *k,ts_vertex *it,ts_vertex *km, ts_vertex *kp,
 ts_bond *bond){
 
     ts_triangle *lm=NULL,*lp=NULL, *lp1=NULL, *lm2=NULL;
-    ts_uint i,j, lmidx, lpidx;
+    ts_uint i,j; //lmidx, lpidx;
 if(k==NULL || it==NULL || km==NULL || kp==NULL){
     fatal("ts_flip_bond: You called me with invalid pointers to vertices",999);
 }
@@ -279,11 +280,11 @@ for(i=0;i<3;i++){
 // 3. step. Correct neighbours in vertex_list
 
 
-            vertex_remove_neighbour(k,it);
-            vertex_remove_neighbour(it,k);
+            vtx_remove_neighbour(k,it);
+            vtx_remove_neighbour(it,k);
             //Tukaj pa nastopi tezava... Kam dodati soseda?
-            vertex_insert_neighbour(km,kp,k);
-            vertex_insert_neighbour(kp,km,it);
+            vtx_insert_neighbour(km,kp,k);
+            vtx_insert_neighbour(kp,km,it);
 //            vertex_add_neighbour(km,kp); //pazi na vrstni red.
 //            vertex_add_neighbour(kp,km);
 //fprintf(stderr,"3. step: vertex neighbours corrected\n");
@@ -318,8 +319,8 @@ for(i=0;i<3;i++){
 // 6. step. Correct tristar for vertices km, kp, k and it
             vertex_add_tristar(km,lp);  // Preveri vrstni red!
             vertex_add_tristar(kp,lm);
-            vertex_remove_tristar(it,lm);
-            vertex_remove_tristar(k,lp);
+            vtx_remove_tristar(it,lm);
+            vtx_remove_tristar(k,lp);
 //fprintf(stderr,"6. step: tristar corrected\n");
 
 /*

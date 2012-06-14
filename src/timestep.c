@@ -5,6 +5,7 @@
 #include "general.h"
 #include "timestep.h"
 #include "vertexmove.h"
+#include "bondflip.h"
 
 ts_bool single_timestep(ts_vesicle *vesicle){
     ts_bool retval;
@@ -23,7 +24,7 @@ ts_bool single_timestep(ts_vesicle *vesicle){
         rnvec[2]=drand48();
         //find a bond and return a pointer to a bond...
         //call single_bondflip_timestep...
-//        retval=single_bondflip_timestep(vesicle,&vesicle->blist.bond[i],rnvec);
+        retval=single_bondflip_timestep(vesicle,vesicle->blist->bond[i],rnvec);
         
     } 
 	if(retval);
