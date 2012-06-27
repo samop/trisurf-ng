@@ -9,3 +9,6 @@ AM_CFLAGS = -Wall -Werror
 co_testdir=../
 co_test_PROGRAMS=co_test
 co_test_SOURCES= general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c energy.c sh.c co_test.c frame.c
+spherical_trisurfdir=../
+spherical_trisurf_PROGRAMS = spherical_trisurf
+spherical_trisurf_SOURCES = general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c frame.c energy.c timestep.c vertexmove.c spherical_trisurf.c sh.c

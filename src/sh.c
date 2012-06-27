@@ -9,7 +9,7 @@ ts_spharm *sph_init(ts_vertex_list *vlist, ts_uint l){
     ts_uint j,i;
     ts_spharm *sph=(ts_spharm *)malloc(sizeof(ts_spharm));
 
-    
+    sph->N=0;
     /* lets initialize Ylm for each vertex. */
     sph->Ylmi=(ts_double ***)calloc(l,sizeof(ts_double **));
     for(i=0;i<l;i++){
@@ -25,6 +25,11 @@ ts_spharm *sph_init(ts_vertex_list *vlist, ts_uint l){
         sph->ulm[j]=(ts_double *)calloc(2*j+1,sizeof(ts_double));
     }
 
+    /* lets initialize sum of Ulm2 */
+    sph->sumUlm2=(ts_double **)calloc(l,sizeof(ts_double *));
+    for(j=0;j<l;j++){
+        sph->sumUlm2[j]=(ts_double *)calloc(2*j+1,sizeof(ts_double));
+    }
 
     /* lets initialize co */
 //NOTE: C is has zero based indexing. Code is imported from fortran and to comply with original indexes we actually generate one index more. Also second dimension is 2*j+2 instead of 2*j+2. elements starting with 0 are useles and should be ignored!
@@ -46,6 +51,7 @@ ts_bool sph_free(ts_spharm *sph){
     int i,j;
     for(i=0;i<sph->l;i++){
         if(sph->ulm[i]!=NULL) free(sph->ulm[i]);
+        if(sph->sumUlm2[i]!=NULL) free(sph->sumUlm2[i]);
         if(sph->co[i]!=NULL) free(sph->co[i]);
     }
         if(sph->co[sph->l]!=NULL) free(sph->co[sph->l]);
@@ -353,4 +359,21 @@ ts_bool calculateUlm(ts_vesicle *vesicle){
     }
 
     return TS_SUCCESS;
+}
+
+
+
+
+
+ts_bool storeUlm2(ts_vesicle *vesicle){
+
+ts_spharm *sph=vesicle->sphHarmonics;
+ts_int i,j;
+for(i=0;i<sph->l;i++){
+    for(j=0;j<2*i+1;j++){
+    sph->sumUlm2[i][j]+=sph->ulm[i][j]* sph->ulm[i][j];
+    }
+}
+	sph->N++;
+return TS_SUCCESS;
 }

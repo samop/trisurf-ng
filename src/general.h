@@ -217,6 +217,8 @@ typedef struct ts_cell_list{
 typedef struct {
     ts_uint l;
     ts_double **ulm;
+    ts_double **sumUlm2;
+    ts_uint N;
     ts_double **co;
     ts_double ***Ylmi;
 } ts_spharm;

@@ -1,7 +1,7 @@
 #ifndef _H_SH
 #define _H_SH
 #include "general.h"
-
+ts_bool storeUlm2(ts_vesicle *vesicle);
 ts_double plgndr(ts_int l, ts_int m, ts_double x);
 ts_double shY(ts_int l,ts_int m,ts_double theta,ts_double fi);
 
