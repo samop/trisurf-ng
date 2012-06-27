@@ -69,7 +69,7 @@ ts_bool sph_free(ts_spharm *sph){
 }
 
 /* Gives you legendre polynomials. Taken from NR, p. 254 */
-ts_double plgndr(ts_int l, ts_int m, ts_float x){
+ts_double plgndr(ts_int l, ts_int m, ts_double x){
 	ts_double fact, pll, pmm, pmmp1, somx2;
 	ts_int i,ll;
 
@@ -274,7 +274,7 @@ ts_bool preparationSh(ts_vesicle *vesicle, ts_double r0){
     r=sqrtl(cvtx->x*cvtx->x+cvtx->y*cvtx->y+cvtx->z*cvtx->z);
 #endif
     cvtx->relR=(r-r0)/r0;
-    cvtx->solAngle=cvtx->projArea/cvtx->relR * cvtx->projArea/cvtx->relR;
+    cvtx->solAngle=cvtx->projArea/r/r;
     }
     return TS_SUCCESS;
 }
@@ -282,7 +282,7 @@ ts_bool preparationSh(ts_vesicle *vesicle, ts_double r0){
 
 
 ts_bool calculateYlmi(ts_vesicle *vesicle){
-    ts_uint i,j,k;
+    ts_int i,j,k;
     ts_spharm *sph=vesicle->sphHarmonics;
     ts_coord *coord=(ts_coord *)malloc(sizeof(ts_coord));
     ts_double fi, theta;
@@ -297,11 +297,30 @@ ts_bool calculateYlmi(ts_vesicle *vesicle){
         for(i=1; i<sph->l; i++){
             for(j=0;j<i;j++){
 			m=j+1;
+//Nastudiraj!!!!!
                 sph->Ylmi[i][j][k]=sph->co[i][m]*cos((m-i-1)*fi)*pow(-1,m-i-1)*plgndr(i,abs(m-i-1),cos(theta));
+		if(i==2 && j==0){
+	/*	fprintf(stderr," **** vtx %d ****\n", k+1);
+		fprintf(stderr,"m-i-1 =%d\n",m-i-1);
+		fprintf(stderr,"fi =%e\n",fi);
+		fprintf(stderr,"(m-i-1)*fi =%e\n",((ts_double)(m-i-1))*fi);
+		fprintf(stderr,"-2*fi =%e\n",-2*fi);
+		fprintf(stderr,"m =%d\n",m);
+	
+		fprintf(stderr," cos(m-i-1)=%e\n",cos((m-i-1)*fi));
+		fprintf(stderr," cos(-2*fi)=%e\n",cos(-2*fi));
+		fprintf(stderr," sph->co[i][m]=%e\n",sph->co[i][m]);
+		fprintf(stderr," plgndr(i,abs(m-i-1),cos(theta))=%e\n",plgndr(i,abs(m-i-1),cos(theta)));
+*/
+		}
             }
-                sph->Ylmi[i][j+1][k]=sph->co[i][m+1]*plgndr(i,0,cos(theta));
-            for(j=i+1;j<2*i;j++){
+//Nastudiraj!!!!!
+		j=i;
+		m=j+1;
+                sph->Ylmi[i][j][k]=sph->co[i][m]*plgndr(i,0,cos(theta));
+            for(j=i+1;j<2*i+1;j++){
 			m=j+1;
+//Nastudiraj!!!!!
                 sph->Ylmi[i][j][k]=sph->co[i][m]*sin((m-i-1)*fi)*plgndr(i,m-i-1,cos(theta));
             }
         }
@@ -326,7 +345,7 @@ ts_bool calculateUlm(ts_vesicle *vesicle){
     for(k=0;k<vesicle->vlist->n; k++){
         cvtx=vesicle->vlist->vtx[k];
         for(i=0;i<vesicle->sphHarmonics->l;i++){
-            for(j=0;j<2*i;j++){
+            for(j=0;j<2*i+1;j++){
                 vesicle->sphHarmonics->ulm[i][j]+= cvtx->solAngle*cvtx->relR*vesicle->sphHarmonics->Ylmi[i][j][k];
             }
 
