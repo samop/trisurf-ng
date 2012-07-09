@@ -343,7 +343,7 @@ ts_bool calculateUlm(ts_vesicle *vesicle){
     ts_uint i,j,k;
     ts_vertex *cvtx;
     for(i=0;i<vesicle->sphHarmonics->l;i++){
-        for(j=0;j<2*i;j++) vesicle->sphHarmonics->ulm[i][j]=0.0;
+        for(j=0;j<2*i+1;j++) vesicle->sphHarmonics->ulm[i][j]=0.0;
     }
 
 //TODO: call calculateYlmi !!!
@@ -372,6 +372,7 @@ ts_spharm *sph=vesicle->sphHarmonics;
 ts_int i,j;
 for(i=0;i<sph->l;i++){
     for(j=0;j<2*i+1;j++){
+	/* DEBUG fprintf(stderr,"sph->sumUlm2[%d][%d]=%e\n",i,j,sph->ulm[i][j]* sph->ulm[i][j]); */
         sph->sumUlm2[i][j]+=sph->ulm[i][j]* sph->ulm[i][j];
     }
 }

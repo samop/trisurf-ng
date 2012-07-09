@@ -40,8 +40,10 @@ fprintf(stderr,"Centroid=(%e,%e,%e)\n", vesicle->cm[0],vesicle->cm[1],vesicle->c
 
 preparationSh(vesicle,r0);
 calculateYlmi(vesicle);
+/*
 ts_coord *coord=(ts_coord *)malloc(sizeof(ts_coord));
 ts_double fi, theta;
+
   for(i=0;i<vesicle->vlist->n;i++){
 
     cart2sph(coord,vesicle->vlist->vtx[i]->x, vesicle->vlist->vtx[i]->y, vesicle->vlist->vtx[i]->z);
@@ -54,15 +56,15 @@ ts_double fi, theta;
 	}
 
 free(coord);
+*/
 calculateUlm(vesicle);
-
 for(i=0;i<vesicle->sphHarmonics->l;i++){
     for(j=0;j<2*i+1;j++){
     fprintf(stderr,"ulm(%d,%d)=%e\n",i,j+1,vesicle->sphHarmonics->ulm[i][j]);
     }
 }
 
-
+storeUlm2(vesicle);
 
 sph_free(vesicle->sphHarmonics);
 vesicle_free(vesicle);
