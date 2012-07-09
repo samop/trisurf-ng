@@ -32,6 +32,7 @@ vesicle->clist->max_occupancy=8;
 vesicle->bending_rigidity=25.0;
 //fprintf(stderr,"xk=%f",vesicle->bending_rigidity);
 
+	centermass(vesicle);
 vesicle->sphHarmonics=sph_init(vesicle->vlist, 21);
 
 vesicle_volume(vesicle);
@@ -43,21 +44,21 @@ calculateUlm(vesicle);
 
 
 
-for(i=0;i<10000;i++){
-	centermass(vesicle);
+for(i=0;i<5;i++){
 	cell_occupation(vesicle);
 	for(j=0;j<1000;j++){
 		single_timestep(vesicle);
 	}	
-vesicle_volume(vesicle);
-r0=getR0(vesicle);
+	centermass(vesicle);
+    vesicle_volume(vesicle);
+    r0=getR0(vesicle);
 
-preparationSh(vesicle,r0);
-calculateYlmi(vesicle);
-calculateUlm(vesicle);
+    preparationSh(vesicle,r0);
+    calculateYlmi(vesicle);
+    calculateUlm(vesicle);
 
-storeUlm2(vesicle);
-saveAvgUlm2(vesicle);
+    storeUlm2(vesicle);
+    saveAvgUlm2(vesicle);
 
 	write_vertex_xml_file(vesicle,i);
 	fprintf(stderr, "Loop %d completed.\n",i+1);

@@ -238,6 +238,7 @@ ts_double getR0(ts_vesicle *vesicle){
 ts_bool preparationSh(ts_vesicle *vesicle, ts_double r0){
 //TODO: before calling or during the call calculate area of each triangle! Can
 //be also done after vertexmove and bondflip //
+//DONE: in energy calculation! //
     ts_uint i,j;
     ts_vertex **vtx=vesicle->vlist->vtx;
     ts_vertex *cvtx;

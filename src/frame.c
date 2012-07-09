@@ -16,6 +16,13 @@ ts_bool centermass(ts_vesicle *vesicle){
     vesicle->cm[0]/=(ts_float)n;
     vesicle->cm[1]/=(ts_float)n;
     vesicle->cm[2]/=(ts_float)n;
+
+    for(i=0;i<n;i++){
+        vtx[i]->x-=vesicle->cm[0];
+        vtx[i]->y-=vesicle->cm[1];
+        vtx[i]->z-=vesicle->cm[2]; 
+    } 
+
     return TS_SUCCESS;
 }
 
