@@ -43,7 +43,7 @@ calculateUlm(vesicle);
 
 
 
-for(i=0;i<10;i++){
+for(i=0;i<10000;i++){
 	centermass(vesicle);
 	cell_occupation(vesicle);
 	for(j=0;j<1000;j++){
@@ -89,6 +89,7 @@ ts_bool saveAvgUlm2(ts_vesicle *vesicle){
 		fprintf(fh,"%d,\t%d,\t%e\n", i, j-i, sph->sumUlm2[i][j]/(ts_double)sph->N);
 
     		}
+    fprintf(fh,"\n");
 	}
 	fclose(fh);
 	return TS_SUCCESS;
