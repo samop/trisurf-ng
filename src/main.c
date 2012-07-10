@@ -73,7 +73,7 @@ fprintf(stderr,"xk=%f",vesicle->bending_rigidity);
 
 centermass(vesicle);
 cell_occupation(vesicle);
-for(i=0;i<10000;i++){
+for(i=0;i<100;i++){
 single_timestep(vesicle);
 if(i%100==0){
 write_vertex_xml_file(vesicle,i/100);
