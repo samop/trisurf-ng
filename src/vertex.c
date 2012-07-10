@@ -74,20 +74,23 @@ ts_bool vtx_remove_neighbour(ts_vertex *vtx, ts_vertex *nvtx){
 /* remove it from the list while shifting remaining neighbours up */
     ts_uint i,j=0;
     for(i=0;i<vtx->neigh_no;i++){
+//		fprintf(stderr,"neigh_addr=%ld\n", (long)vtx->neigh[i]);
         if(vtx->neigh[i]!=nvtx){
             vtx->neigh[j]=vtx->neigh[i];
             j++;
         }
     }
+//	fprintf(stderr,"remove_neighbour: vtx1_addr=%ld, vtx2_addr=%ld\n",(long)vtx,(long)nvtx);
 /* resize memory. potentionally time consuming */
     vtx->neigh_no--;
     vtx->neigh=(ts_vertex **)realloc(vtx->neigh,vtx->neigh_no*sizeof(ts_vertex *));
     if(vtx->neigh == NULL && vtx->neigh_no!=0)
-        fatal("Reallocation of memory failed during removal of vertex neighbour in vtx_remove_neighbour",100);
-
+        fatal("(1) Reallocation of memory failed during removal of vertex neighbour in vtx_remove_neighbour",100);
+//fprintf(stderr,"first alloc");
 /* repeat for the neighbour */
 /* find a neighbour */
 /* remove it from the list while shifting remaining neighbours up */
+	j=0;
     for(i=0;i<nvtx->neigh_no;i++){
         if(nvtx->neigh[i]!=vtx){
             nvtx->neigh[j]=nvtx->neigh[i];
@@ -95,10 +98,12 @@ ts_bool vtx_remove_neighbour(ts_vertex *vtx, ts_vertex *nvtx){
         }
     }
 /* resize memory. potentionally time consuming. */
+//	fprintf(stderr,"Neigbours=%d\n",nvtx->neigh_no);
     nvtx->neigh_no--;
-    nvtx->neigh=(ts_vertex **)realloc(nvtx->neigh,nvtx->neigh_no*sizeof(ts_vertex *));
+    		nvtx->neigh=(ts_vertex **)realloc(nvtx->neigh,nvtx->neigh_no*sizeof(ts_vertex *));
+//	fprintf(stderr,"Neigbours=%d\n",nvtx->neigh_no);
     if(nvtx->neigh == NULL && nvtx->neigh_no!=0)
-        fatal("Reallocation of memory failed during removal of vertex neighbour in vtx_remove_neighbour",100);
+        fatal("(2) Reallocation of memory failed during removal of vertex neighbour in vtx_remove_neighbour",100);
 
     return TS_SUCCESS;
 }
@@ -110,11 +115,14 @@ ts_bool vtx_add_bond(ts_bond_list *blist,ts_vertex *vtx1,ts_vertex *vtx2){
     bond=bond_add(blist,vtx1,vtx2);
     if(bond==NULL) return TS_FAIL;
     vtx1->bond_no++;
+    vtx2->bond_no++;
    // vtx2->data->bond_no++;
 
     vtx1->bond=(ts_bond **)realloc(vtx1->bond, vtx1->bond_no*sizeof(ts_bond *)); 
+    vtx2->bond=(ts_bond **)realloc(vtx2->bond, vtx2->bond_no*sizeof(ts_bond *)); 
    // vtx2->data->bond=(ts_bond **)realloc(vtx2->data->bond, vtx2->data->bond_no*sizeof(ts_bond *)); 
     vtx1->bond[vtx1->bond_no-1]=bond;
+    vtx2->bond[vtx2->bond_no-1]=bond;
    // vtx2->ata->bond[vtx2->data->bond_no-1]=bond;
     return TS_SUCCESS;
 }
@@ -122,6 +130,7 @@ ts_bool vtx_add_bond(ts_bond_list *blist,ts_vertex *vtx1,ts_vertex *vtx2){
 ts_bool vtx_add_cneighbour(ts_bond_list *blist, ts_vertex *vtx1, ts_vertex *vtx2){
     ts_bool retval;
     retval=vtx_add_neighbour(vtx1,vtx2);
+  //  retval=vtx_add_neighbour(vtx2,vtx1);
     if(retval==TS_SUCCESS)
     retval=vtx_add_bond(blist,vtx1,vtx2); 
     return retval;
@@ -205,6 +214,57 @@ inline ts_bool vertex_add_tristar(ts_vertex *vtx, ts_triangle *tristarmem){
 	vtx->tristar[vtx->tristar_no-1]=tristarmem;
 	return TS_SUCCESS;
 }
+
+
+/* Insert neighbour is a function that is required in bondflip. It inserts a
+ * neighbour exactly in the right place. */
+inline ts_bool vtx_insert_neighbour(ts_vertex *vtx, ts_vertex *nvtx, ts_vertex *vtxm){
+//nvtx is a vertex that is to be inserted after vtxm!
+        ts_uint i,j,midx;
+        vtx->neigh_no++;
+        if(vtxm==NULL ||  nvtx==NULL || vtx==NULL)
+                fatal("vertex_insert_neighbour: one of pointers has been zero.. Cannot proceed.",3);
+        //We need to reallocate space! The pointer *neight must be zero if not having neighbours jey (if neigh_no was 0 at thime of calling
+        vtx->neigh=realloc(vtx->neigh,vtx->neigh_no*sizeof(ts_vertex *));
+        if(vtx->neigh == NULL){
+            fatal("Reallocation of memory failed during insertion of vertex neighbour in vertex_insert_neighbour",3);
+        }
+        midx=0;
+        for(i=0;i<vtx->neigh_no-1;i++) if(vtx->neigh[i]==vtxm) {midx=i; break;}
+     //   fprintf(stderr,"midx=%d, vseh=%d\n",midx,vtx->neigh_no-2);
+        if(midx==vtx->neigh_no-2) {
+            vtx->neigh[vtx->neigh_no-1]=nvtx;
+        } else {
+            for(j=vtx->neigh_no-2;j>midx;j--) {
+                vtx->neigh[j+1]=vtx->neigh[j];
+//                vtx->bond_length[j+1]=vtx->bond_length[j];
+//                vtx->bond_length_dual[j+1]=vtx->bond_length_dual[j];
+            }
+            vtx->neigh[midx+1]=nvtx;
+        }
+    return TS_SUCCESS;
+}
+
+
+/* vtx remove tristar is required in  bondflip. */
+/* TODO: Check whether it is important to keep the numbering of tristar
+ * elements in some order or not! */
+inline ts_bool vtx_remove_tristar(ts_vertex *vtx, ts_triangle *tristar){
+    ts_uint i,j=0;
+    for(i=0;i<vtx->tristar_no;i++){
+        if(vtx->tristar[i]!=tristar){
+            vtx->tristar[j]=vtx->tristar[i];
+            j++;
+        }
+    }
+    vtx->tristar_no--;
+    vtx->tristar=realloc(vtx->tristar,vtx->tristar_no*sizeof(ts_triangle *));
+    if(vtx->neigh == NULL){
+            fatal("Reallocation of memory failed during insertion of vertex neighbour in vertex_add_neighbour",3);
+        }
+    return TS_SUCCESS;
+}
+
 
 
 /* ****************************************************************** */

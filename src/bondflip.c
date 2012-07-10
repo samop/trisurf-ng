@@ -8,6 +8,7 @@
 #include "energy.h"
 #include "timestep.h"
 #include "cell.h"
+#include "bondflip.h"
 //#include "io.h"
 #include<stdio.h>
 
@@ -27,7 +28,7 @@ c
     ts_vertex *it=bond->vtx1;
     ts_vertex *k=bond->vtx2;
     ts_uint nei,neip,neim;
-    ts_uint i,j;
+    ts_uint i; //j;
     ts_double oldenergy, delta_energy;
  //   ts_triangle *lm=NULL,*lp=NULL, *lp1=NULL, *lp2=NULL, *lm1=NULL, *lm2=NULL;
 
@@ -39,7 +40,7 @@ c
         fatal("In bondflip, number of neighbours of k or it is less than 3!",999);
     }
 
-
+    nei=0;
     for(i=0;i<it->neigh_no;i++){ // Finds the nn of it, that is k 
         if(it->neigh[i]==k){
             nei=i;
@@ -68,7 +69,7 @@ there the neim is never <0 !!! */
     }
  //   fprintf(stderr,"Membrane didn't wrap too much.. Continue.\n");
 /* if bond would be too long, return... */
-    if(vertex_distance_sq(km,kp) > vesicle->dmax ) return TS_FAIL;
+    if(vtx_distance_sq(km,kp) > vesicle->dmax ) return TS_FAIL;
  //   fprintf(stderr,"Bond will not be too long.. Continue.\n");
 
 /* we make a bond flip. this is different than in original fortran */
@@ -83,26 +84,26 @@ there the neim is never <0 !!! */
 //  for(i=0;i<km->neigh_no;i++) oldenergy+=km->neigh[i]->xk*km->neigh[i]->energy;
 //  for(i=0;i<it->neigh_no;i++) oldenergy+=it->neigh[i]->xk*it->neigh[i]->energy;
 /*
-fprintf(stderr,"*** Naslov k=%d\n",k);
-fprintf(stderr,"*** Naslov it=%d\n",it);
-fprintf(stderr,"*** Naslov km=%d\n",km);
-fprintf(stderr,"*** Naslov kp=%d\n",kp);
+fprintf(stderr,"*** Naslov k=%ld\n",(long)k);
+fprintf(stderr,"*** Naslov it=%ld\n",(long)it);
+fprintf(stderr,"*** Naslov km=%ld\n",(long)km);
+fprintf(stderr,"*** Naslov kp=%ld\n",(long)kp);
 
 for(i=0;i<k->neigh_no;i++)
-    fprintf(stderr,"k sosed=%d\n",k->neigh[i]);
+    fprintf(stderr,"k sosed=%ld\n",(long)k->neigh[i]);
 for(i=0;i<it->neigh_no;i++)
-    fprintf(stderr,"it sosed=%d\n",it->neigh[i]);
+    fprintf(stderr,"it sosed=%ld\n",(long)it->neigh[i]);
 
 for(i=0;i<km->neigh_no;i++)
-    fprintf(stderr,"km sosed=%d\n",km->neigh[i]);
+    fprintf(stderr,"km sosed=%ld\n",(long)km->neigh[i]);
 for(i=0;i<kp->neigh_no;i++)
-    fprintf(stderr,"kp sosed=%d\n",kp->neigh[i]);
+    fprintf(stderr,"kp sosed=%ld\n",(long)kp->neigh[i]);
 
 
 */
-  //  fprintf(stderr,"I WAS HERE! Before bondflip!\n");
+//    fprintf(stderr,"I WAS HERE! Before bondflip!\n");
     ts_flip_bond(k,it,km,kp, bond);
-   // fprintf(stderr,"I WAS HERE! Bondflip successful!\n");
+//    fprintf(stderr,"I WAS HERE! Bondflip successful!\n");
 
 /* Calculating the new energy */
   delta_energy=0;
@@ -174,7 +175,7 @@ ts_bool ts_flip_bond(ts_vertex *k,ts_vertex *it,ts_vertex *km, ts_vertex *kp,
 ts_bond *bond){
 
     ts_triangle *lm=NULL,*lp=NULL, *lp1=NULL, *lm2=NULL;
-    ts_uint i,j, lmidx, lpidx;
+    ts_uint i,j; //lmidx, lpidx;
 if(k==NULL || it==NULL || km==NULL || kp==NULL){
     fatal("ts_flip_bond: You called me with invalid pointers to vertices",999);
 }
@@ -232,26 +233,24 @@ for(i=0;i<it->neigh_no;i++)
 */
 if(lm2==NULL || lp1==NULL) fatal("ts_flip_bond: Cannot find triangles lm2 and lp1!",999);
 
-
-//fprintf(stderr,"1. step: lm, lm2, lp1 and lp found!\n");
-
 /*
 //DEBUG TESTING
-fprintf(stderr,"--- Naslov lm=%d",lm);
+fprintf(stderr,"1. step: lm, lm2, lp1 and lp found!\n");
+fprintf(stderr,"--- Naslov lm=%ld",(long)lm);
 
 
-fprintf(stderr,"   vtxs(%d, %d, %d)\n",lm->vertex[0],lm->vertex[1], lm->vertex[2]);
-fprintf(stderr,"--- Naslov lp=%d",lp);
-fprintf(stderr,"   vtxs(%d, %d, %d)\n",lp->vertex[0],lp->vertex[1], lp->vertex[2]);
-fprintf(stderr,"--- Naslov lm2=%d",lm2);
-fprintf(stderr,"   vtxs(%d, %d, %d)\n",lm2->vertex[0],lm2->vertex[1], lm2->vertex[2]);
-fprintf(stderr,"--- Naslov lp1=%d",lp1);
-fprintf(stderr,"   vtxs(%d, %d, %d)\n",lp1->vertex[0],lp1->vertex[1], lp1->vertex[2]);
+fprintf(stderr,"   vtxs(%ld, %ld, %ld)\n",(long)lm->vertex[0],(long)lm->vertex[1], (long)lm->vertex[2]);
+fprintf(stderr,"--- Naslov lp=%ld",(long)lp);
+fprintf(stderr,"   vtxs(%ld, %ld, %ld)\n",(long)lp->vertex[0],(long)lp->vertex[1], (long)lp->vertex[2]);
+fprintf(stderr,"--- Naslov lm2=%ld",(long)lm2);
+fprintf(stderr,"   vtxs(%ld, %ld, %ld)\n",(long)lm2->vertex[0],(long)lm2->vertex[1], (long)lm2->vertex[2]);
+fprintf(stderr,"--- Naslov lp1=%ld",(long)lp1);
+fprintf(stderr,"   vtxs(%ld, %ld, %ld)\n",(long)lp1->vertex[0],(long)lp1->vertex[1], (long)lp1->vertex[2]);
 
 for(i=0;i<lm->neigh_no;i++)
-    fprintf(stderr,"lm sosed=%d\n",lm->neigh[i]);
+    fprintf(stderr,"lm sosed=%ld\n",(long)lm->neigh[i]);
 for(i=0;i<lp->neigh_no;i++)
-    fprintf(stderr,"lp sosed=%d\n",lp->neigh[i]);
+    fprintf(stderr,"lp sosed=%ld\n",(long)lp->neigh[i]);
 // END DEBUG TESTING
 */
 /*
@@ -276,14 +275,17 @@ for(i=0;i<3;i++){
 //   * normals are recalculated here
     triangle_normal_vector(lp);
     triangle_normal_vector(lm);
+//fprintf(stderr,"2a. step: triangle normals recalculated\n");
 // 3. step. Correct neighbours in vertex_list
 
 
-            vertex_remove_neighbour(k,it);
-            vertex_remove_neighbour(it,k);
+            vtx_remove_neighbour(k,it);
+//            vtx_remove_neighbour(it,k);
+//fprintf(stderr,"3. step (PROGRESS): removed k and it neighbours\n");
+    
             //Tukaj pa nastopi tezava... Kam dodati soseda?
-            vertex_insert_neighbour(km,kp,k);
-            vertex_insert_neighbour(kp,km,it);
+            vtx_insert_neighbour(km,kp,k);
+            vtx_insert_neighbour(kp,km,it);
 //            vertex_add_neighbour(km,kp); //pazi na vrstni red.
 //            vertex_add_neighbour(kp,km);
 //fprintf(stderr,"3. step: vertex neighbours corrected\n");
@@ -300,7 +302,7 @@ for(i=0;i<3;i++){
 // 5. step. Correct neighbouring triangles 
    
     triangle_remove_neighbour(lp,lp1);
-   // fprintf(stderr,".\n");
+  //  fprintf(stderr,".\n");
     triangle_remove_neighbour(lp1,lp);
   //  fprintf(stderr,".\n");
     triangle_remove_neighbour(lm,lm2);
@@ -318,8 +320,8 @@ for(i=0;i<3;i++){
 // 6. step. Correct tristar for vertices km, kp, k and it
             vertex_add_tristar(km,lp);  // Preveri vrstni red!
             vertex_add_tristar(kp,lm);
-            vertex_remove_tristar(it,lm);
-            vertex_remove_tristar(k,lp);
+            vtx_remove_tristar(it,lm);
+            vtx_remove_tristar(k,lp);
 //fprintf(stderr,"6. step: tristar corrected\n");
 
 /*

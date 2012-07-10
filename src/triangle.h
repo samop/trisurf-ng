@@ -6,5 +6,5 @@ ts_triangle *triangle_add(ts_triangle_list *tlist, ts_vertex *vtx1, ts_vertex *v
 ts_bool triangle_add_neighbour(ts_triangle *tria, ts_triangle *ntria);
 ts_bool triangle_normal_vector(ts_triangle *tria);
 ts_bool triangle_list_free(ts_triangle_list *tlist);
-
+ts_bool triangle_remove_neighbour(ts_triangle *tria, ts_triangle *ntria);
 #endif

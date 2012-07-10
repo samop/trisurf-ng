@@ -1,4 +1,4 @@
-#ifdef _H_BONDFLIP
+#ifndef _H_BONDFLIP
 #define _H_BONDFLIP
 
 ts_bool single_bondflip_timestep(ts_vesicle *vesicle, ts_bond *bond, ts_double *rn);
