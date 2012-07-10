@@ -32,9 +32,10 @@ if(retval==TS_FAIL) printf("1. already a member or vertex is null!\n");
 
 retval=vtx_add_cneighbour(blist,vlist->vtx[0],vlist->vtx[1]);
 if(retval==TS_FAIL) printf("2. already a member or vertex is null!\n");
-
+fprintf(stderr,"Was here");
 retval=vtx_remove_neighbour(vlist->vtx[0],vlist->vtx[1]);
 vtx_add_neighbour(vlist->vtx[0],vlist->vtx[1]);
+fprintf(stderr,"Was here too!\n");
 
 vlist->vtx[0]->x=1.0;
 vlist->vtx[0]->x=1.1;

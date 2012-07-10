@@ -72,7 +72,7 @@ ts_bool vtx_add_neighbour(ts_vertex *vtx, ts_vertex *nvtx){
 ts_bool vtx_remove_neighbour(ts_vertex *vtx, ts_vertex *nvtx){
 /* find a neighbour */
 /* remove it from the list while shifting remaining neighbours up */
-    ts_uint i,j=0;
+    ts_int i,j=-1;
     for(i=0;i<vtx->neigh_no;i++){
         if(vtx->neigh[i]!=nvtx){
             vtx->neigh[j]=vtx->neigh[i];
@@ -87,7 +87,7 @@ ts_bool vtx_remove_neighbour(ts_vertex *vtx, ts_vertex *nvtx){
     vtx->neigh=(ts_vertex **)realloc(vtx->neigh,vtx->neigh_no*sizeof(ts_vertex *));
     if(vtx->neigh == NULL && vtx->neigh_no!=0)
         fatal("Reallocation of memory failed during removal of vertex neighbour in vtx_remove_neighbour",100);
-
+fprintf(stderr,"first alloc");
 /* repeat for the neighbour */
 /* find a neighbour */
 /* remove it from the list while shifting remaining neighbours up */
