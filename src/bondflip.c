@@ -83,7 +83,7 @@ there the neim is never <0 !!! */
 //  for(i=0;i<kp->neigh_no;i++) oldenergy+=kp->neigh[i]->xk*kp->neigh[i]->energy;
 //  for(i=0;i<km->neigh_no;i++) oldenergy+=km->neigh[i]->xk*km->neigh[i]->energy;
 //  for(i=0;i<it->neigh_no;i++) oldenergy+=it->neigh[i]->xk*it->neigh[i]->energy;
-
+/*
 fprintf(stderr,"*** Naslov k=%ld\n",(long)k);
 fprintf(stderr,"*** Naslov it=%ld\n",(long)it);
 fprintf(stderr,"*** Naslov km=%ld\n",(long)km);
@@ -100,10 +100,10 @@ for(i=0;i<kp->neigh_no;i++)
     fprintf(stderr,"kp sosed=%ld\n",(long)kp->neigh[i]);
 
 
-
-    fprintf(stderr,"I WAS HERE! Before bondflip!\n");
+*/
+//    fprintf(stderr,"I WAS HERE! Before bondflip!\n");
     ts_flip_bond(k,it,km,kp, bond);
-    fprintf(stderr,"I WAS HERE! Bondflip successful!\n");
+//    fprintf(stderr,"I WAS HERE! Bondflip successful!\n");
 
 /* Calculating the new energy */
   delta_energy=0;
@@ -233,7 +233,7 @@ for(i=0;i<it->neigh_no;i++)
 */
 if(lm2==NULL || lp1==NULL) fatal("ts_flip_bond: Cannot find triangles lm2 and lp1!",999);
 
-
+/*
 //DEBUG TESTING
 fprintf(stderr,"1. step: lm, lm2, lp1 and lp found!\n");
 fprintf(stderr,"--- Naslov lm=%ld",(long)lm);
@@ -252,7 +252,7 @@ for(i=0;i<lm->neigh_no;i++)
 for(i=0;i<lp->neigh_no;i++)
     fprintf(stderr,"lp sosed=%ld\n",(long)lp->neigh[i]);
 // END DEBUG TESTING
-
+*/
 /*
 // DEBUG TESTING!
 
@@ -270,25 +270,25 @@ for(i=0;i<3;i++){
 // 2. step. We change the triangle vertices... (actual bond flip)
     for(i=0;i<3;i++) if(lm->vertex[i]== it) lm->vertex[i]= kp;
     for(i=0;i<3;i++) if(lp->vertex[i]== k) lp->vertex[i]= km;
-fprintf(stderr,"2. step: actual bondflip made\n");
+//fprintf(stderr,"2. step: actual bondflip made\n");
 // 2a. step. If any changes in triangle calculations must be done, do it here!
 //   * normals are recalculated here
     triangle_normal_vector(lp);
     triangle_normal_vector(lm);
-fprintf(stderr,"2a. step: triangle normals recalculated\n");
+//fprintf(stderr,"2a. step: triangle normals recalculated\n");
 // 3. step. Correct neighbours in vertex_list
 
 
             vtx_remove_neighbour(k,it);
 //            vtx_remove_neighbour(it,k);
-fprintf(stderr,"3. step (PROGRESS): removed k and it neighbours\n");
+//fprintf(stderr,"3. step (PROGRESS): removed k and it neighbours\n");
     
             //Tukaj pa nastopi tezava... Kam dodati soseda?
             vtx_insert_neighbour(km,kp,k);
             vtx_insert_neighbour(kp,km,it);
 //            vertex_add_neighbour(km,kp); //pazi na vrstni red.
 //            vertex_add_neighbour(kp,km);
-fprintf(stderr,"3. step: vertex neighbours corrected\n");
+//fprintf(stderr,"3. step: vertex neighbours corrected\n");
 
 // 3a. step. If any changes to ts_vertex, do it here!
 //   bond_length calculatons not required for it is done in energy.c
@@ -302,7 +302,7 @@ fprintf(stderr,"3. step: vertex neighbours corrected\n");
 // 5. step. Correct neighbouring triangles 
    
     triangle_remove_neighbour(lp,lp1);
-   // fprintf(stderr,".\n");
+  //  fprintf(stderr,".\n");
     triangle_remove_neighbour(lp1,lp);
   //  fprintf(stderr,".\n");
     triangle_remove_neighbour(lm,lm2);

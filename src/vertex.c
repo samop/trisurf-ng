@@ -72,25 +72,25 @@ ts_bool vtx_add_neighbour(ts_vertex *vtx, ts_vertex *nvtx){
 ts_bool vtx_remove_neighbour(ts_vertex *vtx, ts_vertex *nvtx){
 /* find a neighbour */
 /* remove it from the list while shifting remaining neighbours up */
-    ts_int i,j=-1;
+    ts_uint i,j=0;
     for(i=0;i<vtx->neigh_no;i++){
+//		fprintf(stderr,"neigh_addr=%ld\n", (long)vtx->neigh[i]);
         if(vtx->neigh[i]!=nvtx){
             vtx->neigh[j]=vtx->neigh[i];
             j++;
         }
     }
-    if(j==0) { 
-        fatal("vtx_remove_neighbour: Error, vertices are not neighbours", 100);
-    }
+//	fprintf(stderr,"remove_neighbour: vtx1_addr=%ld, vtx2_addr=%ld\n",(long)vtx,(long)nvtx);
 /* resize memory. potentionally time consuming */
     vtx->neigh_no--;
     vtx->neigh=(ts_vertex **)realloc(vtx->neigh,vtx->neigh_no*sizeof(ts_vertex *));
     if(vtx->neigh == NULL && vtx->neigh_no!=0)
-        fatal("Reallocation of memory failed during removal of vertex neighbour in vtx_remove_neighbour",100);
-fprintf(stderr,"first alloc");
+        fatal("(1) Reallocation of memory failed during removal of vertex neighbour in vtx_remove_neighbour",100);
+//fprintf(stderr,"first alloc");
 /* repeat for the neighbour */
 /* find a neighbour */
 /* remove it from the list while shifting remaining neighbours up */
+	j=0;
     for(i=0;i<nvtx->neigh_no;i++){
         if(nvtx->neigh[i]!=vtx){
             nvtx->neigh[j]=nvtx->neigh[i];
@@ -98,10 +98,12 @@ fprintf(stderr,"first alloc");
         }
     }
 /* resize memory. potentionally time consuming. */
+//	fprintf(stderr,"Neigbours=%d\n",nvtx->neigh_no);
     nvtx->neigh_no--;
-    nvtx->neigh=(ts_vertex **)realloc(nvtx->neigh,nvtx->neigh_no*sizeof(ts_vertex *));
+    		nvtx->neigh=(ts_vertex **)realloc(nvtx->neigh,nvtx->neigh_no*sizeof(ts_vertex *));
+//	fprintf(stderr,"Neigbours=%d\n",nvtx->neigh_no);
     if(nvtx->neigh == NULL && nvtx->neigh_no!=0)
-        fatal("Reallocation of memory failed during removal of vertex neighbour in vtx_remove_neighbour",100);
+        fatal("(2) Reallocation of memory failed during removal of vertex neighbour in vtx_remove_neighbour",100);
 
     return TS_SUCCESS;
 }
@@ -128,6 +130,7 @@ ts_bool vtx_add_bond(ts_bond_list *blist,ts_vertex *vtx1,ts_vertex *vtx2){
 ts_bool vtx_add_cneighbour(ts_bond_list *blist, ts_vertex *vtx1, ts_vertex *vtx2){
     ts_bool retval;
     retval=vtx_add_neighbour(vtx1,vtx2);
+  //  retval=vtx_add_neighbour(vtx2,vtx1);
     if(retval==TS_SUCCESS)
     retval=vtx_add_bond(blist,vtx1,vtx2); 
     return retval;
