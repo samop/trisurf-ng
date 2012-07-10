@@ -372,6 +372,7 @@ ts_spharm *sph=vesicle->sphHarmonics;
 ts_int i,j;
 for(i=0;i<sph->l;i++){
     for(j=0;j<2*i+1;j++){
+	/* DEBUG fprintf(stderr,"sph->sumUlm2[%d][%d]=%e\n",i,j,sph->ulm[i][j]* sph->ulm[i][j]); */
         sph->sumUlm2[i][j]+=sph->ulm[i][j]* sph->ulm[i][j];
     }
 }
