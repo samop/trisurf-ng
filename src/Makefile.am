@@ -12,3 +12,6 @@ co_test_SOURCES= general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_d
 spherical_trisurfdir=../
 spherical_trisurf_PROGRAMS = spherical_trisurf
 spherical_trisurf_SOURCES = general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c frame.c energy.c timestep.c vertexmove.c spherical_trisurf.c sh.c
+spherical_trisurf_ffdir=../
+spherical_trisurf_ff_PROGRAMS = spherical_trisurf_ff
+spherical_trisurf_ff_SOURCES = general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c frame.c energy.c timestep.c vertexmove.c spherical_trisurf_ff.c sh.c
