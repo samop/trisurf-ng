@@ -11,6 +11,7 @@
 //#include "io.h"
 #include<stdio.h>
 #include "vertexmove.h"
+#include <string.h>
 
 ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
 *rn){
@@ -18,10 +19,13 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
     ts_double dist;
     ts_bool retval; 
     ts_uint cellidx; 
-    ts_double xold,yold,zold;
+    //ts_double xold,yold,zold;
     ts_double delta_energy,oenergy;
     ts_vertex *ovtx;
     ts_vertex *tvtx=(ts_vertex *)calloc(1,sizeof(ts_vertex));
+
+	//This will hold all the information of vtx and its neighbours
+	ts_vertex **backupvtx=(ts_vertex **)calloc(vtx->neigh_no+1,sizeof(ts_vertex *));
 
     //randomly we move the temporary vertex
 	tvtx->x=vtx->x+vesicle->stepsize*(2.0*rn[0]-1.0);
@@ -45,11 +49,22 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
 //	fprintf(stderr,"Fail 2\n");
         return TS_FAIL;
     } 
-    
+   
+ 
     //if all the tests are successful, then we update the vertex position
-    xold=vtx->x;
-    yold=vtx->y;
-    zold=vtx->z;
+	backupvtx[0]=(ts_vertex *)malloc(sizeof(ts_vertex));	
+	backupvtx[0]=(ts_vertex *)memcpy((void *)backupvtx[0],(void *)vtx,sizeof(ts_vertex));
+
+	for(i=0;i<vtx->neigh_no;i++){
+	backupvtx[i+1]=(ts_vertex *)malloc(sizeof(ts_vertex));	
+	backupvtx[i+1]=memcpy((void *)backupvtx[i+1],(void *)vtx->neigh[i],sizeof(ts_vertex));
+	}
+//	fprintf(stderr,"CREATED\n");
+	
+
+  //  xold=vtx->x;
+  //  yold=vtx->y;
+  //  zold=vtx->z;
     ovtx=malloc(sizeof(ts_vertex));
     vtx_copy(ovtx,vtx);
     vtx->x=tvtx->x;
@@ -82,19 +97,30 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
 #endif
     {
     //not accepted, reverting changes
-    vtx->x=xold;
-    vtx->y=yold;
-    vtx->z=zold;
+  //  vtx->x=xold;
+  //  vtx->y=yold;
+  //  vtx->z=zold;
+
+	vtx=memcpy((void *)vtx,(void *)backupvtx[0],sizeof(ts_vertex));
+	free(backupvtx[0]);
+	for(i=0;i<vtx->neigh_no;i++){
+	vtx->neigh[i]=memcpy((void *)vtx->neigh[i],(void *)backupvtx[i+1],sizeof(ts_vertex));
+	free(backupvtx[i+1]);
+	}
+	free(backupvtx);
+//	fprintf(stderr,"Reverted\n");
+	
     //update the normals of triangles that share bead i.
     for(i=0;i<vtx->tristar_no;i++) triangle_normal_vector(vtx->tristar[i]);
     //energy and curvature
-    energy_vertex(vtx);
+   // energy_vertex(vtx);
     //the same is done for neighbouring vertices
-	for(i=0;i<vtx->neigh_no;i++) energy_vertex(vtx->neigh[i]);
-	free(ovtx->bond_length);
+//	for(i=0;i<vtx->neigh_no;i++) energy_vertex(vtx->neigh[i]);
+//	free(ovtx->bond_length);
     free(ovtx->bond_length_dual);
     free(ovtx);
     vtx_free(tvtx);
+
     return TS_FAIL; 
     }
 }
@@ -106,6 +132,12 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
     free(ovtx->bond_length_dual);
     free(ovtx);
     vtx_free(tvtx);
+	free(backupvtx[0]);
+	for(i=0;i<vtx->neigh_no;i++){
+	free(backupvtx[i+1]);
+	}
+	free(backupvtx);
+//	fprintf(stderr,"Accepted\n");
     return TS_SUCCESS;
 }
 

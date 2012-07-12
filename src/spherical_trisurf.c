@@ -44,7 +44,7 @@ calculateUlm(vesicle);
 
 
 
-for(i=0;i<10;i++){
+for(i=0;i<1;i++){
 	cell_occupation(vesicle);
 	for(j=0;j<1000;j++){
 		single_timestep(vesicle);
