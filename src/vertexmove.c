@@ -21,9 +21,10 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
     ts_uint cellidx; 
     ts_double delta_energy,oenergy;
 	//This will hold all the information of vtx and its neighbours
-	ts_vertex **backupvtx=(ts_vertex **)calloc(vtx->neigh_no+1,sizeof(ts_vertex *));
-	backupvtx[0]=(ts_vertex *)malloc(sizeof(ts_vertex));	
-	backupvtx[0]=(ts_vertex *)memcpy((void *)backupvtx[0],(void *)vtx,sizeof(ts_vertex));
+//	ts_vertex **backupvtx=(ts_vertex **)calloc(vtx->neigh_no+1,sizeof(ts_vertex *));
+	ts_vertex backupvtx[20];
+//	backupvtx[0]=(ts_vertex *)malloc(sizeof(ts_vertex));	
+	memcpy((void *)&backupvtx[0],(void *)vtx,sizeof(ts_vertex));
     	//temporarly moving the vertex
 	vtx->x=vtx->x+vesicle->stepsize*(2.0*rn[0]-1.0);
     	vtx->y=vtx->y+vesicle->stepsize*(2.0*rn[1]-1.0);
@@ -32,9 +33,9 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
     for(i=0;i<vtx->neigh_no;i++){
         dist=vtx_distance_sq(vtx,vtx->neigh[i]);
         if(dist<1.0 || dist>vesicle->dmax) {
-		vtx=memcpy((void *)vtx,(void *)backupvtx[0],sizeof(ts_vertex));
-		free(backupvtx[0]);
-		free(backupvtx);
+		vtx=memcpy((void *)vtx,(void *)&backupvtx[0],sizeof(ts_vertex));
+//		free(backupvtx[0]);
+//		free(backupvtx);
 //	fprintf(stderr,"Fail 1, dist=%f, vesicle->dmax=%f\n", dist, vesicle->dmax);
 		return TS_FAIL;
 		}
@@ -42,11 +43,11 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
     //self avoidance check with distant vertices
      cellidx=vertex_self_avoidance(vesicle, vtx);
     //check occupation number
-     retval=cell_occupation_number_and_internal_proximity(vesicle->clist,cellidx,backupvtx[0],vtx);
+     retval=cell_occupation_number_and_internal_proximity(vesicle->clist,cellidx,&backupvtx[0],vtx);
     if(retval==TS_FAIL){
-		vtx=memcpy((void *)vtx,(void *)backupvtx[0],sizeof(ts_vertex));
-		free(backupvtx[0]);
-		free(backupvtx);
+		vtx=memcpy((void *)vtx,(void *)&backupvtx[0],sizeof(ts_vertex));
+//		free(backupvtx[0]);
+//		free(backupvtx);
 //	fprintf(stderr,"Fail 2\n");
         return TS_FAIL;
     } 
@@ -54,8 +55,8 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
  
     //if all the tests are successful, then energy for vtx and neighbours is calculated
 	for(i=0;i<vtx->neigh_no;i++){
-	backupvtx[i+1]=(ts_vertex *)malloc(sizeof(ts_vertex));	
-	backupvtx[i+1]=memcpy((void *)backupvtx[i+1],(void *)vtx->neigh[i],sizeof(ts_vertex));
+//	backupvtx[i+1]=(ts_vertex *)malloc(sizeof(ts_vertex));	
+	memcpy((void *)&backupvtx[i+1],(void *)vtx->neigh[i],sizeof(ts_vertex));
 	}
 
     delta_energy=0;
@@ -63,7 +64,7 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
     for(i=0;i<vtx->tristar_no;i++) triangle_normal_vector(vtx->tristar[i]);
     //energy and curvature
     energy_vertex(vtx);
-    delta_energy=vtx->xk*(vtx->energy - backupvtx[0]->energy);
+    delta_energy=vtx->xk*(vtx->energy - (&backupvtx[0])->energy);
     //the same is done for neighbouring vertices
     for(i=0;i<vtx->neigh_no;i++){
         oenergy=vtx->neigh[i]->energy;
@@ -84,17 +85,17 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
 #endif
     {
     //not accepted, reverting changes
-	vtx=memcpy((void *)vtx,(void *)backupvtx[0],sizeof(ts_vertex));
-	free(backupvtx[0]);
+	vtx=memcpy((void *)vtx,(void *)&backupvtx[0],sizeof(ts_vertex));
+//	free(backupvtx[0]);
 	for(i=0;i<vtx->neigh_no;i++){
-	vtx->neigh[i]=memcpy((void *)vtx->neigh[i],(void *)backupvtx[i+1],sizeof(ts_vertex));
-	free(backupvtx[i+1]);
+	vtx->neigh[i]=memcpy((void *)vtx->neigh[i],(void *)&backupvtx[i+1],sizeof(ts_vertex));
+//	free(backupvtx[i+1]);
 	}
-	free(backupvtx);
+//	free(backupvtx);
 //	fprintf(stderr,"Reverted\n");
 	
     //update the normals of triangles that share bead i.
-    for(i=0;i<vtx->tristar_no;i++) triangle_normal_vector(vtx->tristar[i]);
+   for(i=0;i<vtx->tristar_no;i++) triangle_normal_vector(vtx->tristar[i]);
 
     return TS_FAIL; 
     }
@@ -103,11 +104,11 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
 
     //TODO: change cell occupation if necessary!
 //	fprintf(stderr,"Success!!\n");
-	free(backupvtx[0]);
-	for(i=0;i<vtx->neigh_no;i++){
-	free(backupvtx[i+1]);
-	}
-	free(backupvtx);
+//	free(backupvtx[0]);
+//	for(i=0;i<vtx->neigh_no;i++){
+//	free(backupvtx[i+1]);
+//	}
+//	free(backupvtx);
 //	fprintf(stderr,"Accepted\n");
     return TS_SUCCESS;
 }
