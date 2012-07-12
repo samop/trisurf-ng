@@ -19,64 +19,51 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
     ts_double dist;
     ts_bool retval; 
     ts_uint cellidx; 
-    //ts_double xold,yold,zold;
     ts_double delta_energy,oenergy;
-    ts_vertex *ovtx;
-    ts_vertex *tvtx=(ts_vertex *)calloc(1,sizeof(ts_vertex));
-
 	//This will hold all the information of vtx and its neighbours
 	ts_vertex **backupvtx=(ts_vertex **)calloc(vtx->neigh_no+1,sizeof(ts_vertex *));
-
-    //randomly we move the temporary vertex
-	tvtx->x=vtx->x+vesicle->stepsize*(2.0*rn[0]-1.0);
-    tvtx->y=vtx->y+vesicle->stepsize*(2.0*rn[1]-1.0);
-    tvtx->z=vtx->z+vesicle->stepsize*(2.0*rn[2]-1.0);
-    //check we if some length to neighbours are too much
+	backupvtx[0]=(ts_vertex *)malloc(sizeof(ts_vertex));	
+	backupvtx[0]=(ts_vertex *)memcpy((void *)backupvtx[0],(void *)vtx,sizeof(ts_vertex));
+    	//temporarly moving the vertex
+	vtx->x=vtx->x+vesicle->stepsize*(2.0*rn[0]-1.0);
+    	vtx->y=vtx->y+vesicle->stepsize*(2.0*rn[1]-1.0);
+    	vtx->z=vtx->z+vesicle->stepsize*(2.0*rn[2]-1.0);
+    	//check we if some length to neighbours are too much
     for(i=0;i<vtx->neigh_no;i++){
-        dist=vtx_distance_sq(tvtx,vtx->neigh[i]);
+        dist=vtx_distance_sq(vtx,vtx->neigh[i]);
         if(dist<1.0 || dist>vesicle->dmax) {
-		vtx_free(tvtx);
+		vtx=memcpy((void *)vtx,(void *)backupvtx[0],sizeof(ts_vertex));
+		free(backupvtx[0]);
+		free(backupvtx);
 //	fprintf(stderr,"Fail 1, dist=%f, vesicle->dmax=%f\n", dist, vesicle->dmax);
 		return TS_FAIL;
 		}
     }
     //self avoidance check with distant vertices
-     cellidx=vertex_self_avoidance(vesicle, tvtx);
+     cellidx=vertex_self_avoidance(vesicle, vtx);
     //check occupation number
-     retval=cell_occupation_number_and_internal_proximity(vesicle->clist,cellidx,vtx,tvtx);
+     retval=cell_occupation_number_and_internal_proximity(vesicle->clist,cellidx,backupvtx[0],vtx);
     if(retval==TS_FAIL){
-	vtx_free(tvtx);
+		vtx=memcpy((void *)vtx,(void *)backupvtx[0],sizeof(ts_vertex));
+		free(backupvtx[0]);
+		free(backupvtx);
 //	fprintf(stderr,"Fail 2\n");
         return TS_FAIL;
     } 
    
  
-    //if all the tests are successful, then we update the vertex position
-	backupvtx[0]=(ts_vertex *)malloc(sizeof(ts_vertex));	
-	backupvtx[0]=(ts_vertex *)memcpy((void *)backupvtx[0],(void *)vtx,sizeof(ts_vertex));
-
+    //if all the tests are successful, then energy for vtx and neighbours is calculated
 	for(i=0;i<vtx->neigh_no;i++){
 	backupvtx[i+1]=(ts_vertex *)malloc(sizeof(ts_vertex));	
 	backupvtx[i+1]=memcpy((void *)backupvtx[i+1],(void *)vtx->neigh[i],sizeof(ts_vertex));
 	}
-//	fprintf(stderr,"CREATED\n");
-	
-
-  //  xold=vtx->x;
-  //  yold=vtx->y;
-  //  zold=vtx->z;
-    ovtx=malloc(sizeof(ts_vertex));
-    vtx_copy(ovtx,vtx);
-    vtx->x=tvtx->x;
-    vtx->y=tvtx->y;
-    vtx->z=tvtx->z;
 
     delta_energy=0;
     //update the normals of triangles that share bead i.
     for(i=0;i<vtx->tristar_no;i++) triangle_normal_vector(vtx->tristar[i]);
     //energy and curvature
     energy_vertex(vtx);
-    delta_energy=vtx->xk*(vtx->energy - ovtx->energy);
+    delta_energy=vtx->xk*(vtx->energy - backupvtx[0]->energy);
     //the same is done for neighbouring vertices
     for(i=0;i<vtx->neigh_no;i++){
         oenergy=vtx->neigh[i]->energy;
@@ -97,10 +84,6 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
 #endif
     {
     //not accepted, reverting changes
-  //  vtx->x=xold;
-  //  vtx->y=yold;
-  //  vtx->z=zold;
-
 	vtx=memcpy((void *)vtx,(void *)backupvtx[0],sizeof(ts_vertex));
 	free(backupvtx[0]);
 	for(i=0;i<vtx->neigh_no;i++){
@@ -112,14 +95,6 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
 	
     //update the normals of triangles that share bead i.
     for(i=0;i<vtx->tristar_no;i++) triangle_normal_vector(vtx->tristar[i]);
-    //energy and curvature
-   // energy_vertex(vtx);
-    //the same is done for neighbouring vertices
-//	for(i=0;i<vtx->neigh_no;i++) energy_vertex(vtx->neigh[i]);
-//	free(ovtx->bond_length);
-    free(ovtx->bond_length_dual);
-    free(ovtx);
-    vtx_free(tvtx);
 
     return TS_FAIL; 
     }
@@ -128,10 +103,6 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
 
     //TODO: change cell occupation if necessary!
 //	fprintf(stderr,"Success!!\n");
-    free(ovtx->bond_length);
-    free(ovtx->bond_length_dual);
-    free(ovtx);
-    vtx_free(tvtx);
 	free(backupvtx[0]);
 	for(i=0;i<vtx->neigh_no;i++){
 	free(backupvtx[i+1]);
