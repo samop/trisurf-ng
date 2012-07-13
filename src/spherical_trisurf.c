@@ -60,6 +60,16 @@ preparationSh(vesicle,r0);
 calculateYlmi(vesicle);
 calculateUlm(vesicle);
 
+//preloop:
+for(i=0;i<1000;i++){
+	cell_occupation(vesicle);
+	for(j=0;j<1000;j++){
+		single_timestep(vesicle);
+	}	
+	centermass(vesicle);
+	fprintf(stderr, "Preloop %d completed.\n",i+1);
+}
+
 nmax=1000;
 for(i=0;i<nmax;i++){
 	for(j=0;j<200;j++){
