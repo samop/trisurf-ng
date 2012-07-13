@@ -22,11 +22,20 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
     ts_double delta_energy,oenergy;
     ts_vertex *ovtx;
     ts_vertex *tvtx=(ts_vertex *)calloc(1,sizeof(ts_vertex));
+    ts_double costheta,sintheta,phi,r;
 
     //randomly we move the temporary vertex
-	tvtx->x=vtx->x+vesicle->stepsize*(2.0*rn[0]-1.0);
-    tvtx->y=vtx->y+vesicle->stepsize*(2.0*rn[1]-1.0);
-    tvtx->z=vtx->z+vesicle->stepsize*(2.0*rn[2]-1.0);
+//    tvtx->x=vtx->x+vesicle->stepsize*(2.0*rn[0]-1.0);
+//    tvtx->y=vtx->y+vesicle->stepsize*(2.0*rn[1]-1.0);
+//    tvtx->z=vtx->z+vesicle->stepsize*(2.0*rn[2]-1.0);
+	//random move in a sphere with radius stepsize:
+	r=vesicle->stepsize*rn[0];
+	phi=rn[1]*2*M_PI;
+	costheta=2*rn[2]-1;
+	sintheta=sqrt(1-pow(costheta,2));
+	tvtx->x=vtx->x+r*sintheta*cos(phi);
+	tvtx->y=vtx->y+r*sintheta*sin(phi);
+	tvtx->z=vtx->z+r*costheta;
     //check we if some length to neighbours are too much
     for(i=0;i<vtx->neigh_no;i++){
         dist=vtx_distance_sq(tvtx,vtx->neigh[i]);
