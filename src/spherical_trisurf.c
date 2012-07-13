@@ -25,6 +25,9 @@ ts_double r0;
 vesicle=initial_distribution_dipyramid(17,60,60,60,0.15);
 //parsetape(vesicle,&i);
 
+//similar to nmax in fortran code
+ts_uint nmax;
+
 //these four must come from parsetype!
 vesicle->dmax=1.67*1.67;
 vesicle->stepsize=0.15;
@@ -57,8 +60,8 @@ preparationSh(vesicle,r0);
 calculateYlmi(vesicle);
 calculateUlm(vesicle);
 
-
-for(i=0;i<10;i++){
+nmax=1000;
+for(i=0;i<nmax;i++){
 	for(j=0;j<200;j++){
 		cell_occupation(vesicle);
 		for(k=0;k<5;k++){
@@ -77,7 +80,7 @@ for(i=0;i<10;i++){
     saveAvgUlm2(vesicle);
 
 	write_vertex_xml_file(vesicle,i);
-	fprintf(stderr, "Loop %d completed.\n",i+1);
+	fprintf(stderr, "Loop %d out of %d completed.\n",i+1,nmax);
 
 }
 
