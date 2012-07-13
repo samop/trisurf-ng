@@ -19,7 +19,7 @@
 */
 ts_bool saveAvgUlm2(ts_vesicle *vesicle);
 int main(int argv, char *argc[]){
-ts_uint i,j;
+ts_uint i,j,k;
 ts_vesicle *vesicle;
 ts_double r0;
 vesicle=initial_distribution_dipyramid(17,60,60,60,0.15);
@@ -33,6 +33,21 @@ vesicle->bending_rigidity=25.0;
 //fprintf(stderr,"xk=%f",vesicle->bending_rigidity);
 
 	centermass(vesicle);
+cell_occupation(vesicle);
+
+//test if the structure is internally organized into cells correctly 
+ts_uint cind;
+for(i=0;i<vesicle->vlist->n;i++){
+	cind=vertex_self_avoidance(vesicle, vesicle->vlist->vtx[i]);
+
+	if(vesicle->clist->cell[cind]==vesicle->vlist->vtx[i]->cell){
+		//fprintf(stdout,"(T) Idx match!\n");
+	} else {
+		fprintf(stderr,"(T) ***** Idx don't match!\n");
+
+	}
+}
+//end test
 vesicle->sphHarmonics=sph_init(vesicle->vlist, 21);
 
 vesicle_volume(vesicle);
@@ -43,13 +58,14 @@ calculateYlmi(vesicle);
 calculateUlm(vesicle);
 
 
-
 for(i=0;i<1;i++){
-	cell_occupation(vesicle);
-	for(j=0;j<1000;j++){
+	for(j=0;j<20;j++){
+		cell_occupation(vesicle);
+		for(k=0;k<5;k++){
 		single_timestep(vesicle);
+		}
+		centermass(vesicle);
 	}	
-	centermass(vesicle);
     vesicle_volume(vesicle);
     r0=getR0(vesicle);
 
@@ -62,7 +78,9 @@ for(i=0;i<1;i++){
 
 	write_vertex_xml_file(vesicle,i);
 	fprintf(stderr, "Loop %d completed.\n",i+1);
+
 }
+
 write_master_xml_file("test.pvd");
 write_dout_fcompat_file(vesicle,"dout");
 vesicle_free(vesicle);

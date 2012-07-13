@@ -23,6 +23,10 @@ ts_bool centermass(ts_vesicle *vesicle){
         vtx[i]->z-=vesicle->cm[2]; 
     } 
 
+    vesicle->cm[0]=0;
+    vesicle->cm[1]=0;
+    vesicle->cm[2]=0;
+
     return TS_SUCCESS;
 }
 
@@ -37,7 +41,8 @@ ts_bool cell_occupation(ts_vesicle *vesicle){
     cell_list_cell_occupation_clear(vesicle->clist);
     for(i=0;i<n;i++){
     cellidx=vertex_self_avoidance(vesicle, vesicle->vlist->vtx[i]);
-    vesicle->vlist->vtx[i]->cell=vesicle->clist->cell[cellidx];
+//	already done in cell_add_vertex
+//    vesicle->vlist->vtx[i]->cell=vesicle->clist->cell[cellidx];
 
     cell_add_vertex(vesicle->clist->cell[cellidx],vesicle->vlist->vtx[i]);
 
