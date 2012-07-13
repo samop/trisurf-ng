@@ -20,6 +20,7 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
     ts_bool retval; 
     ts_uint cellidx; 
     ts_double delta_energy,oenergy;
+    ts_double costheta,sintheta,phi,r;
 	//This will hold all the information of vtx and its neighbours
 	ts_vertex backupvtx[20];
 	memcpy((void *)&backupvtx[0],(void *)vtx,sizeof(ts_vertex));
@@ -35,9 +36,20 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double
 */
 
     	//temporarly moving the vertex
-	vtx->x=vtx->x+vesicle->stepsize*(2.0*rn[0]-1.0);
-    	vtx->y=vtx->y+vesicle->stepsize*(2.0*rn[1]-1.0);
-    	vtx->z=vtx->z+vesicle->stepsize*(2.0*rn[2]-1.0);
+//	vtx->x=vtx->x+vesicle->stepsize*(2.0*rn[0]-1.0);
+//    	vtx->y=vtx->y+vesicle->stepsize*(2.0*rn[1]-1.0);
+//    	vtx->z=vtx->z+vesicle->stepsize*(2.0*rn[2]-1.0);
+
+	//random move in a sphere with radius stepsize:
+	r=vesicle->stepsize*rn[0];
+	phi=rn[1]*2*M_PI;
+	costheta=2*rn[2]-1;
+	sintheta=sqrt(1-pow(costheta,2));
+	vtx->x=vtx->x+r*sintheta*cos(phi);
+	vtx->y=vtx->y+r*sintheta*sin(phi);
+	vtx->z=vtx->z+r*costheta;
+
+
     	//distance with neighbours check
     for(i=0;i<vtx->neigh_no;i++){
         dist=vtx_distance_sq(vtx,vtx->neigh[i]);
