@@ -8,7 +8,7 @@
 #include<stdlib.h>
 #include <sys/types.h>
 #include <dirent.h>
-
+#include "initial_distribution.h"
 
 ts_bool print_vertex_list(ts_vertex_list *vlist){
 	ts_uint i;
@@ -294,10 +294,12 @@ ts_bool write_vertex_vtk_file(ts_vesicle *vesicle,ts_char *filename, ts_char *te
 
 
 
-ts_bool parsetape(ts_vesicle *vesicle,ts_uint *iterations){
+ts_vesicle *parsetape(ts_uint *iterations){
     long int nshell=17,ncxmax=60, ncymax=60, nczmax=60;  // THIS IS DUE TO CONFUSE BUG!
-    char buf[255];
-    long int brezveze=1;
+    char *buf=malloc(255*sizeof(char));
+    long int brezveze0=1;
+    long int brezveze1=1;
+    long int brezveze2=1;
     ts_double xk0=25.0, dmax=1.67,stepsize=0.15;
     *iterations=1000;
     cfg_opt_t opts[] = {
@@ -311,9 +313,9 @@ ts_bool parsetape(ts_vesicle *vesicle,ts_uint *iterations){
         CFG_SIMPLE_INT("iterations",iterations),
         CFG_SIMPLE_BOOL("quiet",&quiet),
         CFG_SIMPLE_STR("multiprocessing",buf),
-        CFG_SIMPLE_INT("smp_cores",&brezveze),
-        CFG_SIMPLE_INT("cluster_nodes",&brezveze),
-        CFG_SIMPLE_INT("distributed_processes",&brezveze),
+        CFG_SIMPLE_INT("smp_cores",&brezveze0),
+        CFG_SIMPLE_INT("cluster_nodes",&brezveze1),
+        CFG_SIMPLE_INT("distributed_processes",&brezveze2),
         CFG_END()
     };
     cfg_t *cfg;    
@@ -326,6 +328,8 @@ ts_bool parsetape(ts_vesicle *vesicle,ts_uint *iterations){
     else if(retval==CFG_PARSE_ERROR){
 	fatal("Invalid tape!",100);
 	}
+	ts_vesicle *vesicle;
+	vesicle=initial_distribution_dipyramid(nshell,ncxmax,ncymax,nczmax,stepsize);
     vesicle->nshell=nshell;
     vesicle->dmax=dmax*dmax;
     vesicle->bending_rigidity=xk0;
@@ -334,9 +338,11 @@ ts_bool parsetape(ts_vesicle *vesicle,ts_uint *iterations){
     vesicle->clist->ncmax[1]=ncymax;
     vesicle->clist->ncmax[2]=nczmax;
     vesicle->clist->max_occupancy=8;
+
     cfg_free(cfg);
-//    fprintf(stderr,"NSHELL=%u\n",vesicle->nshell);
-    return TS_SUCCESS;
+	free(buf);
+  //  fprintf(stderr,"NSHELL=%u\n",vesicle->nshell);
+    return vesicle;
 
 }
 
