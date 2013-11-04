@@ -18,7 +18,7 @@
 */
 
 int main(int argv, char *argc[]){
-ts_uint i,n;
+ts_uint inititer,mcsweeps, iterations;
 ts_vesicle *vesicle;
 /* THIS SHOULD GO INTO UNIT TEST
 ts_bool retval;
@@ -63,25 +63,9 @@ cell_list_free(clist);
 vtx_list_free(vlist1);
 printf("Tests complete.\n");
 */
-vesicle=parsetape(&n);
+vesicle=parsetape(&mcsweeps, &inititer, &iterations);
+run_simulation(vesicle, mcsweeps, inititer, iterations);
 
-//these four must come from parsetype!
-/*
-vesicle->dmax=1.67*1.67;
-vesicle->stepsize=0.15;
-vesicle->clist->max_occupancy=8;
-vesicle->bending_rigidity=25.0;
-*/
-// fprintf(stderr,"xk=%f\n",vesicle->bending_rigidity);
-
-centermass(vesicle);
-cell_occupation(vesicle);
-for(i=0;i<n;i++){
-single_timestep(vesicle);
-if(i%100==0){
-write_vertex_xml_file(vesicle,i/100);
-}
-}
 write_master_xml_file("test.pvd");
 write_dout_fcompat_file(vesicle,"dout");
 vesicle_free(vesicle);

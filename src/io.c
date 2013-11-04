@@ -294,14 +294,14 @@ ts_bool write_vertex_vtk_file(ts_vesicle *vesicle,ts_char *filename, ts_char *te
 
 
 
-ts_vesicle *parsetape(ts_uint *iterations){
+ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations){
     long int nshell=17,ncxmax=60, ncymax=60, nczmax=60;  // THIS IS DUE TO CONFUSE BUG!
     char *buf=malloc(255*sizeof(char));
     long int brezveze0=1;
     long int brezveze1=1;
     long int brezveze2=1;
     ts_double xk0=25.0, dmax=1.67,stepsize=0.15;
-    *iterations=1000;
+	long int iter=1000, init=1000, mcsw=1000;
     cfg_opt_t opts[] = {
         CFG_SIMPLE_INT("nshell", &nshell),
         CFG_SIMPLE_FLOAT("dmax", &dmax),
@@ -310,7 +310,9 @@ ts_vesicle *parsetape(ts_uint *iterations){
         CFG_SIMPLE_INT("nxmax", &ncxmax),
         CFG_SIMPLE_INT("nymax", &ncymax),
         CFG_SIMPLE_INT("nzmax", &nczmax),
-        CFG_SIMPLE_INT("iterations",iterations),
+        CFG_SIMPLE_INT("iterations",&iter),
+	CFG_SIMPLE_INT("mcsweeps",&mcsw),
+	CFG_SIMPLE_INT("inititer", &init),
         CFG_SIMPLE_BOOL("quiet",&quiet),
         CFG_SIMPLE_STR("multiprocessing",buf),
         CFG_SIMPLE_INT("smp_cores",&brezveze0),
@@ -329,6 +331,9 @@ ts_vesicle *parsetape(ts_uint *iterations){
 	fatal("Invalid tape!",100);
 	}
 	ts_vesicle *vesicle;
+    	*iterations=iter;
+	*inititer=init;
+	*mcsweeps=mcsw;
 	vesicle=initial_distribution_dipyramid(nshell,ncxmax,ncymax,nczmax,stepsize);
     vesicle->nshell=nshell;
     vesicle->dmax=dmax*dmax;

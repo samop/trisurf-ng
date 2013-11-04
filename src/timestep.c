@@ -6,6 +6,26 @@
 #include "timestep.h"
 #include "vertexmove.h"
 #include "bondflip.h"
+#include "frame.h"
+#include "io.h"
+ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, ts_uint iterations){
+	ts_uint i, j;
+
+	centermass(vesicle);
+	cell_occupation(vesicle);
+	ts_fprintf(stdout, "Starting simulation (first %d x %d MC sweeps will not be recorded on disk)\n", inititer, mcsweeps);
+	for(i=0;i<inititer+iterations;i++){
+		for(j=0;j<mcsweeps;j++){
+			single_timestep(vesicle);
+		}
+		centermass(vesicle);
+		cell_occupation(vesicle);
+		if(i>inititer){
+			write_vertex_xml_file(vesicle,i-inititer);
+		}
+	}
+	return TS_SUCCESS;
+}
 
 ts_bool single_timestep(ts_vesicle *vesicle){
     ts_bool retval;
