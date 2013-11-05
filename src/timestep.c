@@ -7,6 +7,7 @@
 #include "vertexmove.h"
 #include "bondflip.h"
 #include "frame.h"
+#include "vertex.h"
 #include "io.h"
 ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, ts_uint iterations){
 	ts_uint i, j;
@@ -35,7 +36,15 @@ ts_bool single_timestep(ts_vesicle *vesicle){
         rnvec[0]=drand48();
         rnvec[1]=drand48();
         rnvec[2]=drand48();
+	vertex_taint(vesicle->vlist->vtx[i],1);
+//		ts_fprintf(stdout, "Vertex %d should be tainted, level=%d.\n", i, vesicle->vlist->vtx[i]->locked);
+	if(vertex_tainted(vesicle->vlist->vtx[i],1,1)){
+		ts_fprintf(stdout, "Vertex %d tainted, level=%d. Waiting....\n", i, vesicle->vlist->vtx[i]->locked);
+		while(vertex_tainted(vesicle->vlist->vtx[i],1,1));
+	}
         retval=single_verticle_timestep(vesicle,vesicle->vlist->vtx[i],rnvec);
+	vertex_untaint(vesicle->vlist->vtx[i],1);
+//		ts_fprintf(stdout, "Vertex %d should be untainted, level=%d.\n", i, vesicle->vlist->vtx[i]->locked);
     }
 
 //	ts_int cnt=0;

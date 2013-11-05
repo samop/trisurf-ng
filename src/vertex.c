@@ -311,3 +311,36 @@ ts_vertex_list *vertex_list_copy(ts_vertex_list *ovlist){
 
     return vlist;
 }
+
+
+
+ts_bool vertex_taint(ts_vertex *vtx, ts_uint level){
+	if(level==0){
+		vtx->locked++;
+		return TS_SUCCESS;	
+	}	
+	ts_uint i;
+	for(i=0; i<vtx->neigh_no; i++){
+		vertex_taint(vtx->neigh[i], level-1);
+	}
+		vtx->locked++;
+	return TS_SUCCESS;
+}
+
+ts_bool vertex_untaint(ts_vertex *vtx, ts_uint level){
+	if(level==0){
+		vtx->locked--;
+		return TS_SUCCESS;	
+	}	
+	ts_uint i;
+	for(i=0; i<vtx->neigh_no; i++){
+		vertex_untaint(vtx->neigh[i], level-1);
+	}
+		vtx->locked--;
+	return TS_SUCCESS;
+}
+
+inline ts_bool vertex_tainted(ts_vertex *vtx, ts_uint level, ts_uint amount){
+	if(vtx->locked>amount) return 1;
+	else return 0;
+}
