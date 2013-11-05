@@ -21,7 +21,7 @@ mcsweeps=100
 #how many initial mcsweeps*inititer MC sweeps before recording to disk?
 inititer=10
 #how many records do you want on the disk iteration are there in a run?
-iterations=10
+iterations=100
 
 
 #shut up if we are using cluster!!!
