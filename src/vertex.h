@@ -30,7 +30,5 @@ ts_bool vtx_copy(ts_vertex *cvtx,ts_vertex *ovtx);
 ts_bool vtx_duplicate(ts_vertex *cvtx, ts_vertex *ovtx);
 ts_vertex **vtx_neigh_copy(ts_vertex_list *vlist,ts_vertex *ovtx);
 ts_vertex_list *vertex_list_copy(ts_vertex_list *ovlist);
-ts_bool vertex_taint(ts_vertex *vtx, ts_uint level);
-ts_bool vertex_untaint(ts_vertex *vtx, ts_uint level);
-inline ts_bool vertex_tainted(ts_vertex *vtx, ts_uint level, ts_uint amount);
+
 #endif

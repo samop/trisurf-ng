@@ -7,7 +7,6 @@
 #include "vertexmove.h"
 #include "bondflip.h"
 #include "frame.h"
-#include "vertex.h"
 #include "io.h"
 ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, ts_uint iterations){
 	ts_uint i, j;
@@ -31,25 +30,21 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 ts_bool single_timestep(ts_vesicle *vesicle){
     ts_bool retval;
     ts_double rnvec[3];
-    ts_uint i;// b;
+    ts_uint i, b;
     for(i=0;i<vesicle->vlist->n;i++){
         rnvec[0]=drand48();
         rnvec[1]=drand48();
         rnvec[2]=drand48();
-	vertex_taint(vesicle->vlist->vtx[i],1);
-//		ts_fprintf(stdout, "Vertex %d should be tainted, level=%d.\n", i, vesicle->vlist->vtx[i]->locked);
-	if(vertex_tainted(vesicle->vlist->vtx[i],1,1)){
-		ts_fprintf(stdout, "Vertex %d tainted, level=%d. Waiting....\n", i, vesicle->vlist->vtx[i]->locked);
-		while(vertex_tainted(vesicle->vlist->vtx[i],1,1));
-	}
         retval=single_verticle_timestep(vesicle,vesicle->vlist->vtx[i],rnvec);
-	vertex_untaint(vesicle->vlist->vtx[i],1);
-//		ts_fprintf(stdout, "Vertex %d should be untainted, level=%d.\n", i, vesicle->vlist->vtx[i]->locked);
     }
 
 //	ts_int cnt=0;
-/*
     for(i=0;i<vesicle->vlist->n;i++){
+//why is rnvec needed in bondflip?
+/*        rnvec[0]=drand48();
+        rnvec[1]=drand48();
+        rnvec[2]=drand48();
+*/ 
 	b=rand() % vesicle->blist->n;
         //find a bond and return a pointer to a bond...
         //call single_bondflip_timestep...
@@ -57,7 +52,6 @@ ts_bool single_timestep(ts_vesicle *vesicle){
 //	if(retval==TS_SUCCESS) cnt++;        
     } 
 //	printf("Bondflip success rate in one sweep: %d/%d=%e\n", cnt,vesicle->blist->n,(double)cnt/(double)vesicle->blist->n);
-*/
 	if(retval);
     return TS_SUCCESS;
 }

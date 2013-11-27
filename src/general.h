@@ -154,7 +154,6 @@ struct ts_vertex {
         ts_double projArea;
         ts_double relR;
         ts_double solAngle;
-	ts_int locked;
 };
 typedef struct ts_vertex ts_vertex;
 
