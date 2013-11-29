@@ -126,8 +126,6 @@ typedef struct {
     ts_uint coord_type;
 } ts_coord;
 
-
-
 /** @brief Data structure of all data connected to a vertex
  *
  *  ts_vertex holds the data for one single point (bead, vertex). To understand how to use it
@@ -155,6 +153,7 @@ struct ts_vertex {
         ts_double projArea;
         ts_double relR;
         ts_double solAngle;
+	struct ts_poly *grafted_poly;
 };
 typedef struct ts_vertex ts_vertex;
 
@@ -227,6 +226,23 @@ typedef struct {
 
 
 
+struct ts_poly {
+	ts_vertex_list *vlist;
+	ts_bond_list *blist;
+	ts_vertex *grafted_vtx;
+};
+typedef struct ts_poly ts_poly;
+
+
+struct ts_poly_list {
+	ts_uint	n;
+	ts_poly **poly;
+};
+typedef struct ts_poly_list ts_poly_list;
+
+
+
+
 typedef struct {
 	ts_vertex_list *vlist;
 	ts_bond_list *blist;
@@ -239,6 +255,7 @@ typedef struct {
     ts_double cm[3];
     ts_double volume;
     ts_spharm *sphHarmonics;
+	ts_poly_list *poly_list;
 } ts_vesicle;
 
 
