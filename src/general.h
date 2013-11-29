@@ -8,10 +8,11 @@
   * @file header.h
   * @author Samo Penic
   * @date 5.3.2001
-  *
+  * 
   * Header file for general inclusion in all the code, defining data structures
   * and general constans. All datatypes used in the code is also defined here.
   *
+  * Miha: branch trisurf-polyel
   */
 
 /* Defines */
