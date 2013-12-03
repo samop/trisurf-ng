@@ -6,9 +6,10 @@
 #include "cell.h"
 #include "stdlib.h"
 
+
 ts_vesicle *init_vesicle(ts_uint N, ts_uint ncmax1, ts_uint ncmax2, ts_uint
 ncmax3, ts_double stepsize){
-    ts_vesicle *vesicle=(ts_vesicle *)malloc(sizeof(ts_vesicle));
+    ts_vesicle *vesicle=(ts_vesicle *)calloc(1,sizeof(ts_vesicle));
     vesicle->vlist=init_vertex_list(N);
     vesicle->blist=init_bond_list();
     vesicle->tlist=init_triangle_list();
