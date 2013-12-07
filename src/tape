@@ -10,7 +10,7 @@ stepsize=0.15
 
 ####### Polymer definitions ###########
 # npoly is a number of polymers attached to npoly distinct vertices on vesicle
-npoly=1000
+npoly=10
 # nmono is a number of monomers in each polymere
 nmono=15
 
@@ -22,11 +22,11 @@ nzmax=60
 
 ####### Program Control ############
 #how many MC sweeps between subsequent records of states to disk
-mcsweeps=100
+mcsweeps=10
 #how many initial mcsweeps*inititer MC sweeps before recording to disk?
-inititer=100
+inititer=1
 #how many records do you want on the disk iteration are there in a run?
-iterations=1000
+iterations=100
 
 
 #shut up if we are using cluster!!!

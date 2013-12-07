@@ -207,7 +207,7 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 	ts_vertex_list *vlist=vesicle->vlist;
 	ts_bond_list *blist=vesicle->blist;
 	ts_vertex **vtx=vlist->vtx;
-    ts_uint i;
+    ts_uint i,j;
     	char filename[255];
 	FILE *fh;
 
@@ -218,29 +218,69 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 		return TS_FAIL;
 	}
 	/* Here comes header of the file */
+
+	//find number of extra vtxs and bonds of polymeres
+	ts_uint monono=0, polyno=0;
+	ts_bool poly=0;
+	if(vesicle->poly_list!=NULL){
+		if(vesicle->poly_list->poly[0]!=NULL){
+		polyno=vesicle->poly_list->n;
+		monono=vesicle->poly_list->poly[0]->vlist->n;
+		poly=1;
+		}
+	}
 	fprintf(fh, "<?xml version=\"1.0\"?>\n<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\" compressor=\"vtkZLibDataCompressor\">\n <UnstructuredGrid>\n");
-    fprintf(fh, "<Piece NumberOfPoints=\"%u\" NumberOfCells=\"%u\">\n",vlist->n, blist->n);
+    fprintf(fh, "<Piece NumberOfPoints=\"%u\" NumberOfCells=\"%u\">\n",vlist->n+monono*polyno, blist->n+monono*polyno);
     fprintf(fh,"<PointData Scalars=\"scalars\">\n<DataArray type=\"Int64\" Name=\"scalars\" format=\"ascii\">");
    	for(i=0;i<vlist->n;i++){
 		fprintf(fh,"%u ",vtx[i]->idx);
     }
+	//polymeres
+	if(poly){
+		for(i=0;i<vesicle->poly_list->n;i++){
+			for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++){
+				fprintf(fh,"%u ", vesicle->poly_list->poly[i]->vlist->vtx[j]->idx);
+			}
+		}
+	}
 
     fprintf(fh,"</DataArray>\n</PointData>\n<CellData>\n</CellData>\n<Points>\n<DataArray type=\"Float64\" Name=\"Koordinate tock\" NumberOfComponents=\"3\" format=\"ascii\">\n");
 	for(i=0;i<vlist->n;i++){
 		fprintf(fh,"%e %e %e\n",vtx[i]->x,vtx[i]->y, vtx[i]->z);
+	}
+	//polymeres
+	if(poly){
+		for(i=0;i<vesicle->poly_list->n;i++){
+			for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++){
+				fprintf(fh,"%e %e %e\n", vesicle->poly_list->poly[i]->vlist->vtx[j]->x,vesicle->poly_list->poly[i]->vlist->vtx[j]->y, vesicle->poly_list->poly[i]->vlist->vtx[j]->z );
+			}
+		}
 	}
 
     fprintf(fh,"</DataArray>\n</Points>\n<Cells>\n<DataArray type=\"Int64\" Name=\"connectivity\" format=\"ascii\">");
 	for(i=0;i<blist->n;i++){
 			fprintf(fh,"%u %u\n",blist->bond[i]->vtx1->idx,blist->bond[i]->vtx2->idx);
 	}
+	//polymeres
+	if(poly){
+		for(i=0;i<vesicle->poly_list->n;i++){
+			for(j=0;j<vesicle->poly_list->poly[i]->blist->n;j++){
+				fprintf(fh,"%u %u\n", vesicle->poly_list->poly[i]->blist->bond[j]->vtx1->idx,vesicle->poly_list->poly[i]->blist->bond[j]->vtx2->idx);
+			}
+	//grafted bonds
+		fprintf(fh,"%u %u\n", vesicle->poly_list->poly[i]->grafted_vtx->idx, vesicle->poly_list->poly[i]->vlist->vtx[0]->idx);
+		}
+
+	}
+	
+
     fprintf(fh,"</DataArray>\n<DataArray type=\"Int64\" Name=\"offsets\" format=\"ascii\">");
-    for (i=2;i<blist->n*2+1;i+=2){
+    for (i=2;i<(blist->n+monono*polyno)*2+1;i+=2){
     fprintf(fh,"%u ",i);
     }
     fprintf(fh,"\n");
     fprintf(fh,"</DataArray>\n<DataArray type=\"UInt8\" Name=\"types\" format=\"ascii\">\n");
-     for (i=0;i<blist->n;i++){
+     for (i=0;i<blist->n+monono*polyno;i++){
         fprintf(fh,"3 ");
     }
 
@@ -303,6 +343,8 @@ ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations)
     long int brezveze2=1;
     ts_double xk0=25.0, dmax=1.67,stepsize=0.15;
 	long int iter=1000, init=1000, mcsw=1000;
+
+
     cfg_opt_t opts[] = {
         CFG_SIMPLE_INT("nshell", &nshell),
         CFG_SIMPLE_INT("npoly", &npoly),
@@ -352,6 +394,9 @@ ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations)
     cfg_free(cfg);
 	free(buf);
   //  fprintf(stderr,"NSHELL=%u\n",vesicle->nshell);
+
+			
+
     return vesicle;
 
 }

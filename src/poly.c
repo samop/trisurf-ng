@@ -26,7 +26,7 @@ ts_poly	*init_poly(ts_uint n, ts_vertex *grafted_vtx){
 ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vlist){
 	ts_poly_list *poly_list=(ts_poly_list *)calloc(1,sizeof(ts_poly_list));
 	poly_list->poly	= (ts_poly **)calloc(n_poly,sizeof(ts_poly *));
-	ts_uint i=0,j=0;
+	ts_uint i=0,j=0, idx;
 	ts_uint gvtxi;
 	ts_double xnorm,ynorm,znorm,normlength;
 
@@ -49,9 +49,9 @@ ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vli
 		ynorm=0.0;
 		znorm=0.0;
 		for (j=0;j<poly_list->poly[i]->grafted_vtx->tristar_no;j++){
-			xnorm+=poly_list->poly[i]->grafted_vtx->tristar[j]->xnorm;
-			ynorm+=poly_list->poly[i]->grafted_vtx->tristar[j]->ynorm;
-			znorm+=poly_list->poly[i]->grafted_vtx->tristar[j]->znorm;	
+			xnorm-=poly_list->poly[i]->grafted_vtx->tristar[j]->xnorm;
+			ynorm-=poly_list->poly[i]->grafted_vtx->tristar[j]->ynorm;
+			znorm-=poly_list->poly[i]->grafted_vtx->tristar[j]->znorm;	
 		}
 		normlength=sqrt(xnorm*xnorm+ynorm*ynorm+znorm*znorm);
 		xnorm=xnorm/normlength;
@@ -64,6 +64,17 @@ ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vli
 			poly_list->poly[i]->vlist->vtx[j]->z = poly_list->poly[i]->grafted_vtx->z + znorm*(ts_double)(j+1);
 		}
 	}
+
+		//index correction for polymeres. Important, since each vtx has to have unique id
+	idx=vlist->n;
+	for(i=0;i<n_poly;i++){
+		for(j=0;j<n_mono;j++,idx++){
+
+			poly_list->poly[i]->vlist->vtx[j]->idx=idx;
+
+		}
+	}
+
 
 	return poly_list;
 }
