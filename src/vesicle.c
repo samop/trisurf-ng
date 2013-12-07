@@ -5,7 +5,7 @@
 #include "bond.h"
 #include "cell.h"
 #include "stdlib.h"
-
+#include "poly.h"
 
 ts_vesicle *init_vesicle(ts_uint N, ts_uint ncmax1, ts_uint ncmax2, ts_uint
 ncmax3, ts_double stepsize){
@@ -34,6 +34,7 @@ ts_bool vesicle_free(ts_vesicle *vesicle){
     bond_list_free(vesicle->blist);
     triangle_list_free(vesicle->tlist);
     cell_list_free(vesicle->clist);
+    poly_list_free(vesicle->poly_list);
     free(vesicle);
     return TS_SUCCESS;
 }

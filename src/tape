@@ -8,6 +8,11 @@ xk0=25.0
 # max step size 
 stepsize=0.15
 
+####### Polymer definitions ###########
+# npoly is a number of polymers attached to npoly distinct vertices on vesicle
+npoly=1000
+# nmono is a number of monomers in each polymere
+nmono=15
 
 #######  Cell definitions ############
 nxmax=60

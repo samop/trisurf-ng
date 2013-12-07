@@ -67,9 +67,9 @@ printf("Tests complete.\n");
 vesicle=parsetape(&mcsweeps, &inititer, &iterations);
 
 /*Testing */
-vesicle->poly_list=init_poly_list(1400,20,vesicle->vlist);
+//vesicle->poly_list=init_poly_list(1400,20,vesicle->vlist);
 
-poly_list_free(vesicle->poly_list);
+//poly_list_free(vesicle->poly_list);
 /*End testing*/
 
 run_simulation(vesicle, mcsweeps, inititer, iterations);

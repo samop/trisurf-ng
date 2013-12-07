@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include "initial_distribution.h"
+#include "poly.h"
 
 ts_bool print_vertex_list(ts_vertex_list *vlist){
 	ts_uint i;
@@ -295,7 +296,7 @@ ts_bool write_vertex_vtk_file(ts_vesicle *vesicle,ts_char *filename, ts_char *te
 
 
 ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations){
-    long int nshell=17,ncxmax=60, ncymax=60, nczmax=60;  // THIS IS DUE TO CONFUSE BUG!
+    long int nshell=17,ncxmax=60, ncymax=60, nczmax=60, npoly=10, nmono=20;  // THIS IS DUE TO CONFUSE BUG!
     char *buf=malloc(255*sizeof(char));
     long int brezveze0=1;
     long int brezveze1=1;
@@ -304,6 +305,8 @@ ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations)
 	long int iter=1000, init=1000, mcsw=1000;
     cfg_opt_t opts[] = {
         CFG_SIMPLE_INT("nshell", &nshell),
+        CFG_SIMPLE_INT("npoly", &npoly),
+        CFG_SIMPLE_INT("nmono", &nmono),
         CFG_SIMPLE_FLOAT("dmax", &dmax),
         CFG_SIMPLE_FLOAT("xk0",&xk0),
         CFG_SIMPLE_FLOAT("stepsize",&stepsize),
@@ -335,6 +338,8 @@ ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations)
 	*inititer=init;
 	*mcsweeps=mcsw;
 	vesicle=initial_distribution_dipyramid(nshell,ncxmax,ncymax,nczmax,stepsize);
+	vesicle->poly_list=init_poly_list(npoly,nmono, vesicle->vlist);
+
     vesicle->nshell=nshell;
     vesicle->dmax=dmax*dmax;
     vesicle->bending_rigidity=xk0;
