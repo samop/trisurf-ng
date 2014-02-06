@@ -230,6 +230,7 @@ struct ts_poly {
 	ts_vertex_list *vlist;
 	ts_bond_list *blist;
 	ts_vertex *grafted_vtx;
+	ts_double k;
 };
 typedef struct ts_poly ts_poly;
 
@@ -247,15 +248,17 @@ typedef struct {
 	ts_vertex_list *vlist;
 	ts_bond_list *blist;
 	ts_triangle_list *tlist;
-    ts_cell_list *clist;
+	ts_cell_list *clist;
 	ts_uint nshell;
-    ts_double bending_rigidity;
-    ts_double dmax;
-    ts_double stepsize;
-    ts_double cm[3];
-    ts_double volume;
-    ts_spharm *sphHarmonics;
+	ts_double bending_rigidity;
+	ts_double dmax;
+	ts_double stepsize;
+   	ts_double cm[3];
+	ts_double volume;
+	ts_spharm *sphHarmonics;
+
 	ts_poly_list *poly_list;
+	ts_double spring_constant;
 } ts_vesicle;
 
 

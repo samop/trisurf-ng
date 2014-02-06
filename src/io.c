@@ -341,7 +341,7 @@ ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations)
     long int brezveze0=1;
     long int brezveze1=1;
     long int brezveze2=1;
-    ts_double xk0=25.0, dmax=1.67,stepsize=0.15;
+    ts_double xk0=25.0, dmax=1.67,stepsize=0.15,kspring=800.0;
 	long int iter=1000, init=1000, mcsw=1000;
 
 
@@ -351,6 +351,7 @@ ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations)
         CFG_SIMPLE_INT("nmono", &nmono),
         CFG_SIMPLE_FLOAT("dmax", &dmax),
         CFG_SIMPLE_FLOAT("xk0",&xk0),
+        CFG_SIMPLE_FLOAT("k_spring",&kspring),
         CFG_SIMPLE_FLOAT("stepsize",&stepsize),
         CFG_SIMPLE_INT("nxmax", &ncxmax),
         CFG_SIMPLE_INT("nymax", &ncymax),
@@ -381,6 +382,9 @@ ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations)
 	*mcsweeps=mcsw;
 	vesicle=initial_distribution_dipyramid(nshell,ncxmax,ncymax,nczmax,stepsize);
 	vesicle->poly_list=init_poly_list(npoly,nmono, vesicle->vlist);
+	vesicle->spring_constant=kspring;
+	poly_assign_spring_const(vesicle);
+	
 
     vesicle->nshell=nshell;
     vesicle->dmax=dmax*dmax;

@@ -5,6 +5,15 @@
 #include"bond.h"
 #include<math.h>
 
+ts_bool poly_assign_spring_const(ts_vesicle *vesicle){
+	ts_uint i;
+
+	for(i=0;i<vesicle->poly_list->n;i++){
+ 	vesicle->poly_list->poly[i]->k = vesicle->spring_constant;
+    	}
+	
+	return TS_SUCCESS;
+}
 
 ts_poly	*init_poly(ts_uint n, ts_vertex *grafted_vtx){
 	ts_poly	*poly=(ts_poly *)calloc(1,sizeof(ts_poly));
@@ -17,6 +26,10 @@ ts_poly	*init_poly(ts_uint n, ts_vertex *grafted_vtx){
 	for(i=0;i<n-1;i++){
 		vtx_add_cneighbour(poly->blist, poly->vlist->vtx[i], poly->vlist->vtx[i+1]);
 		vtx_add_neighbour(poly->vlist->vtx[i+1], poly->vlist->vtx[i]);
+	}
+
+	for(i=0;i<poly->blist->n;i++){
+	poly->blist->bond[i]->bond_length=sqrt(vtx_distance_sq(poly->blist->bond[i]->vtx1,poly->blist->bond[i]->vtx2));
 	}
 
 	return poly;

@@ -31,11 +31,11 @@ ts_bool centermass(ts_vesicle *vesicle){
 }
 
 ts_bool cell_occupation(ts_vesicle *vesicle){
-    ts_uint i,cellidx, n=vesicle->vlist->n;
-    ts_double shift;
-    ts_double dcell;
-    shift=(ts_double) vesicle->clist->ncmax[0]/2;
-    dcell=1.0/(1.0 + vesicle->stepsize);
+    ts_uint i,j,cellidx, n=vesicle->vlist->n;
+    //ts_double shift;
+    //ts_double dcell;
+    //shift=(ts_double) vesicle->clist->ncmax[0]/2;
+    //dcell=1.0/(1.0 + vesicle->stepsize);
     //`fprintf(stderr, "Bil sem tu\n"); 
 
     cell_list_cell_occupation_clear(vesicle->clist);
@@ -45,10 +45,19 @@ ts_bool cell_occupation(ts_vesicle *vesicle){
 //    vesicle->vlist->vtx[i]->cell=vesicle->clist->cell[cellidx];
 
     cell_add_vertex(vesicle->clist->cell[cellidx],vesicle->vlist->vtx[i]);
-
     }
+
+    for(i=0;i<vesicle->poly_list->n;i++){
+	for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++){
+    	cellidx=vertex_self_avoidance(vesicle, vesicle->poly_list->poly[i]->vlist->vtx[j]);
+    	cell_add_vertex(vesicle->clist->cell[cellidx],vesicle->poly_list->poly[i]->vlist->vtx[j]);
+	}
+    }
+
+    
+
     //fprintf(stderr, "Bil sem tu\n"); 
-	if(dcell);
-	if(shift);
+	//if(dcell);
+	//if(shift);
     return TS_SUCCESS;
 }

@@ -11,8 +11,10 @@ stepsize=0.15
 ####### Polymer definitions ###########
 # npoly is a number of polymers attached to npoly distinct vertices on vesicle
 npoly=10
-# nmono is a number of monomers in each polymere
+# nmono is a number of monomers in each polymer
 nmono=15
+# Spring constant between monomers of the polymer
+k_spring=800
 
 #######  Cell definitions ############
 nxmax=60

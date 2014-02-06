@@ -11,4 +11,6 @@ ts_bool poly_free(ts_poly *poly);
 
 ts_bool poly_list_free(ts_poly_list *poly_list);
 
+ts_bool poly_assign_spring_const(ts_vesicle *vesicle);
+
 #endif
