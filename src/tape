@@ -1,8 +1,8 @@
 ####### Vesicle definitions ###########
 # nshell is a number of divisions of dipyramid
 nshell=17
-# dmax is the square of the bond length 
-dmax=1.67
+# dmax is the max. bond length 
+dmax=1.7
 # bending rigidity of the membrane 
 xk0=25.0
 # max step size 
@@ -10,7 +10,7 @@ stepsize=0.15
 
 ####### Polymer definitions ###########
 # npoly is a number of polymers attached to npoly distinct vertices on vesicle
-npoly=10
+npoly=20
 # nmono is a number of monomers in each polymer
 nmono=15
 # Spring constant between monomers of the polymer

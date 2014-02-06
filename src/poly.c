@@ -4,6 +4,7 @@
 #include"vertex.h"
 #include"bond.h"
 #include<math.h>
+#include"energy.h"
 
 ts_bool poly_assign_spring_const(ts_vesicle *vesicle){
 	ts_uint i;
@@ -30,6 +31,7 @@ ts_poly	*init_poly(ts_uint n, ts_vertex *grafted_vtx){
 
 	for(i=0;i<poly->blist->n;i++){
 	poly->blist->bond[i]->bond_length=sqrt(vtx_distance_sq(poly->blist->bond[i]->vtx1,poly->blist->bond[i]->vtx2));
+	bond_energy(poly->blist->bond[i],poly);
 	}
 
 	return poly;

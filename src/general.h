@@ -164,12 +164,13 @@ typedef struct {
 } ts_vertex_list;
 
 struct ts_bond {
-    ts_uint idx;
+    	ts_uint idx;
 	ts_vertex *vtx1;
 	ts_vertex *vtx2;
     ts_double bond_length;
     ts_double bond_length_dual;
 	ts_bool tainted;
+	ts_double energy;
 };
 typedef struct ts_bond ts_bond;
 

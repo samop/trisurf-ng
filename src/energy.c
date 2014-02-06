@@ -19,9 +19,12 @@ ts_bool mean_curvature_and_energy(ts_vesicle *vesicle){
     return TS_SUCCESS;
 }
 
-inline ts_bool energy_poly_vertex(ts_vertex *vtx,ts_poly *poly){
-	
-}
+
+inline ts_bool bond_energy(ts_bond *bond,ts_poly *poly){
+	bond->energy=poly->k*pow(bond->bond_length-1,2);
+	return TS_SUCCESS;
+};
+
 
 inline ts_bool energy_vertex(ts_vertex *vtx){
 //    ts_vertex *vtx=&vlist->vertex[n]-1; // Caution! 0 Indexed value!
