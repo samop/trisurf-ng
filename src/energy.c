@@ -28,7 +28,7 @@ inline ts_bool energy_vertex(ts_vertex *vtx){
     ts_uint jjp,jjm;
     ts_vertex *j,*jp, *jm;
     ts_triangle *jt;
-    ts_double s=0,xh=0,yh=0,zh=0,txn=0,tyn=0,tzn=0;
+    ts_double s=0.0,xh=0.0,yh=0.0,zh=0.0,txn=0.0,tyn=0.0,tzn=0.0;
     ts_double x1,x2,x3,ctp,ctm,tot,xlen;
     ts_double h,ht;
     for(jj=1; jj<=vtx->neigh_no;jj++){
@@ -72,7 +72,9 @@ inline ts_bool energy_vertex(ts_vertex *vtx){
 #endif
         tot=ctp+ctm;
         tot=0.5*tot;
+
         xlen=vtx_distance_sq(j,vtx);
+/*
 #ifdef  TS_DOUBLE_DOUBLE 
         vtx->bond[jj-1]->bond_length=sqrt(xlen); 
 #endif
@@ -84,7 +86,7 @@ inline ts_bool energy_vertex(ts_vertex *vtx){
 #endif
 
         vtx->bond[jj-1]->bond_length_dual=tot*vtx->bond[jj-1]->bond_length;
-
+*/
         s+=tot*xlen;
         xh+=tot*(j->x - vtx->x);
         yh+=tot*(j->y - vtx->y);

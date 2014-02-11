@@ -169,6 +169,7 @@ struct ts_bond {
 	ts_vertex *vtx2;
     ts_double bond_length;
     ts_double bond_length_dual;
+	ts_bool tainted;
 };
 typedef struct ts_bond ts_bond;
 

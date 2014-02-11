@@ -18,14 +18,15 @@
 */
 
 int main(int argv, char *argc[]){
+ts_uint inititer,mcsweeps, iterations;
+ts_vesicle *vesicle;
+/* THIS SHOULD GO INTO UNIT TEST
 ts_bool retval;
-ts_uint i;
     ts_vertex_list *vlist=init_vertex_list(5);
 ts_vertex_list *vlist1;
 ts_bond_list *blist=init_bond_list();
 ts_triangle_list *tlist=init_triangle_list();
 ts_cell_list *clist=init_cell_list(3,3,3,0.3);
-ts_vesicle *vesicle;
 
 retval=vtx_add_cneighbour(blist,vlist->vtx[1],vlist->vtx[0]);
 if(retval==TS_FAIL) printf("1. already a member or vertex is null!\n");
@@ -61,24 +62,10 @@ cell_list_free(clist);
 
 vtx_list_free(vlist1);
 printf("Tests complete.\n");
-vesicle=initial_distribution_dipyramid(17,60,60,60,0.15);
-//parsetape(vesicle,&i);
+*/
+vesicle=parsetape(&mcsweeps, &inititer, &iterations);
+run_simulation(vesicle, mcsweeps, inititer, iterations);
 
-//these four must come from parsetype!
-vesicle->dmax=1.67*1.67;
-vesicle->stepsize=0.15;
-vesicle->clist->max_occupancy=8;
-vesicle->bending_rigidity=25.0;
-fprintf(stderr,"xk=%f",vesicle->bending_rigidity);
-
-centermass(vesicle);
-cell_occupation(vesicle);
-for(i=0;i<100;i++){
-single_timestep(vesicle);
-if(i%100==0){
-write_vertex_xml_file(vesicle,i/100);
-}
-}
 write_master_xml_file("test.pvd");
 write_dout_fcompat_file(vesicle,"dout");
 vesicle_free(vesicle);

@@ -53,13 +53,13 @@ inline ts_uint vertex_self_avoidance(ts_vesicle *vesicle, ts_vertex *vtx){
     ncy=(ts_uint)((vtx->y-vesicle->cm[1])*clist->dcell+clist->shift);
     ncz=(ts_uint)((vtx->z-vesicle->cm[2])*clist->dcell+clist->shift);
 
-    if(ncx == clist->ncmax[0]-1 || ncx == 2){
+    if(ncx >= clist->ncmax[0]-1 || ncx <= 2){
         fatal("Vesicle is positioned outside the cell covered area. Coordinate x is the problem.",1500);
     }
-    if(ncy == clist->ncmax[1]-1 || ncy == 2){
+    if(ncy >= clist->ncmax[1]-1 || ncy <= 2){
         fatal("Vesicle is positioned outside the cell covered area. Coordinate y is the problem.",1500);
     }
-    if(ncz == clist->ncmax[2]-1 || ncz == 2){
+    if(ncz >= clist->ncmax[2]-1 || ncz <= 2){
         fatal("Vesicle is positioned outside the cell covered area. Coordinate z is the problem.",1500);
     }
     cellidx=ncz+(ncy-1)*clist->ncmax[2] + (ncx-1)*clist->ncmax[2]* 
@@ -69,16 +69,48 @@ inline ts_uint vertex_self_avoidance(ts_vesicle *vesicle, ts_vertex *vtx){
 
 
 //TODO: looks ok, but debug anyway in the future
-ts_bool cell_add_vertex(ts_cell *cell, ts_vertex *vtx){
+inline ts_bool cell_add_vertex(ts_cell *cell, ts_vertex *vtx){
+	ts_uint i;
+	for(i=0;i<cell->nvertex;i++){
+		if(cell->vertex[i]==vtx){
+	//vertex is already in the cell!
+			//fprintf(stderr,"VTX in the cell!\n");
+			return TS_FAIL;
+		}
+	}
+			//fprintf(stderr,"VTX added to the cell!\n");
     cell->nvertex++;
 	cell->vertex=(ts_vertex **)realloc(cell->vertex,cell->nvertex*sizeof(ts_vertex *));
 		if(cell->vertex == NULL){
 			fatal("Reallocation of memory failed during insertion of vertex in cell_add_vertex",3);
         }
     cell->vertex[cell->nvertex-1]=vtx;
+	vtx->cell=cell;
     return TS_SUCCESS;
 }
 
+inline ts_bool cell_remove_vertex(ts_cell *cell, ts_vertex *vtx){
+   ts_uint i,j=0;
+    for(i=0;i<cell->nvertex;i++){
+        if(cell->vertex[i]!=vtx){
+            cell->vertex[j]=cell->vertex[i];
+            j++;
+        }
+    }
+	if(j==i){
+	fatal("Vertex was not in the cell!",3);
+	} 
+	//fprintf(stderr, "Vertex deleted from the cell!\n");
+
+/* resize memory. potentionally time consuming */
+    cell->nvertex--;
+	cell->vertex=(ts_vertex **)realloc(cell->vertex,cell->nvertex*sizeof(ts_vertex *));
+    if(vtx->neigh == NULL && vtx->neigh_no!=0)
+		if(cell->vertex == NULL){
+			fatal("Reallocation of memory failed during removal of vertex in cell_remove_vertex",3);
+        }
+	return TS_SUCCESS;
+}
 
 ts_bool cell_list_cell_occupation_clear(ts_cell_list *clist){
     ts_uint i;
@@ -93,7 +125,7 @@ ts_bool cell_list_cell_occupation_clear(ts_cell_list *clist){
 }
 
 // TODO: compiles ok, but it is completely untested and undebugged. It was debugged before rewrite, but this was long time ago.
-ts_bool cell_occupation_number_and_internal_proximity(ts_cell_list *clist, ts_uint cellidx, ts_vertex *vtx, ts_vertex *tvtx){
+ts_bool cell_occupation_number_and_internal_proximity(ts_cell_list *clist, ts_uint cellidx, ts_vertex *vtx){
     ts_uint ncx,ncy,ncz,remainder,cell_occupation;
     ts_uint i,j,k,l,neigh_cidx;
     ts_double dist;
@@ -117,17 +149,18 @@ ts_bool cell_occupation_number_and_internal_proximity(ts_cell_list *clist, ts_ui
 // cell!
                 if(cell_occupation>1){
                     for(l=0;l<cell_occupation;l++){
-                        if(clist->cell[neigh_cidx]->vertex[l]!=vtx){
+
+				//carefull with this checks!
+                        if(clist->cell[neigh_cidx]->vertex[l]->idx!=vtx->idx){
                     //        fprintf(stderr,"calling dist on vertex %i\n",l);
-                           dist=vtx_distance_sq(clist->cell[neigh_cidx]->vertex[l],tvtx);
+                           dist=vtx_distance_sq(clist->cell[neigh_cidx]->vertex[l],vtx);
                     //        fprintf(stderr,"dist was %f\n",dist);
-                            if(dist<1) return TS_FAIL;
+                            if(dist<=1.0) return TS_FAIL;
                         }
                     }
                 }
             }
         }
-    }
-    
+    } 
     return TS_SUCCESS;
 }
