@@ -10,9 +10,9 @@ stepsize=0.15
 
 ####### Polymer definitions ###########
 # npoly is a number of polymers attached to npoly distinct vertices on vesicle
-npoly=20
+npoly=30
 # nmono is a number of monomers in each polymer
-nmono=15
+nmono=10
 # Spring constant between monomers of the polymer
 k_spring=800
 
@@ -24,11 +24,11 @@ nzmax=60
 
 ####### Program Control ############
 #how many MC sweeps between subsequent records of states to disk
-mcsweeps=10
+mcsweeps=2000
 #how many initial mcsweeps*inititer MC sweeps before recording to disk?
 inititer=1
 #how many records do you want on the disk iteration are there in a run?
-iterations=100
+iterations=3000
 
 
 #shut up if we are using cluster!!!
