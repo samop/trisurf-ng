@@ -147,7 +147,7 @@ ts_bool cell_occupation_number_and_internal_proximity(ts_cell_list *clist, ts_ui
                 }
 // Now we check whether we didn't come close to some other vertices in the same
 // cell!
-                if(cell_occupation>1){
+                if(cell_occupation>0){
                     for(l=0;l<cell_occupation;l++){
 
 				//carefull with this checks!

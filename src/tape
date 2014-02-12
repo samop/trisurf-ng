@@ -1,6 +1,6 @@
 ####### Vesicle definitions ###########
 # nshell is a number of divisions of dipyramid
-nshell=17
+nshell=10
 # dmax is the max. bond length 
 dmax=1.7
 # bending rigidity of the membrane 
