@@ -57,6 +57,16 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
 		return TS_FAIL;
 		}
     }
+
+// Distance with grafted poly-vertex check:	
+	if(vtx->grafted_poly!=NULL){
+		dist=vtx_distance_sq(vtx,vtx->grafted_poly->vlist->vtx[0]);
+        if(dist<1.0 || dist>vesicle->dmax) {
+		vtx=memcpy((void *)vtx,(void *)&backupvtx[0],sizeof(ts_vertex));
+		return TS_FAIL;
+		}
+	}
+
     //self avoidance check with distant vertices
      cellidx=vertex_self_avoidance(vesicle, vtx);
     //check occupation number
@@ -87,15 +97,13 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
         energy_vertex(vtx->neigh[i]);
         delta_energy+=vtx->neigh[i]->xk*(vtx->neigh[i]->energy-oenergy);
     }
-
+/* No poly-bond energy for now!
 	if(vtx->grafted_poly!=NULL){
 		delta_energy+=
 			(pow(sqrt(vtx_distance_sq(vtx, vtx->grafted_poly->vlist->vtx[0])-1),2)-
 			pow(sqrt(vtx_distance_sq(&backupvtx[0], vtx->grafted_poly->vlist->vtx[0])-1),2)) *vtx->grafted_poly->k;
-		
-	
 	}
-
+*/
 //   fprintf(stderr, "DE=%f\n",delta_energy);
     //MONTE CARLOOOOOOOO
     if(delta_energy>=0){
@@ -139,11 +147,12 @@ ts_bool single_poly_vertex_move(ts_vesicle *vesicle,ts_poly *poly,ts_vertex *vtx
 	ts_uint i;
 	ts_bool retval; 
 	ts_uint cellidx; 
-	ts_double delta_energy;
+//	ts_double delta_energy;
 	ts_double costheta,sintheta,phi,r;
+	ts_double dist;
 	//This will hold all the information of vtx and its neighbours
 	ts_vertex backupvtx;
-	ts_bond backupbond[2];
+//	ts_bond backupbond[2];
 	memcpy((void *)&backupvtx,(void *)vtx,sizeof(ts_vertex));
 
 	//random move in a sphere with radius stepsize:
@@ -157,13 +166,23 @@ ts_bool single_poly_vertex_move(ts_vesicle *vesicle,ts_poly *poly,ts_vertex *vtx
 
 
 	//distance with neighbours check
-//	for(i=0;i<vtx->neigh_no;i++){
-//	dist=vtx_distance_sq(vtx,vtx->neigh[i]);
-//	if(dist<1.0 || dist>vesicle->dmax) {
-//	vtx=memcpy((void *)vtx,(void *)&backupvtx[0],sizeof(ts_vertex));
-//	return TS_FAIL;
-//		}
-//	}
+	for(i=0;i<vtx->neigh_no;i++){
+		dist=vtx_distance_sq(vtx,vtx->neigh[i]);
+		if(dist<1.0 || dist>vesicle->dmax) {
+			vtx=memcpy((void *)vtx,(void *)&backupvtx,sizeof(ts_vertex));
+			return TS_FAIL;
+		}
+	}
+
+// Distance with grafted vesicle-vertex check:	
+	if(vtx==poly->vlist->vtx[0]){
+		dist=vtx_distance_sq(vtx,poly->grafted_vtx);
+        if(dist<1.0 || dist>vesicle->dmax) {
+		vtx=memcpy((void *)vtx,(void *)&backupvtx,sizeof(ts_vertex));
+		return TS_FAIL;
+		}
+	}
+
 
 	//self avoidance check with distant vertices
 	cellidx=vertex_self_avoidance(vesicle, vtx);
@@ -177,6 +196,7 @@ ts_bool single_poly_vertex_move(ts_vesicle *vesicle,ts_poly *poly,ts_vertex *vtx
 
 
 	//if all the tests are successful, then energy for vtx and neighbours is calculated
+/* Energy ignored for now!
 	delta_energy=0;
 	for(i=0;i<vtx->bond_no;i++){
 		memcpy((void *)&backupbond[i],(void *)vtx->bond[i],sizeof(ts_bond));
@@ -214,6 +234,7 @@ ts_bool single_poly_vertex_move(ts_vesicle *vesicle,ts_poly *poly,ts_vertex *vtx
     return TS_FAIL; 
 	}
 	}
+*/
 		
 //	oldcellidx=vertex_self_avoidance(vesicle, &backupvtx[0]);
 	if(vtx->cell!=vesicle->clist->cell[cellidx]){

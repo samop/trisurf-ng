@@ -2,7 +2,7 @@
 # nshell is a number of divisions of dipyramid
 nshell=17
 # dmax is the max. bond length 
-dmax=1.4
+dmax=1.7
 # bending rigidity of the membrane 
 xk0=25.0
 # max step size 

@@ -21,7 +21,9 @@ ts_bool mean_curvature_and_energy(ts_vesicle *vesicle){
 
 
 inline ts_bool bond_energy(ts_bond *bond,ts_poly *poly){
-	bond->energy=poly->k*pow(bond->bond_length-1,2);
+//TODO: This value to be changed and implemented in data structure:
+	ts_double d_relaxed=1.0;
+	bond->energy=poly->k*pow(bond->bond_length-d_relaxed,2);
 	return TS_SUCCESS;
 };
 
