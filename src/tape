@@ -1,8 +1,8 @@
 ####### Vesicle definitions ###########
 # nshell is a number of divisions of dipyramid
-nshell=10
+nshell=17
 # dmax is the max. bond length 
-dmax=1.7
+dmax=1.4
 # bending rigidity of the membrane 
 xk0=25.0
 # max step size 
@@ -24,11 +24,11 @@ nzmax=60
 
 ####### Program Control ############
 #how many MC sweeps between subsequent records of states to disk
-mcsweeps=2000
+mcsweeps=5000
 #how many initial mcsweeps*inititer MC sweeps before recording to disk?
 inititer=1
 #how many records do you want on the disk iteration are there in a run?
-iterations=3000
+iterations=10000
 
 
 #shut up if we are using cluster!!!
