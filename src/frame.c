@@ -3,7 +3,7 @@
 #include "cell.h"
 #include "frame.h"
 ts_bool centermass(ts_vesicle *vesicle){
-    ts_uint i, n=vesicle->vlist->n;
+    ts_uint i,j, n=vesicle->vlist->n;
     ts_vertex **vtx=vesicle->vlist->vtx;
     vesicle->cm[0]=0;
     vesicle->cm[1]=0;
@@ -22,6 +22,15 @@ ts_bool centermass(ts_vesicle *vesicle){
         vtx[i]->y-=vesicle->cm[1];
         vtx[i]->z-=vesicle->cm[2]; 
     } 
+
+	for(i=0;i<vesicle->poly_list->n;i++){
+		for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++){
+			vesicle->poly_list->poly[i]->vlist->vtx[j]->x-=vesicle->cm[0];
+			vesicle->poly_list->poly[i]->vlist->vtx[j]->y-=vesicle->cm[1];
+			vesicle->poly_list->poly[i]->vlist->vtx[j]->z-=vesicle->cm[2];
+		}
+    }
+
 
     vesicle->cm[0]=0;
     vesicle->cm[1]=0;
