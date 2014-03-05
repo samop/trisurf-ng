@@ -50,4 +50,6 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno);
 ts_bool write_master_xml_file(ts_char *filename);
 ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations);
 
+ts_bool dump_state(ts_vesicle *vesicle);
+ts_vesicle *restore_state();
 #endif
