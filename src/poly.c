@@ -41,7 +41,7 @@ ts_poly	*init_poly(ts_uint n, ts_vertex *grafted_vtx){
 ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vlist){
 	ts_poly_list *poly_list=(ts_poly_list *)calloc(1,sizeof(ts_poly_list));
 	poly_list->poly	= (ts_poly **)calloc(n_poly,sizeof(ts_poly *));
-	ts_uint i=0,j=0, idx;
+	ts_uint i=0,j=0; //idx;
 	ts_uint gvtxi;
 	ts_double xnorm,ynorm,znorm,normlength;
 
@@ -81,7 +81,7 @@ ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vli
 	}
 
 		//index correction for polymeres. Important, since each vtx has to have unique id
-	idx=vlist->n;
+/*	idx=vlist->n;
 	for(i=0;i<n_poly;i++){
 		for(j=0;j<n_mono;j++,idx++){
 
@@ -89,7 +89,7 @@ ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vli
 
 		}
 	}
-
+*/
 
 	return poly_list;
 }

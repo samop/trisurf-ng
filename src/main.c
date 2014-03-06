@@ -20,7 +20,7 @@
 
 int main(int argv, char *argc[]){
 ts_uint inititer,mcsweeps, iterations;
-ts_vesicle *vesicle;
+ts_vesicle *vesicle, *vesicle1;
 /* THIS SHOULD GO INTO UNIT TEST
 ts_bool retval;
     ts_vertex_list *vlist=init_vertex_list(5);
@@ -64,25 +64,23 @@ cell_list_free(clist);
 vtx_list_free(vlist1);
 printf("Tests complete.\n");
 */
-vesicle=parsetape(&mcsweeps, &inititer, &iterations);
+//vesicle1=parsetape(&mcsweeps, &inititer, &iterations);
 
 /*Testing */
 //vesicle->poly_list=init_poly_list(1400,20,vesicle->vlist);
 
 //poly_list_free(vesicle->poly_list);
 /*End testing*/
-printf("Vertex %d ima x komponento %e\n",123,vesicle->vlist->vtx[123]->x);
-dump_state(vesicle);
-vesicle->vlist->vtx[123]->x=123.0;
-printf("Vertex %d ima x komponento %e\n",123,vesicle->vlist->vtx[123]->x);
-write_vertex_xml_file(vesicle,0);
+
+//write_vertex_xml_file(vesicle,0);
+//vesicle_free(vesicle);
 vesicle=restore_state();
-printf("Stevilo vertexov je %d\n",vesicle->vlist->n);
-printf("Vertex %d ima x komponento %e\n",123,vesicle->vlist->vtx[123]->x);
 write_vertex_xml_file(vesicle,1);
 write_master_xml_file("test.pvd");
+//vesicle_free(vesicle1);
+//vesicle_free(vesicle);
 return 0;
-
+vesicle_free(vesicle1);
 run_simulation(vesicle, mcsweeps, inititer, iterations);
 
 write_master_xml_file("test.pvd");
