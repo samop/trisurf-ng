@@ -19,11 +19,10 @@ ts_bool dump_state(ts_vesicle *vesicle){
 
     /* save current state with wrong pointers. Will fix that later */
     ts_uint i,j,k;
-    ts_ulong off;
     FILE *fh=fopen("dump.bin","wb");
 
     /* dump vesicle */
-    fwrite(vesicle, sizeof(vesicle),1,fh);
+    fwrite(vesicle, sizeof(ts_vesicle),1,fh);
     /* dump vertex list */
     fwrite(vesicle->vlist, sizeof(ts_vertex_list),1,fh);
     /* dump bond list */
@@ -46,64 +45,45 @@ ts_bool dump_state(ts_vesicle *vesicle){
                     cell is ignored
         */
         for(j=0;j<vesicle->vlist->vtx[i]->neigh_no;j++){
-            off=(ts_ulong)(vesicle->vlist->vtx[i]->neigh[j]-vesicle->vlist->vtx[0]);
-            fwrite(&off,sizeof(ts_ulong),1,fh); 
+            fwrite(&vesicle->vlist->vtx[i]->neigh[j]->idx,sizeof(ts_uint),1,fh); 
         }
         for(j=0;j<vesicle->vlist->vtx[i]->bond_no;j++){
-            off=(ts_ulong)(vesicle->vlist->vtx[i]->bond[j]-vesicle->blist->bond[0]);
-            fwrite(&off,sizeof(ts_ulong),1,fh); 
+            fwrite(&vesicle->vlist->vtx[i]->bond[j]->idx,sizeof(ts_uint),1,fh); 
         }
         for(j=0;j<vesicle->vlist->vtx[i]->tristar_no;j++){
-            off=(ts_ulong)(vesicle->vlist->vtx[i]->tristar[j]-vesicle->tlist->tria[0]);
-            fwrite(&off,sizeof(ts_ulong),1,fh); 
+            fwrite(&vesicle->vlist->vtx[i]->tristar[j]->idx,sizeof(ts_uint),1,fh); 
         }
-//        off=(ts_ulong)(vesicle->vlist->vtx[i]->cell-vesicle->clist->cell[0]);
-//        fwrite(&off,sizeof(ts_ulong),1,fh); 
-
     }
 
     /*dump bonds*/
     for(i=0;i<vesicle->blist->n;i++){
         fwrite(vesicle->blist->bond[i],sizeof(ts_bond),1,fh);
         /* dump pointer offsets for vtx1 and vtx2 */
-        off=(ts_ulong)(vesicle->blist->bond[i]->vtx1-vesicle->vlist->vtx[0]);
-        fwrite(&off,sizeof(ts_ulong),1,fh); 
-        off=(ts_ulong)(vesicle->blist->bond[i]->vtx2-vesicle->vlist->vtx[0]);
-        fwrite(&off,sizeof(ts_ulong),1,fh); 
+        //off=(ts_ulong)(vesicle->blist->bond[i]->vtx1-vesicle->vlist->vtx[0]);
+        fwrite(&vesicle->blist->bond[i]->vtx1->idx,sizeof(ts_uint),1,fh); 
+        //off=(ts_ulong)(vesicle->blist->bond[i]->vtx2-vesicle->vlist->vtx[0]);
+        fwrite(&vesicle->blist->bond[i]->vtx2->idx,sizeof(ts_uint),1,fh); 
     }
 
     /*dump triangles*/
     for(i=0;i<vesicle->tlist->n;i++){
         fwrite(vesicle->tlist->tria[i],sizeof(ts_triangle),1,fh);
         /* dump pointer offsets for vertex */
-        off=(ts_ulong)(vesicle->tlist->tria[i]->vertex[0]-vesicle->vlist->vtx[0]);
-        fwrite(&off,sizeof(ts_ulong),1,fh); 
-        off=(ts_ulong)(vesicle->tlist->tria[i]->vertex[1]-vesicle->vlist->vtx[0]);
-        fwrite(&off,sizeof(ts_ulong),1,fh); 
-        off=(ts_ulong)(vesicle->tlist->tria[i]->vertex[2]-vesicle->vlist->vtx[0]);
-        fwrite(&off,sizeof(ts_ulong),1,fh); 
+        fwrite(&vesicle->tlist->tria[i]->vertex[0]->idx,sizeof(ts_uint),1,fh); 
+        fwrite(&vesicle->tlist->tria[i]->vertex[1]->idx,sizeof(ts_uint),1,fh); 
+        fwrite(&vesicle->tlist->tria[i]->vertex[2]->idx,sizeof(ts_uint),1,fh); 
         /* dump pointer offsets for neigh */
         for(j=0;j<vesicle->tlist->tria[i]->neigh_no;j++){
-            off=(ts_ulong)(vesicle->tlist->tria[i]->neigh[j]-vesicle->tlist->tria[0]);
-            fwrite(&off,sizeof(ts_ulong),1,fh); 
+            fwrite(&vesicle->tlist->tria[i]->neigh[j]->idx,sizeof(ts_uint),1,fh); 
         }
     }
-   
-    /*dump cells and its contents is not dumped but recalculated on restore*/
-
-/*    for(i=0;i<vesicle->clist->cellno;i++){
-        fwrite(vesicle->clist->cell[i],sizeof(ts_cell),1,fh);
-        for(j=0;j<vesicle->clist->cell[i]->nvertex;j++){
-            off=(ts_ulong)(vesicle->clist->cell[i]->vertex[j]-vesicle->vlist->vtx[0]);
-            fwrite(&off,sizeof(ts_ulong),1,fh);
-        }
-    }
-*/
 
 
     /*dump polymeres */
     for(i=0;i<vesicle->poly_list->n;i++){
         fwrite(vesicle->poly_list->poly[i],sizeof(ts_poly),1,fh);
+        fwrite(vesicle->poly_list->poly[i]->vlist,sizeof(ts_vertex_list),1,fh);
+        fwrite(vesicle->poly_list->poly[i]->blist,sizeof(ts_bond_list),1,fh);
     } 
      
     /* dump poly vertex(monomer) list*/
@@ -112,24 +92,26 @@ ts_bool dump_state(ts_vesicle *vesicle){
             fwrite(vesicle->poly_list->poly[i]->vlist->vtx[j],sizeof(ts_vertex),1,fh);
             /* dump offset for neigh and bond */
             for(k=0;k<vesicle->poly_list->poly[i]->vlist->vtx[j]->neigh_no;k++){
-                off=(ts_ulong)(vesicle->poly_list->poly[i]->vlist->vtx[j]->neigh[k]-vesicle->poly_list->poly[i]->vlist->vtx[0]);
-                fwrite(&off,sizeof(ts_ulong),1,fh); 
+               // off=(ts_ulong)(vesicle->poly_list->poly[i]->vlist->vtx[j]->neigh[k]-vesicle->poly_list->poly[i]->vlist->vtx[0]);
+                fwrite(&vesicle->poly_list->poly[i]->vlist->vtx[j]->neigh[k]->idx,sizeof(ts_uint),1,fh); 
             }
             for(k=0;k<vesicle->poly_list->poly[i]->vlist->vtx[j]->bond_no;k++){
-                off=(ts_ulong)(vesicle->poly_list->poly[i]->vlist->vtx[j]->bond[k]-vesicle->poly_list->poly[i]->blist->bond[0]);
-                fwrite(&off,sizeof(ts_ulong),1,fh); 
+                //off=(ts_ulong)(vesicle->poly_list->poly[i]->vlist->vtx[j]->bond[k]-vesicle->poly_list->poly[i]->blist->bond[0]);
+                fwrite(&vesicle->poly_list->poly[i]->vlist->vtx[j]->bond[k]->idx,sizeof(ts_uint),1,fh); 
             }
         }
+	// grafted vtx on vesicle data dump
+		fwrite(&vesicle->poly_list->poly[i]->grafted_vtx->idx, sizeof(ts_uint),1,fh);
     }
     /* dump poly bonds between monomers list*/
     for(i=0;i<vesicle->poly_list->n;i++){
         for(j=0;j<vesicle->poly_list->poly[i]->blist->n;j++){
             fwrite(vesicle->poly_list->poly[i]->blist->bond[j],sizeof(ts_bond),1,fh);
             /* dump vtx1 and vtx2 offsets */
-            off=(ts_ulong)(vesicle->poly_list->poly[i]->blist->bond[j]->vtx1-vesicle->poly_list->poly[i]->vlist->vtx[0]);
-            fwrite(&off,sizeof(ts_ulong),1,fh); 
-            off=(ts_ulong)(vesicle->poly_list->poly[i]->blist->bond[j]->vtx2-vesicle->poly_list->poly[i]->vlist->vtx[0]);
-            fwrite(&off,sizeof(ts_ulong),1,fh); 
+            //off=(ts_ulong)(vesicle->poly_list->poly[i]->blist->bond[j]->vtx1-vesicle->poly_list->poly[i]->vlist->vtx[0]);
+            fwrite(&vesicle->poly_list->poly[i]->blist->bond[j]->vtx1->idx,sizeof(ts_uint),1,fh); 
+//            off=(ts_ulong)(vesicle->poly_list->poly[i]->blist->bond[j]->vtx2-vesicle->poly_list->poly[i]->vlist->vtx[0]);
+            fwrite(&vesicle->poly_list->poly[i]->blist->bond[j]->vtx2->idx,sizeof(ts_uint),1,fh); 
         }
     }
 
@@ -145,15 +127,8 @@ ts_bool dump_state(ts_vesicle *vesicle){
         poly_list->poly->bond
 */
 
-    fwrite(vesicle->vlist->vtx, sizeof(ts_vertex *),1,fh);
-    fwrite(vesicle->blist->bond, sizeof(ts_bond *),1,fh);
-    fwrite(vesicle->tlist->tria, sizeof(ts_triangle *),1,fh);
-    fwrite(vesicle->clist->cell, sizeof(ts_cell *),1,fh);
-    fwrite(vesicle->poly_list->poly, sizeof(ts_poly *),1,fh);
-    for(i=0;i<vesicle->poly_list->n;i++){
-        fwrite(vesicle->poly_list->poly[i]->vlist->vtx, sizeof(ts_vertex *),1,fh);
-        fwrite(vesicle->poly_list->poly[i]->blist->bond, sizeof(ts_bond *),1,fh);
-    }
+	fwrite(vesicle->clist, sizeof(ts_cell_list),1,  fh);
+
     fclose(fh);
     return TS_SUCCESS;
 }
@@ -164,12 +139,14 @@ ts_vesicle *restore_state(){
     ts_uint i,j,k;
     FILE *fh=fopen("dump.bin","rb");
     ts_uint retval;
-    ts_ulong off;
+	ts_uint idx;
 
 /* we restore all the data from the dump */
     /* restore vesicle */
     ts_vesicle *vesicle=(ts_vesicle *)calloc(1,sizeof(ts_vesicle));
-    retval=fread(vesicle, sizeof(vesicle),1,fh);
+    retval=fread(vesicle, sizeof(ts_vesicle),1,fh);
+//	fprintf(stderr,"was here! %e\n",vesicle->dmax);
+
     /* restore vertex list */
     vesicle->vlist=(ts_vertex_list *)malloc(sizeof(ts_vertex_list));
     retval=fread(vesicle->vlist, sizeof(ts_vertex_list),1,fh);
@@ -187,59 +164,75 @@ ts_vesicle *restore_state(){
     retval=fread(vesicle->poly_list, sizeof(ts_poly_list),1,fh);
     /* level 1 complete */
 
-  /*restore vertices*/
+/* prerequisity. Bonds must be malloced before vertexes are recreated */
+  vesicle->blist->bond=(ts_bond **)calloc(vesicle->blist->n,sizeof(ts_bond *));
+    for(i=0;i<vesicle->blist->n;i++){
+        vesicle->blist->bond[i]=(ts_bond *)malloc(sizeof(ts_bond));
+	}
+/* prerequisity. Triangles must be malloced before vertexes are recreated */
+  vesicle->tlist->tria=(ts_triangle **)calloc(vesicle->tlist->n,sizeof(ts_triangle *));
+    for(i=0;i<vesicle->tlist->n;i++){
+        vesicle->tlist->tria[i]=(ts_triangle *)malloc(sizeof(ts_triangle));
+}
+/* prerequisity. Vertices must be malloced before vertexes are recreated */
     vesicle->vlist->vtx=(ts_vertex **)calloc(vesicle->vlist->n,sizeof(ts_vertex *));
-    for(i=0;i<vesicle->vlist->n;i++){
+ for(i=0;i<vesicle->vlist->n;i++){
         vesicle->vlist->vtx[i]=(ts_vertex *)malloc(sizeof(ts_vertex));
+ }
+  /*restore vertices*/
+    for(i=0;i<vesicle->vlist->n;i++){
         retval=fread(vesicle->vlist->vtx[i],sizeof(ts_vertex),1,fh);
         /*restore neigh, bond, tristar. Ignoring cell */
         vesicle->vlist->vtx[i]->neigh=(ts_vertex **)calloc(vesicle->vlist->vtx[i]->neigh_no, sizeof(ts_vertex *));
         for(j=0;j<vesicle->vlist->vtx[i]->neigh_no;j++){
-            retval=fread(&off,sizeof(ts_ulong),1,fh);
-            vesicle->vlist->vtx[i]->neigh[j]=vesicle->vlist->vtx[0]+off;
+            retval=fread(&idx,sizeof(ts_uint),1,fh);
+            vesicle->vlist->vtx[i]->neigh[j]=vesicle->vlist->vtx[idx];
         }
         vesicle->vlist->vtx[i]->bond=(ts_bond **)calloc(vesicle->vlist->vtx[i]->bond_no, sizeof(ts_bond *));
         for(j=0;j<vesicle->vlist->vtx[i]->bond_no;j++){
-            retval=fread(&off,sizeof(ts_ulong),1,fh);
-            vesicle->vlist->vtx[i]->bond[j]=vesicle->blist->bond[0]+off;    
+            retval=fread(&idx,sizeof(ts_uint),1,fh);
+/* pointer can be assigned only when list of bonds is fully initialized in memory. Thus bondlist popularization must be done before vertex can reference to it */
+            vesicle->vlist->vtx[i]->bond[j]=vesicle->blist->bond[idx];    
         }
 
         vesicle->vlist->vtx[i]->tristar=(ts_triangle **)calloc(vesicle->vlist->vtx[i]->tristar_no, sizeof(ts_triangle *));
         for(j=0;j<vesicle->vlist->vtx[i]->tristar_no;j++){
-            retval=fread(&off,sizeof(ts_ulong),1,fh);
-            vesicle->vlist->vtx[i]->tristar[j]=vesicle->tlist->tria[0]+off;
+            retval=fread(&idx,sizeof(ts_uint),1,fh);
+/* same comment as above */
+            vesicle->vlist->vtx[i]->tristar[j]=vesicle->tlist->tria[idx];
         }
 
     }
 
     /*restore bonds*/
-    vesicle->blist->bond=(ts_bond **)calloc(vesicle->blist->n,sizeof(ts_bond *));
+   // vesicle->blist->bond=(ts_bond **)calloc(vesicle->blist->n,sizeof(ts_bond *)); // done before.
     for(i=0;i<vesicle->blist->n;i++){
-        vesicle->blist->bond[i]=(ts_bond *)malloc(sizeof(ts_bond));
+     //   vesicle->blist->bond[i]=(ts_bond *)malloc(sizeof(ts_bond)); //done before.
         retval=fread(vesicle->blist->bond[i],sizeof(ts_bond),1,fh);
         /* restore vtx1 and vtx2 */
-        retval=fread(&off,sizeof(ts_ulong),1,fh);
-        vesicle->blist->bond[i]->vtx1=vesicle->vlist->vtx[0]+off;
-        retval=fread(&off,sizeof(ts_ulong),1,fh);
-        vesicle->blist->bond[i]->vtx2=vesicle->vlist->vtx[0]+off;
+        retval=fread(&idx,sizeof(ts_uint),1,fh);
+        vesicle->blist->bond[i]->vtx1=vesicle->vlist->vtx[idx];
+        retval=fread(&idx,sizeof(ts_uint),1,fh);
+        vesicle->blist->bond[i]->vtx2=vesicle->vlist->vtx[idx];
     }
 
     /*restore triangles*/
-    vesicle->tlist->tria=(ts_triangle **)calloc(vesicle->tlist->n,sizeof(ts_triangle *));
+//    vesicle->tlist->tria=(ts_triangle **)calloc(vesicle->tlist->n,sizeof(ts_triangle *)); // done before
     for(i=0;i<vesicle->tlist->n;i++){
-        vesicle->tlist->tria[i]=(ts_triangle *)malloc(sizeof(ts_triangle));
+ //       vesicle->tlist->tria[i]=(ts_triangle *)malloc(sizeof(ts_triangle)); // done before
         retval=fread(vesicle->tlist->tria[i],sizeof(ts_triangle),1,fh);
         /* restore pointers for vertices */
-        retval=fread(&off,sizeof(ts_ulong),1,fh);
-        vesicle->tlist->tria[i]->vertex[0]=vesicle->vlist->vtx[0]+off;
-        retval=fread(&off,sizeof(ts_ulong),1,fh);
-        vesicle->tlist->tria[i]->vertex[1]=vesicle->vlist->vtx[0]+off;
-        retval=fread(&off,sizeof(ts_ulong),1,fh);
-        vesicle->tlist->tria[i]->vertex[2]=vesicle->vlist->vtx[0]+off;
+        retval=fread(&idx,sizeof(ts_uint),1,fh);
+        vesicle->tlist->tria[i]->vertex[0]=vesicle->vlist->vtx[idx];
+        retval=fread(&idx,sizeof(ts_uint),1,fh);
+        vesicle->tlist->tria[i]->vertex[1]=vesicle->vlist->vtx[idx];
+        retval=fread(&idx,sizeof(ts_uint),1,fh);
+        vesicle->tlist->tria[i]->vertex[2]=vesicle->vlist->vtx[idx];
         /* restore pointers for neigh */
+	 vesicle->tlist->tria[i]->neigh=(ts_triangle **)malloc(vesicle->tlist->tria[i]->neigh_no*sizeof(ts_triangle *));
         for(j=0;j<vesicle->tlist->tria[i]->neigh_no;j++){
-            retval=fread(&off,sizeof(ts_ulong),1,fh);
-            vesicle->tlist->tria[i]->neigh[j]=vesicle->tlist->tria[0]+off;
+            retval=fread(&idx,sizeof(ts_uint),1,fh);
+            vesicle->tlist->tria[i]->neigh[j]=vesicle->tlist->tria[idx];
         }
 
     }
@@ -257,74 +250,68 @@ ts_vesicle *restore_state(){
     for(i=0;i<vesicle->poly_list->n;i++){
         vesicle->poly_list->poly[i]=(ts_poly *)calloc(1,sizeof(ts_poly));
         retval=fread(vesicle->poly_list->poly[i],sizeof(ts_poly),1,fh);
+        vesicle->poly_list->poly[i]->vlist=(ts_vertex_list *)calloc(1,sizeof(ts_vertex_list));
+        retval=fread(vesicle->poly_list->poly[i]->vlist,sizeof(ts_vertex_list),1,fh);
+        vesicle->poly_list->poly[i]->blist=(ts_bond_list *)calloc(1,sizeof(ts_bond_list));
+        retval=fread(vesicle->poly_list->poly[i]->blist,sizeof(ts_bond_list),1,fh);
+	/* initialize adress space for pointers that will hold specific vertices (monomers) and bonds */
+        vesicle->poly_list->poly[i]->vlist->vtx=(ts_vertex **)calloc(vesicle->poly_list->poly[i]->vlist->n,sizeof(ts_vertex *));
+        vesicle->poly_list->poly[i]->blist->bond=(ts_bond **)calloc(vesicle->poly_list->poly[i]->blist->n,sizeof(ts_bond *));
+	 for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++){
+            vesicle->poly_list->poly[i]->vlist->vtx[j]=(ts_vertex *)malloc(sizeof(ts_vertex));
+	}
+	for(j=0;j<vesicle->poly_list->poly[i]->blist->n;j++){
+            vesicle->poly_list->poly[i]->blist->bond[j]=(ts_bond *)malloc(sizeof(ts_bond));
+	}
+
     } 
+
      
     /* restore poly vertex(monomer) list*/
     for(i=0;i<vesicle->poly_list->n;i++){
-        vesicle->poly_list->poly[i]->vlist->vtx=(ts_vertex **)calloc(vesicle->poly_list->poly[i]->vlist->n,sizeof(ts_vertex *));
         for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++){
-            vesicle->poly_list->poly[i]->vlist->vtx[j]=(ts_vertex *)malloc(sizeof(ts_vertex));
             retval=fread(vesicle->poly_list->poly[i]->vlist->vtx[j],sizeof(ts_vertex),1,fh);
-            
+           	 
             /* restore neigh and bonds */
             vesicle->poly_list->poly[i]->vlist->vtx[j]->neigh=(ts_vertex **)calloc(vesicle->poly_list->poly[i]->vlist->vtx[j]->neigh_no, sizeof(ts_vertex *));
             for(k=0;k<vesicle->poly_list->poly[i]->vlist->vtx[j]->neigh_no;k++){
-                retval=fread(&off,sizeof(ts_ulong),1,fh);
-                vesicle->poly_list->poly[i]->vlist->vtx[j]->neigh[k]=vesicle->poly_list->poly[i]->vlist->vtx[0]+off;
+                retval=fread(&idx,sizeof(ts_uint),1,fh);
+                vesicle->poly_list->poly[i]->vlist->vtx[j]->neigh[k]=vesicle->poly_list->poly[i]->vlist->vtx[idx];
             }
             vesicle->poly_list->poly[i]->vlist->vtx[j]->bond=(ts_bond **)calloc(vesicle->poly_list->poly[i]->vlist->vtx[j]->bond_no, sizeof(ts_bond *));
             for(k=0;k<vesicle->poly_list->poly[i]->vlist->vtx[j]->bond_no;k++){
-                retval=fread(&off,sizeof(ts_ulong),1,fh);
-                vesicle->poly_list->poly[i]->vlist->vtx[j]->bond[k]=vesicle->poly_list->poly[i]->blist->bond[0]+off;
+                retval=fread(&idx,sizeof(ts_uint),1,fh);
+                vesicle->poly_list->poly[i]->vlist->vtx[j]->bond[k]=vesicle->poly_list->poly[i]->blist->bond[idx];
             }
 
         }
+	/* restore grafted vtx on vesicle and grafted_poly */
+                retval=fread(&idx,sizeof(ts_uint),1,fh);
+		vesicle->vlist->vtx[idx]->grafted_poly=vesicle->poly_list->poly[i];
+		vesicle->poly_list->poly[i]->grafted_vtx=vesicle->vlist->vtx[idx];	
     }
+
     /* restore poly bonds between monomers list*/
     for(i=0;i<vesicle->poly_list->n;i++){
-        vesicle->poly_list->poly[i]->blist->bond=(ts_bond **)calloc(vesicle->poly_list->poly[i]->blist->n,sizeof(ts_bond *));
         for(j=0;j<vesicle->poly_list->poly[i]->blist->n;j++){
-            vesicle->poly_list->poly[i]->blist->bond[j]=(ts_bond *)malloc(sizeof(ts_bond));
+       //     vesicle->poly_list->poly[i]->blist->bond[j]=(ts_bond *)malloc(sizeof(ts_bond));
             retval=fread(vesicle->poly_list->poly[i]->blist->bond[j],sizeof(ts_bond),1,fh);
             /* restore vtx1 and vtx2 */
-                retval=fread(&off,sizeof(ts_ulong),1,fh);
-                vesicle->poly_list->poly[i]->blist->bond[j]->vtx1=vesicle->poly_list->poly[i]->vlist->vtx[0]+off;
-                retval=fread(&off,sizeof(ts_ulong),1,fh);
-                vesicle->poly_list->poly[i]->blist->bond[j]->vtx2=vesicle->poly_list->poly[i]->vlist->vtx[0]+off;
+                retval=fread(&idx,sizeof(ts_uint),1,fh);
+                vesicle->poly_list->poly[i]->blist->bond[j]->vtx1=vesicle->poly_list->poly[i]->vlist->vtx[idx];
+                retval=fread(&idx,sizeof(ts_uint),1,fh);
+                vesicle->poly_list->poly[i]->blist->bond[j]->vtx2=vesicle->poly_list->poly[i]->vlist->vtx[idx];
         }
     }
 
-
-    /* recalculate pointers using saved information on pointer addresses */
-    /* following pointers need to be recalculated:
-        all vtx->neigh
-        all vtx->tristar
-        all vtx->bond
-        vtx->cell
-        vtx->grafted_poly
-        bond->vtx1
-        bond->vtx2
-        tria->vertex[*]
-        tria->neigh
-        cell->vertex
-        poly->grafted_vtx
-        poly->vlist->vtx->neigh
-        poly->vlist->vtx->bond
-        poly->vlist->vtx->cell
-    */
-
-    /* read pointers from disk */
-/*    fwrite(vesicle->vlist->vtx, sizeof(ts_vertex *),1,fh);
-    fwrite(vesicle->blist->bond, sizeof(ts_bond *),1,fh);
-    fwrite(vesicle->tlist->tria, sizeof(ts_triangle *),1,fh);
-    fwrite(vesicle->clist->cell, sizeof(ts_cell *),1,fh);
-    fwrite(vesicle->poly_list->poly, sizeof(ts_poly *),1,fh);
-    for(i=0;i<vesicle->poly_list->n;i++){
-        fwrite(vesicle->poly_list->poly[i]->vlist->vtx, sizeof(ts_vertex *),1,fh);
-        fwrite(vesicle->poly_list->poly[i]->blist->bond, sizeof(ts_bond *),1,fh);
-    }
-*/
-
+// recreating space for cells // 
+	vesicle->clist=(ts_cell_list *)malloc(sizeof(ts_cell_list));
+	retval=fread(vesicle->clist, sizeof(ts_cell_list), 1,fh); 
+	vesicle->clist->cell=(ts_cell **)malloc(sizeof(ts_cell *)*vesicle->clist->ncmax[0]*vesicle->clist->ncmax[1]*vesicle->clist->ncmax[2]);
+	for(i=0;i<vesicle->clist->ncmax[0]*vesicle->clist->ncmax[1]*vesicle->clist->ncmax[2];i++){
+        	vesicle->clist->cell[i]=(ts_cell *)calloc(1,sizeof(ts_cell));
+        	vesicle->clist->cell[i]->idx=i+1; // We enumerate cells! Probably never required!
+    	}
 
     if(retval); 
     fclose(fh);
@@ -542,7 +529,7 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 	/* Here comes header of the file */
 
 	//find number of extra vtxs and bonds of polymeres
-	ts_uint monono=0, polyno=0;
+	ts_uint monono=0, polyno=0, poly_idx=0;
 	ts_bool poly=0;
 	if(vesicle->poly_list!=NULL){
 		if(vesicle->poly_list->poly[0]!=NULL){
@@ -559,9 +546,10 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
     }
 	//polymeres
 	if(poly){
+		poly_idx=vlist->n;
 		for(i=0;i<vesicle->poly_list->n;i++){
-			for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++){
-				fprintf(fh,"%u ", vesicle->poly_list->poly[i]->vlist->vtx[j]->idx);
+			for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++,poly_idx++){
+				fprintf(fh,"%u ", poly_idx);
 			}
 		}
 	}
@@ -585,12 +573,14 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 	}
 	//polymeres
 	if(poly){
+		poly_idx=vlist->n;
 		for(i=0;i<vesicle->poly_list->n;i++){
 			for(j=0;j<vesicle->poly_list->poly[i]->blist->n;j++){
-				fprintf(fh,"%u %u\n", vesicle->poly_list->poly[i]->blist->bond[j]->vtx1->idx,vesicle->poly_list->poly[i]->blist->bond[j]->vtx2->idx);
+//				fprintf(fh,"%u %u\n", vesicle->poly_list->poly[i]->blist->bond[j]->vtx1->idx,vesicle->poly_list->poly[i]->blist->bond[j]->vtx2->idx);
+				fprintf(fh,"%u %u\n", vesicle->poly_list->poly[i]->blist->bond[j]->vtx1->idx+vlist->n+i*monono,vesicle->poly_list->poly[i]->blist->bond[j]->vtx2->idx+vlist->n+i*monono);
 			}
 	//grafted bonds
-		fprintf(fh,"%u %u\n", vesicle->poly_list->poly[i]->grafted_vtx->idx, vesicle->poly_list->poly[i]->vlist->vtx[0]->idx);
+		fprintf(fh,"%u %u\n", vesicle->poly_list->poly[i]->grafted_vtx->idx, vesicle->poly_list->poly[i]->vlist->vtx[0]->idx+vlist->n+i*monono);
 		}
 
 	}
