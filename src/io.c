@@ -127,6 +127,8 @@ ts_bool dump_state(ts_vesicle *vesicle){
         poly_list->poly->bond
 */
 
+	fwrite(vesicle->clist, sizeof(ts_cell_list),1,  fh);
+
     fclose(fh);
     return TS_SUCCESS;
 }
@@ -298,8 +300,14 @@ ts_vesicle *restore_state(){
         }
     }
 
-  
-
+// recreating space for cells // 
+	vesicle->clist=(ts_cell_list *)malloc(sizeof(ts_cell_list));
+	retval=fread(vesicle->clist, sizeof(ts_cell_list), 1,fh); 
+	vesicle->clist->cell=(ts_cell **)malloc(sizeof(ts_cell *)*vesicle->clist->ncmax[0]*vesicle->clist->ncmax[1]*vesicle->clist->ncmax[2]);
+	for(i=0;i<vesicle->clist->ncmax[0]*vesicle->clist->ncmax[1]*vesicle->clist->ncmax[2];i++){
+        	vesicle->clist->cell[i]=(ts_cell *)calloc(1,sizeof(ts_cell));
+        	vesicle->clist->cell[i]->idx=i+1; // We enumerate cells! Probably never required!
+    	}
 
     if(retval); 
     fclose(fh);
