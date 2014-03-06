@@ -172,11 +172,13 @@ ts_vesicle *restore_state(){
     for(i=0;i<vesicle->tlist->n;i++){
         vesicle->tlist->tria[i]=(ts_triangle *)malloc(sizeof(ts_triangle));
 }
-
-  /*restore vertices*/
+/* prerequisity. Vertices must be malloced before vertexes are recreated */
     vesicle->vlist->vtx=(ts_vertex **)calloc(vesicle->vlist->n,sizeof(ts_vertex *));
-    for(i=0;i<vesicle->vlist->n;i++){
+ for(i=0;i<vesicle->vlist->n;i++){
         vesicle->vlist->vtx[i]=(ts_vertex *)malloc(sizeof(ts_vertex));
+ }
+  /*restore vertices*/
+    for(i=0;i<vesicle->vlist->n;i++){
         retval=fread(vesicle->vlist->vtx[i],sizeof(ts_vertex),1,fh);
         /*restore neigh, bond, tristar. Ignoring cell */
         vesicle->vlist->vtx[i]->neigh=(ts_vertex **)calloc(vesicle->vlist->vtx[i]->neigh_no, sizeof(ts_vertex *));

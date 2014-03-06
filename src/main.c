@@ -83,7 +83,6 @@ vesicle=restore_state();
 vesicle_free(vesicle1);
 fprintf(stderr,"Starting simulation...");
 run_simulation(vesicle, mcsweeps, inititer, iterations);
-return 0;
 
 write_master_xml_file("test.pvd");
 write_dout_fcompat_file(vesicle,"dout");
