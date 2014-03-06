@@ -1,6 +1,18 @@
 #ifndef _IO_H
 #define _IO_H
 
+/** @ Global variables for I/O operations like filenames etc. */
+/*static char mastername[1024];
+static char prefixname[1024];
+static ts_bool restore=0;
+static char tape[1024]; */
+char path[1024];
+int force_from_tape;
+
+ts_bool parse_args(int argc, char **argv);
+
+
+
 /** @brief Prints the position of vertices for the whole list
  *  
  *  The function is meant more or less as a debug tool, but can be used in production

@@ -11,8 +11,11 @@
 #include "initial_distribution.h"
 #include "poly.h"
 
-
-
+#include <getopt.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <errno.h>
 /** DUMP STATE TO DISK DRIVE **/
 
 ts_bool dump_state(ts_vesicle *vesicle){
@@ -317,6 +320,106 @@ ts_vesicle *restore_state(){
     fclose(fh);
     return vesicle;
 }
+
+
+
+ts_bool parse_args(int argc, char **argv){
+ int c, retval;
+ DIR *dir;
+    path[0]=0;
+while (1)
+     {
+       static struct option long_options[] =
+         {
+           {"force-from-tape", no_argument,       &force_from_tape, 1},
+           {"tape",     no_argument,       0, 't'},
+           {"output-file",  required_argument, 0, 'o'},
+           {"directory",  required_argument, 0, 'd'},
+           {"dump-file", required_argument,0, 'f'},
+           {0, 0, 0, 0}
+         };
+       /* getopt_long stores the option index here. */
+       int option_index = 0;
+
+       c = getopt_long (argc, argv, "d:fot",
+                        long_options, &option_index);
+
+       /* Detect the end of the options. */
+       if (c == -1)
+         break;
+
+       switch (c)
+         {
+         case 0:
+           /* If this option set a flag, do nothing else now. */
+           if (long_options[option_index].flag != 0)
+             break;
+           printf ("option %s", long_options[option_index].name);
+           if (optarg)
+             printf (" with arg %s", optarg);
+           printf ("\n");
+           break;
+
+         case 't':
+            //check if tape exists. If not, fail immediately.
+           puts ("option -t\n");
+           break;
+
+         case 'o':
+            //set filename of master output file
+           printf ("option -o with value `%s'\n", optarg);
+           break;
+
+         case 'd':
+            //check if directory exists. If not create one. If creation is
+            //successful, set directory for output files.
+            //printf ("option -d with value `%s'\n", optarg);
+            dir = opendir(optarg);
+            if (dir)
+            {
+                /* Directory exists. */
+                closedir(dir);
+            }
+            else if (ENOENT == errno)
+            {
+                /* Directory does not exist. */
+                retval=mkdir(optarg, 0700);
+                if(retval){
+                fatal("Could not create requested directory. Check if you have permissions",1);
+                }
+            }
+            else
+            {
+                /* opendir() failed for some other reason. */
+                fatal("Could not check if directory exists. Reason unknown",1);
+            }
+            ts_fprintf(stdout,"\n*** Using output directory: %s\n\n", optarg);
+//            sprintf(path,"%s", optarg);
+            strcpy(path, optarg);
+           // ts_fprintf(stdout,"ok!\n"); 
+
+           break;
+
+        case 'f':
+            //check if dump file specified exists. Defaults to dump.bin
+            break;
+
+         case '?':
+           /* getopt_long already printed an error message. */
+
+            ts_fprintf(stderr,"\n\nhere comes the help.\n\n");
+            fatal("Ooops, read help first",1);
+           break;
+
+         default:
+           exit (1);
+         }
+     }
+
+    return TS_SUCCESS;
+
+}
+
 
 
 
