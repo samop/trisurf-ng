@@ -72,18 +72,11 @@ vesicle1=parsetape(&mcsweeps, &inititer, &iterations);
 //poly_list_free(vesicle->poly_list);
 /*End testing*/
 
-//write_vertex_xml_file(vesicle,0);
-//vesicle_free(vesicle);
 dump_state(vesicle1);
-vesicle=restore_state();
-//write_vertex_xml_file(vesicle,1);
-//write_master_xml_file("test.pvd");
-//vesicle_free(vesicle1);
-//vesicle_free(vesicle);
-vesicle_free(vesicle1);
-fprintf(stderr,"Starting simulation...");
-run_simulation(vesicle, mcsweeps, inititer, iterations);
 
+vesicle=restore_state();
+//vesicle_free(vesicle1);
+run_simulation(vesicle1, mcsweeps, inititer, iterations);
 write_master_xml_file("test.pvd");
 write_dout_fcompat_file(vesicle,"dout");
 vesicle_free(vesicle);
