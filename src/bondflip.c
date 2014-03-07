@@ -29,7 +29,7 @@ c
     ts_vertex *k=bond->vtx2;
     ts_uint nei,neip,neim;
     ts_uint i,j;
-    ts_double oldenergy, delta_energy;
+    ts_double oldenergy, delta_energy, dvol=0.0;
     ts_triangle *lm=NULL,*lp=NULL, *lp1=NULL, *lm2=NULL;
 
     ts_vertex *kp,*km;
@@ -113,19 +113,19 @@ if(lm==NULL || lp==NULL) fatal("ts_flip_bond: Cannot find triangles lm and lp!",
     }
 
 if(lm2==NULL || lp1==NULL) fatal("ts_flip_bond: Cannot find triangles lm2 and lp1!",999);
- //   fprintf(stderr,"I WAS HERE! Before bondflip!\n");
- //   fprintf(stderr,"%e, %e, %e\n", lm->xnorm, lm->ynorm, lm->znorm);
 	
-    ts_flip_bond(k,it,km,kp, bond,lm, lp, lm2, lp1);
-//    fprintf(stderr,"I WAS HERE! Bondflip successful!\n");
-
+/* Save old energy */
   oldenergy=0;
   oldenergy+=k->xk* k->energy;
   oldenergy+=kp->xk* kp->energy;
   oldenergy+=km->xk* km->energy;
   oldenergy+=it->xk* it->energy;
-	//Neigbours don't change its energy.
+  //Neigbours of k, it, km, kp don't change its energy.
 
+	if(vesicle->pswitch == 1){dvol = -lm->volume - lp->volume;}
+
+/* fix data structure for flipped bond */
+    ts_flip_bond(k,it,km,kp, bond,lm, lp, lm2, lp1);
 
 
 /* Calculating the new energy */
@@ -134,9 +134,14 @@ if(lm2==NULL || lp1==NULL) fatal("ts_flip_bond: Cannot find triangles lm2 and lp
   delta_energy+=kp->xk* kp->energy;
   delta_energy+=km->xk* km->energy;
   delta_energy+=it->xk* it->energy;
-	//Neigbours don't change its energy.
+  //Neigbours of k, it, km, kp don't change its energy.
+
   delta_energy-=oldenergy;
- // fprintf(stderr,"I WAS HERE! Got energy!\n");
+	if(vesicle->pswitch == 1){
+		dvol = dvol + lm->volume + lp->volume;
+		delta_energy-= vesicle->pressure*dvol;
+	}
+
 /* MONTE CARLO */
     if(delta_energy>=0){
 #ifdef TS_DOUBLE_DOUBLE
