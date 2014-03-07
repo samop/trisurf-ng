@@ -79,10 +79,7 @@ there the neim is never <0 !!! */
   oldenergy+=kp->xk* kp->energy;
   oldenergy+=km->xk* km->energy;
   oldenergy+=it->xk* it->energy;
-//  for(i=0;i<k->neigh_no;i++) oldenergy+=k->neigh[i]->xk*k->neigh[i]->energy;
-//  for(i=0;i<kp->neigh_no;i++) oldenergy+=kp->neigh[i]->xk*kp->neigh[i]->energy;
-//  for(i=0;i<km->neigh_no;i++) oldenergy+=km->neigh[i]->xk*km->neigh[i]->energy;
-//  for(i=0;i<it->neigh_no;i++) oldenergy+=it->neigh[i]->xk*it->neigh[i]->energy;
+	//Neigbours don't change its energy.
 /*
 fprintf(stderr,"*** Naslov k=%ld\n",(long)k);
 fprintf(stderr,"*** Naslov it=%ld\n",(long)it);
@@ -107,18 +104,34 @@ for(i=0;i<kp->neigh_no;i++)
 
 /* Calculating the new energy */
   delta_energy=0;
-  for(i=0;i<k->neigh_no;i++) energy_vertex(k->neigh[i]);
-  for(i=0;i<kp->neigh_no;i++) energy_vertex(kp->neigh[i]);
-  for(i=0;i<km->neigh_no;i++) energy_vertex(km->neigh[i]);
-  for(i=0;i<it->neigh_no;i++) energy_vertex(it->neigh[i]);
+/*	ts_double dbg_energy=0.0;
+  for(i=0;i<k->neigh_no;i++) {
+	dbg_energy=k->neigh[i]->energy;
+	energy_vertex(k->neigh[i]);
+	if(abs(dbg_energy-k->neigh[i]->energy)>1e-100) fatal("Energy changes!",1);
+  }
+  for(i=0;i<kp->neigh_no;i++) {
+	dbg_energy=kp->neigh[i]->energy;
+	energy_vertex(kp->neigh[i]);
+	if(abs(dbg_energy-kp->neigh[i]->energy)>1e-100) fatal("Energy changes!",1);
+  }
+  for(i=0;i<km->neigh_no;i++){
+	dbg_energy=km->neigh[i]->energy;
+	 energy_vertex(km->neigh[i]);
+	if(abs(dbg_energy-km->neigh[i]->energy)>1e-100) fatal("Energy changes!",1);
+  }
+
+  for(i=0;i<it->neigh_no;i++){
+	dbg_energy=it->neigh[i]->energy;
+	 energy_vertex(it->neigh[i]);
+	if(abs(dbg_energy-it->neigh[i]->energy)>1e-100) fatal("Energy changes!",1);
+  }
+*/
   delta_energy+=k->xk* k->energy;
   delta_energy+=kp->xk* kp->energy;
   delta_energy+=km->xk* km->energy;
   delta_energy+=it->xk* it->energy;
-//  for(i=0;i<k->neigh_no;i++) delta_energy+=k->neigh[i]->xk*k->neigh[i]->energy;
-//  for(i=0;i<kp->neigh_no;i++) delta_energy+=kp->neigh[i]->xk*kp->neigh[i]->energy;
-//  for(i=0;i<km->neigh_no;i++) delta_energy+=km->neigh[i]->xk*km->neigh[i]->energy;
-//  for(i=0;i<it->neigh_no;i++) delta_energy+=it->neigh[i]->xk*it->neigh[i]->energy;
+	//Neigbours don't change its energy.
   delta_energy-=oldenergy;
  // fprintf(stderr,"I WAS HERE! Got energy!\n");
 /* MONTE CARLO */

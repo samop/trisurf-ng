@@ -341,7 +341,7 @@ ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations)
     long int brezveze0=1;
     long int brezveze1=1;
     long int brezveze2=1;
-    ts_double xk0=25.0, dmax=1.67,stepsize=0.15,kspring=800.0;
+    ts_double xk0=25.0, dmax=1.67,stepsize=0.15,kspring=800.0,pressure=0.0;
 	long int iter=1000, init=1000, mcsw=1000;
 
 
@@ -351,7 +351,8 @@ ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations)
         CFG_SIMPLE_INT("nmono", &nmono),
         CFG_SIMPLE_FLOAT("dmax", &dmax),
         CFG_SIMPLE_FLOAT("xk0",&xk0),
-        CFG_SIMPLE_FLOAT("k_spring",&kspring),
+	CFG_SIMPLE_FLOAT("pressure",&pressure),
+	CFG_SIMPLE_FLOAT("k_spring",&kspring),
         CFG_SIMPLE_FLOAT("stepsize",&stepsize),
         CFG_SIMPLE_INT("nxmax", &ncxmax),
         CFG_SIMPLE_INT("nymax", &ncymax),
@@ -389,11 +390,15 @@ ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations)
     vesicle->nshell=nshell;
     vesicle->dmax=dmax*dmax;
     vesicle->bending_rigidity=xk0;
+    vtx_set_global_values(vesicle); //copies xk0 to every vertex
+
+
     vesicle->stepsize=stepsize;
     vesicle->clist->ncmax[0]=ncxmax;
     vesicle->clist->ncmax[1]=ncymax;
     vesicle->clist->ncmax[2]=nczmax;
     vesicle->clist->max_occupancy=8;
+	vesicle->pressure=pressure/vesicle->bending_rigidity;	//all energy contributions need to be divided by bending_rigidity!
 
     cfg_free(cfg);
 	free(buf);
