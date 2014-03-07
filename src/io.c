@@ -336,7 +336,7 @@ ts_bool write_vertex_vtk_file(ts_vesicle *vesicle,ts_char *filename, ts_char *te
 
 
 ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations){
-    long int nshell=17,ncxmax=60, ncymax=60, nczmax=60, npoly=10, nmono=20;  // THIS IS DUE TO CONFUSE BUG!
+    long int nshell=17,ncxmax=60, ncymax=60, nczmax=60, npoly=10, nmono=20, pswitch=0;  // THIS IS DUE TO CONFUSE BUG!
     char *buf=malloc(255*sizeof(char));
     long int brezveze0=1;
     long int brezveze1=1;
@@ -351,6 +351,7 @@ ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations)
         CFG_SIMPLE_INT("nmono", &nmono),
         CFG_SIMPLE_FLOAT("dmax", &dmax),
         CFG_SIMPLE_FLOAT("xk0",&xk0),
+	CFG_SIMPLE_INT("pswitch",&pswitch),
 	CFG_SIMPLE_FLOAT("pressure",&pressure),
 	CFG_SIMPLE_FLOAT("k_spring",&kspring),
         CFG_SIMPLE_FLOAT("stepsize",&stepsize),
@@ -399,7 +400,7 @@ ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations)
     vesicle->clist->ncmax[2]=nczmax;
     vesicle->clist->max_occupancy=8;
 	vesicle->pressure=pressure/vesicle->bending_rigidity;	//all energy contributions need to be divided by bending_rigidity!
-
+    vesicle->pswitch=pswitch;
     cfg_free(cfg);
 	free(buf);
   //  fprintf(stderr,"NSHELL=%u\n",vesicle->nshell);

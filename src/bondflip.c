@@ -28,9 +28,9 @@ c
     ts_vertex *it=bond->vtx1;
     ts_vertex *k=bond->vtx2;
     ts_uint nei,neip,neim;
-    ts_uint i; //j;
+    ts_uint i,j;
     ts_double oldenergy, delta_energy;
- //   ts_triangle *lm=NULL,*lp=NULL, *lp1=NULL, *lp2=NULL, *lm1=NULL, *lm2=NULL;
+    ts_triangle *lm=NULL,*lp=NULL, *lp1=NULL, *lm2=NULL;
 
     ts_vertex *kp,*km;
 
@@ -73,125 +73,7 @@ there the neim is never <0 !!! */
  //   fprintf(stderr,"Bond will not be too long.. Continue.\n");
 
 /* we make a bond flip. this is different than in original fortran */
-// 0. step. Get memory prior the flip
-  oldenergy=0;
-  oldenergy+=k->xk* k->energy;
-  oldenergy+=kp->xk* kp->energy;
-  oldenergy+=km->xk* km->energy;
-  oldenergy+=it->xk* it->energy;
-	//Neigbours don't change its energy.
-/*
-fprintf(stderr,"*** Naslov k=%ld\n",(long)k);
-fprintf(stderr,"*** Naslov it=%ld\n",(long)it);
-fprintf(stderr,"*** Naslov km=%ld\n",(long)km);
-fprintf(stderr,"*** Naslov kp=%ld\n",(long)kp);
-
-for(i=0;i<k->neigh_no;i++)
-    fprintf(stderr,"k sosed=%ld\n",(long)k->neigh[i]);
-for(i=0;i<it->neigh_no;i++)
-    fprintf(stderr,"it sosed=%ld\n",(long)it->neigh[i]);
-
-for(i=0;i<km->neigh_no;i++)
-    fprintf(stderr,"km sosed=%ld\n",(long)km->neigh[i]);
-for(i=0;i<kp->neigh_no;i++)
-    fprintf(stderr,"kp sosed=%ld\n",(long)kp->neigh[i]);
-
-
-*/
-//    fprintf(stderr,"I WAS HERE! Before bondflip!\n");
-    ts_flip_bond(k,it,km,kp, bond);
-//    fprintf(stderr,"I WAS HERE! Bondflip successful!\n");
-
-/* Calculating the new energy */
-  delta_energy=0;
-/*	ts_double dbg_energy=0.0;
-  for(i=0;i<k->neigh_no;i++) {
-	dbg_energy=k->neigh[i]->energy;
-	energy_vertex(k->neigh[i]);
-	if(abs(dbg_energy-k->neigh[i]->energy)>1e-100) fatal("Energy changes!",1);
-  }
-  for(i=0;i<kp->neigh_no;i++) {
-	dbg_energy=kp->neigh[i]->energy;
-	energy_vertex(kp->neigh[i]);
-	if(abs(dbg_energy-kp->neigh[i]->energy)>1e-100) fatal("Energy changes!",1);
-  }
-  for(i=0;i<km->neigh_no;i++){
-	dbg_energy=km->neigh[i]->energy;
-	 energy_vertex(km->neigh[i]);
-	if(abs(dbg_energy-km->neigh[i]->energy)>1e-100) fatal("Energy changes!",1);
-  }
-
-  for(i=0;i<it->neigh_no;i++){
-	dbg_energy=it->neigh[i]->energy;
-	 energy_vertex(it->neigh[i]);
-	if(abs(dbg_energy-it->neigh[i]->energy)>1e-100) fatal("Energy changes!",1);
-  }
-*/
-  delta_energy+=k->xk* k->energy;
-  delta_energy+=kp->xk* kp->energy;
-  delta_energy+=km->xk* km->energy;
-  delta_energy+=it->xk* it->energy;
-	//Neigbours don't change its energy.
-  delta_energy-=oldenergy;
- // fprintf(stderr,"I WAS HERE! Got energy!\n");
-/* MONTE CARLO */
-    if(delta_energy>=0){
-#ifdef TS_DOUBLE_DOUBLE
-        if(exp(-delta_energy)< drand48() )
-#endif
-#ifdef TS_DOUBLE_FLOAT
-        if(expf(-delta_energy)< (ts_float)drand48())
-#endif
-#ifdef TS_DOUBLE_LONGDOUBLE
-        if(expl(-delta_energy)< (ts_ldouble)drand48())
-#endif
-        {
-            //not accepted, reverting changes
-       //     fprintf(stderr,"Failed to move, due to MC\n");
-
-//            ts_flip_bond(km,kp,it,k, bond);
-            ts_flip_bond(kp,km,k,it, bond);
-                
-
-/*
-fprintf(stderr,"*** Naslov k=%d\n",k);
-fprintf(stderr,"*** Naslov it=%d\n",it);
-fprintf(stderr,"*** Naslov km=%d\n",km);
-fprintf(stderr,"*** Naslov kp=%d\n",kp);
-for(i=0;i<k->neigh_no;i++)
-    fprintf(stderr,"k sosed=%d\n",k->neigh[i]);
-for(i=0;i<it->neigh_no;i++)
-    fprintf(stderr,"it sosed=%d\n",it->neigh[i]);
-
-
-for(i=0;i<km->neigh_no;i++)
-    fprintf(stderr,"km sosed=%d\n",km->neigh[i]);
-for(i=0;i<kp->neigh_no;i++)
-    fprintf(stderr,"kp sosed=%d\n",kp->neigh[i]);
-*/
-
-
-
-        //    fprintf(stderr,"Reverted condition!\n");
-            return TS_FAIL;
-        }
-    }
-        //    fprintf(stderr,"Success\n");
-
-
-/* IF BONDFLIP ACCEPTED, THEN RETURN SUCCESS! */
-    return TS_SUCCESS;
-}
-
-
-ts_bool ts_flip_bond(ts_vertex *k,ts_vertex *it,ts_vertex *km, ts_vertex *kp,
-ts_bond *bond){
-
-    ts_triangle *lm=NULL,*lp=NULL, *lp1=NULL, *lm2=NULL;
-    ts_uint i,j; //lmidx, lpidx;
-if(k==NULL || it==NULL || km==NULL || kp==NULL){
-    fatal("ts_flip_bond: You called me with invalid pointers to vertices",999);
-}
+// find lm, lp
 // 1. step. We find lm and lp from k->tristar !
     for(i=0;i<it->tristar_no;i++){
         for(j=0;j<k->tristar_no;j++){
@@ -229,57 +111,65 @@ if(lm==NULL || lp==NULL) fatal("ts_flip_bond: Cannot find triangles lm and lp!",
             } 
         }
     }
-/*
-// DEBUG TESTING!
-fprintf(stderr,"*** Naslov k=%d\n",k);
-fprintf(stderr,"*** Naslov it=%d\n",it);
-fprintf(stderr,"*** Naslov km=%d\n",km);
-fprintf(stderr,"*** Naslov kp=%d\n",kp);
 
-for(i=0;i<k->neigh_no;i++)
-    fprintf(stderr,"k sosed=%d\n",k->neigh[i]);
-for(i=0;i<it->neigh_no;i++)
-    fprintf(stderr,"it sosed=%d\n",it->neigh[i]);
-
-
-// END DEBUG TESTING!
-*/
 if(lm2==NULL || lp1==NULL) fatal("ts_flip_bond: Cannot find triangles lm2 and lp1!",999);
+ //   fprintf(stderr,"I WAS HERE! Before bondflip!\n");
+ //   fprintf(stderr,"%e, %e, %e\n", lm->xnorm, lm->ynorm, lm->znorm);
+	
+    ts_flip_bond(k,it,km,kp, bond,lm, lp, lm2, lp1);
+//    fprintf(stderr,"I WAS HERE! Bondflip successful!\n");
 
-/*
-//DEBUG TESTING
-fprintf(stderr,"1. step: lm, lm2, lp1 and lp found!\n");
-fprintf(stderr,"--- Naslov lm=%ld",(long)lm);
+  oldenergy=0;
+  oldenergy+=k->xk* k->energy;
+  oldenergy+=kp->xk* kp->energy;
+  oldenergy+=km->xk* km->energy;
+  oldenergy+=it->xk* it->energy;
+	//Neigbours don't change its energy.
 
 
-fprintf(stderr,"   vtxs(%ld, %ld, %ld)\n",(long)lm->vertex[0],(long)lm->vertex[1], (long)lm->vertex[2]);
-fprintf(stderr,"--- Naslov lp=%ld",(long)lp);
-fprintf(stderr,"   vtxs(%ld, %ld, %ld)\n",(long)lp->vertex[0],(long)lp->vertex[1], (long)lp->vertex[2]);
-fprintf(stderr,"--- Naslov lm2=%ld",(long)lm2);
-fprintf(stderr,"   vtxs(%ld, %ld, %ld)\n",(long)lm2->vertex[0],(long)lm2->vertex[1], (long)lm2->vertex[2]);
-fprintf(stderr,"--- Naslov lp1=%ld",(long)lp1);
-fprintf(stderr,"   vtxs(%ld, %ld, %ld)\n",(long)lp1->vertex[0],(long)lp1->vertex[1], (long)lp1->vertex[2]);
 
-for(i=0;i<lm->neigh_no;i++)
-    fprintf(stderr,"lm sosed=%ld\n",(long)lm->neigh[i]);
-for(i=0;i<lp->neigh_no;i++)
-    fprintf(stderr,"lp sosed=%ld\n",(long)lp->neigh[i]);
-// END DEBUG TESTING
-*/
-/*
-// DEBUG TESTING!
+/* Calculating the new energy */
+  delta_energy=0;
+  delta_energy+=k->xk* k->energy;
+  delta_energy+=kp->xk* kp->energy;
+  delta_energy+=km->xk* km->energy;
+  delta_energy+=it->xk* it->energy;
+	//Neigbours don't change its energy.
+  delta_energy-=oldenergy;
+ // fprintf(stderr,"I WAS HERE! Got energy!\n");
+/* MONTE CARLO */
+    if(delta_energy>=0){
+#ifdef TS_DOUBLE_DOUBLE
+        if(exp(-delta_energy)< drand48() )
+#endif
+#ifdef TS_DOUBLE_FLOAT
+        if(expf(-delta_energy)< (ts_float)drand48())
+#endif
+#ifdef TS_DOUBLE_LONGDOUBLE
+        if(expl(-delta_energy)< (ts_ldouble)drand48())
+#endif
+        {
+            //not accepted, reverting changes
+//            fprintf(stderr,"Failed to move, due to MC\n");
 
-for(i=0;i<3;i++){
-
-    if(lp1->neigh[i]==lp) fprintf(stderr,"Nasel sem par lp1->lp\n");
-    if(lp->neigh[i]==lp1) fprintf(stderr,"Nasel sem par lp->lp1\n");
-    if(lm2->neigh[i]==lm) fprintf(stderr,"Nasel sem par lm2->lm\n");
-    if(lm->neigh[i]==lm2) fprintf(stderr,"Nasel sem par lm->lm2\n");
+            ts_flip_bond(kp,km,k,it, bond, lm,lp,lm2,lp1);
+//    fprintf(stderr,"%e, %e, %e\n", lp->xnorm, lp->ynorm, lp->znorm);
+            return TS_FAIL;
+        }
+    }
+     /* IF BONDFLIP ACCEPTED, THEN RETURN SUCCESS! */
+//            fprintf(stderr,"SUCCESS!!!\n");
+    return TS_SUCCESS;
 }
-// END DEBUG TESTING!
-*/
 
 
+ts_bool ts_flip_bond(ts_vertex *k,ts_vertex *it,ts_vertex *km, ts_vertex *kp,
+ts_bond *bond, ts_triangle *lm, ts_triangle *lp, ts_triangle *lm2, ts_triangle *lp1){
+
+    ts_uint i; //lmidx, lpidx;
+if(k==NULL || it==NULL || km==NULL || kp==NULL){
+    fatal("ts_flip_bond: You called me with invalid pointers to vertices",999);
+}
 // 2. step. We change the triangle vertices... (actual bond flip)
     for(i=0;i<3;i++) if(lm->vertex[i]== it) lm->vertex[i]= kp;
     for(i=0;i<3;i++) if(lp->vertex[i]== k) lp->vertex[i]= km;
@@ -336,34 +226,10 @@ for(i=0;i<3;i++){
             vtx_remove_tristar(it,lm);
             vtx_remove_tristar(k,lp);
 //fprintf(stderr,"6. step: tristar corrected\n");
-
-/*
-//DEBUG TESTING
-fprintf(stderr,"--- Naslov lm=%d",lm);
-
-
-fprintf(stderr,"   vtxs(%d, %d, %d)\n",lm->vertex[0],lm->vertex[1], lm->vertex[2]);
-fprintf(stderr,"--- Naslov lp=%d",lp);
-fprintf(stderr,"   vtxs(%d, %d, %d)\n",lp->vertex[0],lp->vertex[1], lp->vertex[2]);
-fprintf(stderr,"--- Naslov lm2=%d",lm2);
-fprintf(stderr,"   vtxs(%d, %d, %d)\n",lm2->vertex[0],lm2->vertex[1], lm2->vertex[2]);
-fprintf(stderr,"--- Naslov lp1=%d",lp1);
-fprintf(stderr,"   vtxs(%d, %d, %d)\n",lp1->vertex[0],lp1->vertex[1], lp1->vertex[2]);
-
-for(i=0;i<lm->neigh_no;i++)
-    fprintf(stderr,"lm sosed=%d\n",lm->neigh[i]);
-for(i=0;i<lp->neigh_no;i++)
-    fprintf(stderr,"lp sosed=%d\n",lp->neigh[i]);
-// END DEBUG TESTING
-*/
   energy_vertex(k);
   energy_vertex(kp);
   energy_vertex(km);
   energy_vertex(it);
-
-
 // END modifications to data structure!
-
-
     return TS_SUCCESS;
 }
