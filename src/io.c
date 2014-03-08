@@ -108,11 +108,11 @@ ts_bool fprint_vertex_data(FILE *fh,ts_vertex_list *vlist){
         fprintf(fh," %.17E\t%.17E\t%.17E\t%.17E\t%.17E\t%u\n",
         vlist->vtx[i]->xk,vlist->vtx[i]->c,vlist->vtx[i]->energy,
         vlist->vtx[i]->energy_h, vlist->vtx[i]->curvature, 0);
-        for(j=0;j<vlist->vtx[i]->neigh_no;j++){
+        for(j=0;j<vlist->vtx[i]->bond_no;j++){
             fprintf(fh," %.17E", vlist->vtx[i]->bond[j]->bond_length_dual);
         }
             fprintf(fh,"\n");
-        for(j=0;j<vlist->vtx[i]->neigh_no;j++){
+        for(j=0;j<vlist->vtx[i]->bond_no;j++){
             fprintf(fh," %.17E", vlist->vtx[i]->bond[j]->bond_length);
         }
             fprintf(fh,"\n");
