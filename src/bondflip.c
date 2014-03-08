@@ -126,32 +126,36 @@ ts_vertex *bck_vtx[4];
 ts_triangle *bck_tria[4];
 ts_bond *bck_bond;
 ts_vertex *orig_vtx[]={k,it,kp,km};
-ts_triangle *orig_tria[]={lm,lp, lm2,lp1};
+ts_triangle *orig_tria[]={lm,lp,lm2,lp1};
 
-fprintf(stderr,"Backuping!!!\n");
+//fprintf(stderr,"Backuping!!!\n");
+	bck_bond=(ts_bond *)malloc(sizeof(ts_bond));
 for(i=0;i<4;i++){
+/*	fprintf(stderr,"vtx neigh[%d]=",i);
+	for(j=0;j<orig_vtx[i]->neigh_no;j++) fprintf(stderr," %d", orig_vtx[i]->neigh[j]->idx);
+	fprintf(stderr,"\n");
+*/
 	bck_vtx[i]=(ts_vertex *)malloc(sizeof(ts_vertex));
 	bck_tria[i]=(ts_triangle *)malloc(sizeof(ts_triangle));
-	bck_bond=(ts_bond *)malloc(sizeof(ts_bond));
+	memcpy((void *)bck_vtx[i],(void *)orig_vtx[i],sizeof(ts_vertex));
+	memcpy((void *)bck_tria[i],(void *)orig_tria[i],sizeof(ts_triangle));
 	/* level 2 pointers */
+
 	bck_vtx[i]->neigh=(ts_vertex **)malloc(orig_vtx[i]->neigh_no*sizeof(ts_vertex *));
 	bck_vtx[i]->tristar=(ts_triangle **)malloc(orig_vtx[i]->tristar_no*sizeof(ts_triangle *));
 	bck_vtx[i]->bond=(ts_bond **)malloc(orig_vtx[i]->bond_no*sizeof(ts_bond *));
 	bck_tria[i]->neigh=(ts_triangle **)malloc(orig_tria[i]->neigh_no*sizeof(ts_triangle *));
 
-	bck_vtx[i]=memcpy(bck_vtx[i],orig_vtx[i],sizeof(ts_vertex));
-	bck_vtx[i]->neigh=memcpy(bck_vtx[i]->neigh,orig_vtx[i]->neigh,orig_vtx[i]->neigh_no*sizeof(ts_vertex *));
-	bck_vtx[i]->tristar=memcpy(bck_vtx[i]->tristar,orig_vtx[i]->tristar,orig_vtx[i]->tristar_no*sizeof(ts_triangle *));
-	bck_vtx[i]->bond=memcpy(bck_vtx[i]->bond,orig_vtx[i]->bond,orig_vtx[i]->bond_no*sizeof(ts_bond *));
-
-		
-	bck_tria[i]=memcpy(bck_tria[i],orig_tria[i],sizeof(ts_triangle));
-	bck_tria[i]->neigh=memcpy(bck_tria[i]->neigh,orig_tria[i]->neigh,orig_tria[i]->neigh_no*sizeof(ts_triangle *));	
-}
-	bck_bond=memcpy(bck_bond,bond,sizeof(ts_bond));
-fprintf(stderr,"Backup complete!!!\n");
-/* end backup vertex */
+	memcpy((void *)bck_vtx[i]->neigh,(void *)orig_vtx[i]->neigh,orig_vtx[i]->neigh_no*sizeof(ts_vertex *));
+	memcpy((void *)bck_vtx[i]->tristar,(void *)orig_vtx[i]->tristar,orig_vtx[i]->tristar_no*sizeof(ts_triangle *));
+	memcpy((void *)bck_vtx[i]->bond,(void *)orig_vtx[i]->bond,orig_vtx[i]->bond_no*sizeof(ts_bond *));
 	
+	memcpy((void *)bck_tria[i]->neigh,(void *)orig_tria[i]->neigh,orig_tria[i]->neigh_no*sizeof(ts_triangle *));	
+}
+	memcpy(bck_bond,bond,sizeof(ts_bond));
+//fprintf(stderr,"Backup complete!!!\n");
+/* end backup vertex */
+
 /* Save old energy */
   oldenergy=0;
   oldenergy+=k->xk* k->energy;
@@ -193,54 +197,54 @@ fprintf(stderr,"Backup complete!!!\n");
 #endif
         {
             //not accepted, reverting changes
-//            fprintf(stderr,"Failed to move, due to MC\n");
+	    //restore all backups
+//		fprintf(stderr,"Restoring!!!\n");
 
-      //      ts_flip_bond(kp,km,k,it, bond, lm,lp,lm2,lp1);
-//    fprintf(stderr,"%e, %e, %e\n", lp->xnorm, lp->ynorm, lp->znorm);
+		for(i=0;i<4;i++){
+//			fprintf(stderr,"Restoring vtx neigh[%d] with neighbours %d\n",i, orig_vtx[i]->neigh_no );
+			free(orig_vtx[i]->neigh);
+			free(orig_vtx[i]->tristar);
+			free(orig_vtx[i]->bond);
+			free(orig_tria[i]->neigh);
+			memcpy((void *)orig_vtx[i],(void *)bck_vtx[i],sizeof(ts_vertex));
+			memcpy((void *)orig_tria[i],(void *)bck_tria[i],sizeof(ts_triangle));
+//			fprintf(stderr,"Restored vtx neigh[%d] with neighbours %d\n",i, orig_vtx[i]->neigh_no );
+			/* level 2 pointers are redirected*/
+		}
+		memcpy(bond,bck_bond,sizeof(ts_bond));
 
-	//restore all backups
-            fprintf(stderr,"Restoring!!!\n");
+		for(i=0;i<4;i++){
+			free(bck_vtx[i]);
+			free(bck_tria[i]);
+/*			fprintf(stderr,"Restoring vtx neigh[%d] with neighbours %d =",i, orig_vtx[i]->neigh_no );
+			for(j=0;j<orig_vtx[i]->neigh_no;j++) fprintf(stderr," %d", orig_vtx[i]->neigh[j]->idx);
+			fprintf(stderr,"\n"); */
+		}
 
-for(i=0;i<4;i++){
-	/* level 2 pointers */
-	orig_vtx[i]=memcpy(orig_vtx[i],bck_vtx[i],sizeof(ts_vertex));
-	orig_vtx[i]->neigh=memcpy(orig_vtx[i]->neigh,bck_vtx[i]->neigh,bck_vtx[i]->neigh_no*sizeof(ts_vertex *));
-	orig_vtx[i]->tristar=memcpy(orig_vtx[i]->tristar,bck_vtx[i]->tristar,bck_vtx[i]->tristar_no*sizeof(ts_triangle *));
-	orig_vtx[i]->bond=memcpy(orig_vtx[i]->bond,bck_vtx[i]->bond,bck_vtx[i]->bond_no*sizeof(ts_bond *));
-
-		
-	orig_tria[i]=memcpy(orig_tria[i],bck_tria[i],sizeof(ts_triangle));
-	orig_tria[i]->neigh=memcpy(orig_tria[i]->neigh,bck_tria[i]->neigh,bck_tria[i]->neigh_no*sizeof(ts_triangle *));	
-}
-	bond=memcpy(bond,bck_bond,sizeof(ts_bond));
-
-
-	for(i=0;i<4;i++){
-		vtx_free(bck_vtx[i]);
-
- 	free(bck_tria[i]->neigh);
-        free(bck_tria[i]);
-		
-	}
 		free(bck_bond);
+//		fprintf(stderr,"Restoration complete!!!\n");
 
-            fprintf(stderr,"Restoration complete!!!\n");
-
-            return TS_FAIL;
+		return TS_FAIL;
         }
     }
      /* IF BONDFLIP ACCEPTED, THEN RETURN SUCCESS! */
-            fprintf(stderr,"SUCCESS!!!\n");
+  //          fprintf(stderr,"SUCCESS!!!\n");
 
 	// delete all backups
 	for(i=0;i<4;i++){
-		vtx_free(bck_vtx[i]);
-
+	free(bck_vtx[i]->neigh);
+	free(bck_vtx[i]->bond);
+	free(bck_vtx[i]->tristar);
+	free(bck_vtx[i]);
  	free(bck_tria[i]->neigh);
         free(bck_tria[i]);
-		
+/*	fprintf(stderr,"Afret backup deletion vtx neigh[%d]=",i);
+	for(j=0;j<orig_vtx[i]->neigh_no;j++) fprintf(stderr," %d", orig_vtx[i]->neigh[j]->idx);
+	fprintf(stderr,"\n");
+*/	
 	}
-		free(bck_bond);
+	free(bck_bond);
+
     return TS_SUCCESS;
 }
 
