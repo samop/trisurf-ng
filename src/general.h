@@ -260,6 +260,8 @@ typedef struct {
 
 	ts_poly_list *poly_list;
 	ts_double spring_constant;
+	ts_double pressure;
+	ts_int pswitch;
 } ts_vesicle;
 
 

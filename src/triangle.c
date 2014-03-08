@@ -150,6 +150,7 @@ ts_bool triangle_remove_neighbour(ts_triangle *tria, ts_triangle *ntria){
 //	fprintf(stderr,"*** tria_number=%d\n",tria->neigh_no);
     tria->neigh=(ts_triangle **)realloc(tria->neigh,tria->neigh_no*sizeof(ts_triangle *));
 	if(tria->neigh == NULL){
+		fprintf(stderr,"Ooops: tria->neigh_no=%d\n",tria->neigh_no);
 		fatal("Reallocation of memory failed during removal of vertex neighbour in triangle_remove_neighbour",100);
 	}
 /* we repeat the procedure for neighbour */
@@ -168,6 +169,7 @@ ts_bool triangle_remove_neighbour(ts_triangle *tria, ts_triangle *ntria){
 //	fprintf(stderr,"*** ntria_number=%d\n",ntria->neigh_no);
     ntria->neigh=(ts_triangle **)realloc(ntria->neigh,ntria->neigh_no*sizeof(ts_triangle *));
 	if(ntria->neigh == NULL){
+		fprintf(stderr,"Ooops: ntria->neigh_no=%d\n",ntria->neigh_no);
 		fatal("Reallocation of memory failed during removal of vertex neighbour in triangle_remove_neighbour",100);
 	}
     return TS_SUCCESS;

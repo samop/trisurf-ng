@@ -19,9 +19,6 @@ ts_vesicle *initial_distribution_dipyramid(ts_uint nshell, ts_uint ncmax1, ts_ui
 	
     ts_vesicle *vesicle=init_vesicle(no_vertices,ncmax1,ncmax2,ncmax3,stepsize);
 
-//TODO: debugging only. Please remove ASAP!
-	vesicle->bending_rigidity=25.0;
-
     vesicle->nshell=nshell;
     retval = vtx_set_global_values(vesicle);
     retval = pentagonal_dipyramid_vertex_distribution(vesicle->vlist);
