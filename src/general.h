@@ -3,7 +3,6 @@
 
 #include<stdarg.h>
 #include<stdio.h>
-
 /* @brief This is a header file, defining general constants and structures.
   * @file header.h
   * @author Samo Penic
@@ -260,8 +259,9 @@ typedef struct {
 
 	ts_poly_list *poly_list;
 	ts_double spring_constant;
+	ts_double pressure;
+	ts_int pswitch;
 } ts_vesicle;
-
 
 
 

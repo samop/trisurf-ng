@@ -1,6 +1,8 @@
+#include "io.h"
+
+
 /** @brief initial bond length */
 #define A0 1.2 
-
 
 /** @brief Creates initial distribution of vertices
   *
@@ -10,6 +12,7 @@
 */
 ts_vesicle *initial_distribution_dipyramid(ts_uint nshell, ts_uint ncmax1, ts_uint ncmax2, ts_uint ncmax3, ts_double stepsize);
 
+ts_vesicle *create_vesicle_from_tape(ts_tape *tape);
 
 /** Sets the initial position of the vertexes to dipyramid
  *

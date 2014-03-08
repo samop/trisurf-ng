@@ -18,7 +18,7 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
     ts_double dist;
     ts_bool retval; 
     ts_uint cellidx; 
-    ts_double delta_energy,oenergy;
+    ts_double delta_energy,oenergy,dvol=0.0;
     ts_double costheta,sintheta,phi,r;
 	//This will hold all the information of vtx and its neighbours
 	ts_vertex backupvtx[20];
@@ -83,7 +83,9 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
 	memcpy((void *)&backupvtx[i+1],(void *)vtx->neigh[i],sizeof(ts_vertex));
 	}
 
-
+	if(vesicle->pswitch == 1){
+		for(i=0;i<vtx->tristar_no;i++) dvol-=vtx->tristar[i]->volume;
+	};
 
     delta_energy=0;
     //update the normals of triangles that share bead i.
@@ -97,6 +99,12 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
         energy_vertex(vtx->neigh[i]);
         delta_energy+=vtx->neigh[i]->xk*(vtx->neigh[i]->energy-oenergy);
     }
+
+	if(vesicle->pswitch == 1){
+		for(i=0;i<vtx->tristar_no;i++) dvol+=vtx->tristar[i]->volume;
+		delta_energy-=vesicle->pressure*dvol;
+	};
+
 /* No poly-bond energy for now!
 	if(vtx->grafted_poly!=NULL){
 		delta_energy+=

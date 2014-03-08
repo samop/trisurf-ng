@@ -19,67 +19,38 @@
 */
 
 int main(int argv, char *argc[]){
-ts_uint inititer,mcsweeps, iterations;
-ts_vesicle *vesicle, *vesicle1;
-/* THIS SHOULD GO INTO UNIT TEST
-ts_bool retval;
-    ts_vertex_list *vlist=init_vertex_list(5);
-ts_vertex_list *vlist1;
-ts_bond_list *blist=init_bond_list();
-ts_triangle_list *tlist=init_triangle_list();
-ts_cell_list *clist=init_cell_list(3,3,3,0.3);
+	ts_vesicle *vesicle;
+	ts_tape *tape;
+	ts_uint start_iteration=0;
+	parse_args(argv,argc); // sets global variable command_line_args (defined in io.h)
+	ts_fprintf(stdout,"Starting program...\n\n");
+	if(force_from_tape){
+		ts_fprintf(stdout,"************************************************\n");
+		ts_fprintf(stdout,"**** Generating initial geometry from tape *****\n");
+		ts_fprintf(stdout,"************************************************\n\n");
+		tape=parsetape("tape");
+		vesicle=create_vesicle_from_tape(tape);
+	} else {
 
-retval=vtx_add_cneighbour(blist,vlist->vtx[1],vlist->vtx[0]);
-if(retval==TS_FAIL) printf("1. already a member or vertex is null!\n");
+		ts_fprintf(stdout,"**********************************************************************\n");
+		ts_fprintf(stdout,"**** Recreating vesicle from dump file and continuing simulation *****\n");
+		ts_fprintf(stdout,"**********************************************************************\n\n");
+		tape=parsetape("tape");
+		vesicle=restore_state(&start_iteration);
 
-retval=vtx_add_neighbour(vlist->vtx[0],vlist->vtx[1]);
-if(retval==TS_FAIL) printf("2. already a member or vertex is null!\n");
-fprintf(stderr,"Was here");
-retval=vtx_remove_neighbour(vlist->vtx[1],vlist->vtx[0]);
-vtx_add_neighbour(vlist->vtx[0],vlist->vtx[1]);
-fprintf(stderr,"Was here too!\n");
+		if(command_line_args.reset_iteration_count) start_iteration=0;
+		else start_iteration++;
 
-vlist->vtx[0]->x=1.0;
-vlist->vtx[0]->x=1.1;
-vlist1=vertex_list_copy(vlist);
-bond_add(blist, vlist->vtx[1],vlist->vtx[0]);
-triangle_add(tlist,vlist->vtx[1],vlist->vtx[2],vlist->vtx[3]);
+		if(start_iteration>=tape->iterations){
+			ts_fprintf(stdout, "Simulation already completed. if you want to rerun it try with --force-from-tape or --reset-iteration-count\n\n");
+			return 0;
+		}
+	}
 
-triangle_add(tlist,vlist->vtx[1],vlist->vtx[2],vlist->vtx[3]);
-
-printf("Cell idx=1 has vertices=%u\n",clist->cell[0]->nvertex);
-cell_add_vertex(clist->cell[0], vlist->vtx[0]);
-printf("Cell idx=1 has vertices=%u\n",clist->cell[0]->nvertex);
-printf("Cell idx=1 has vertex[0] has x coordinate=%e\n",clist->cell[0]->vertex[0]->x);
-cell_list_cell_occupation_clear(clist);
-printf("Cell idx=1 has vertices=%u\n",clist->cell[0]->nvertex);
-cell_add_vertex(clist->cell[0], vlist->vtx[0]);
-
-
-triangle_list_free(tlist);
-bond_list_free(blist);
-vtx_list_free(vlist);
-cell_list_free(clist);
-
-vtx_list_free(vlist1);
-printf("Tests complete.\n");
-*/
-vesicle1=parsetape(&mcsweeps, &inititer, &iterations);
-
-/*Testing */
-//vesicle->poly_list=init_poly_list(1400,20,vesicle->vlist);
-
-//poly_list_free(vesicle->poly_list);
-/*End testing*/
-
-dump_state(vesicle1);
-
-vesicle=restore_state();
-//vesicle_free(vesicle1);
-run_simulation(vesicle1, mcsweeps, inititer, iterations);
-write_master_xml_file("test.pvd");
-write_dout_fcompat_file(vesicle,"dout");
-vesicle_free(vesicle);
-
-return 0; //program finished perfectly ok. We return 0.
+	run_simulation(vesicle, tape->mcsweeps, tape->inititer, tape->iterations, start_iteration);
+	write_master_xml_file("test.pvd");
+	write_dout_fcompat_file(vesicle,"dout");
+	vesicle_free(vesicle);
+	tape_free(tape);
+	return 0; //program finished perfectly ok. We return 0.
 } 

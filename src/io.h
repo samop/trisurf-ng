@@ -1,6 +1,49 @@
 #ifndef _IO_H
 #define _IO_H
 
+/** @ Global variables for I/O operations like filenames etc. */
+/*static char mastername[1024];
+static char prefixname[1024];
+static ts_bool restore=0;
+static char tape[1024]; */
+char path[1024];
+int force_from_tape;
+
+
+typedef struct {
+	long int nshell;
+	long int ncxmax;
+	long int ncymax;
+	long int nczmax;
+	long int npoly;
+	long int nmono;
+	long int pswitch;
+    	char *multiprocessing;
+   	long int brezveze0;
+    	long int brezveze1;
+    	long int brezveze2;
+    	ts_double xk0;
+	ts_double dmax;
+	ts_double stepsize;
+	ts_double kspring;
+	ts_double pressure;
+	long int iterations;
+	long int inititer;
+	long int mcsweeps;
+	long int quiet;
+} ts_tape;
+
+typedef struct{
+	ts_int force_from_tape;
+	ts_int reset_iteration_count;
+} ts_args;
+
+ts_args command_line_args;
+
+ts_bool parse_args(int argc, char **argv);
+
+
+
 /** @brief Prints the position of vertices for the whole list
  *  
  *  The function is meant more or less as a debug tool, but can be used in production
@@ -48,8 +91,9 @@ ts_bool read_tape_fcompat_file(ts_vesicle *vesicle, ts_char *filename);
 ts_bool write_vertex_vtk_file(ts_vesicle *vesicle,ts_char *filename, ts_char *text);
 ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno);
 ts_bool write_master_xml_file(ts_char *filename);
-ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations);
+ts_tape *parsetape(char *filename);
+ts_bool tape_free(ts_tape *tape);
 
-ts_bool dump_state(ts_vesicle *vesicle);
-ts_vesicle *restore_state();
+ts_bool dump_state(ts_vesicle *vesicle, ts_uint iteration);
+ts_vesicle *restore_state(ts_uint *iteration);
 #endif

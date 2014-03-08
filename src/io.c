@@ -11,11 +11,14 @@
 #include "initial_distribution.h"
 #include "poly.h"
 
-
-
+#include <getopt.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <errno.h>
 /** DUMP STATE TO DISK DRIVE **/
 
-ts_bool dump_state(ts_vesicle *vesicle){
+ts_bool dump_state(ts_vesicle *vesicle, ts_uint iteration){
 
     /* save current state with wrong pointers. Will fix that later */
     ts_uint i,j,k;
@@ -128,14 +131,15 @@ ts_bool dump_state(ts_vesicle *vesicle){
 */
 
 	fwrite(vesicle->clist, sizeof(ts_cell_list),1,  fh);
-
+	
+	fwrite(&iteration, sizeof(ts_uint),1,fh);
     fclose(fh);
     return TS_SUCCESS;
 }
 
 
 /** RESTORE DUMP FROM DISK **/
-ts_vesicle *restore_state(){
+ts_vesicle *restore_state(ts_uint *iteration){
     ts_uint i,j,k;
     FILE *fh=fopen("dump.bin","rb");
     ts_uint retval;
@@ -313,10 +317,112 @@ ts_vesicle *restore_state(){
         	vesicle->clist->cell[i]->idx=i+1; // We enumerate cells! Probably never required!
     	}
 
+	retval=fread(iteration,sizeof(ts_uint),1,fh);
     if(retval); 
     fclose(fh);
     return vesicle;
 }
+
+
+
+ts_bool parse_args(int argc, char **argv){
+ int c, retval;
+ DIR *dir;
+    path[0]=0;
+while (1)
+     {
+       static struct option long_options[] =
+         {
+           {"force-from-tape", no_argument,       &(command_line_args.force_from_tape), 1},
+	   {"reset-iteration-count", no_argument, &(command_line_args.reset_iteration_count), 1},
+           {"tape",     no_argument,       0, 't'},
+           {"output-file",  required_argument, 0, 'o'},
+           {"directory",  required_argument, 0, 'd'},
+           {"dump-file", required_argument,0, 'f'},
+           {0, 0, 0, 0}
+         };
+       /* getopt_long stores the option index here. */
+       int option_index = 0;
+
+       c = getopt_long (argc, argv, "d:fot",
+                        long_options, &option_index);
+
+       /* Detect the end of the options. */
+       if (c == -1)
+         break;
+
+       switch (c)
+         {
+         case 0:
+           /* If this option set a flag, do nothing else now. */
+           if (long_options[option_index].flag != 0)
+             break;
+           printf ("option %s", long_options[option_index].name);
+           if (optarg)
+             printf (" with arg %s", optarg);
+           printf ("\n");
+           break;
+
+         case 't':
+            //check if tape exists. If not, fail immediately.
+           puts ("option -t\n");
+           break;
+
+         case 'o':
+            //set filename of master output file
+           printf ("option -o with value `%s'\n", optarg);
+           break;
+
+         case 'd':
+            //check if directory exists. If not create one. If creation is
+            //successful, set directory for output files.
+            //printf ("option -d with value `%s'\n", optarg);
+            dir = opendir(optarg);
+            if (dir)
+            {
+                /* Directory exists. */
+                closedir(dir);
+            }
+            else if (ENOENT == errno)
+            {
+                /* Directory does not exist. */
+                retval=mkdir(optarg, 0700);
+                if(retval){
+                fatal("Could not create requested directory. Check if you have permissions",1);
+                }
+            }
+            else
+            {
+                /* opendir() failed for some other reason. */
+                fatal("Could not check if directory exists. Reason unknown",1);
+            }
+            ts_fprintf(stdout,"\n*** Using output directory: %s\n\n", optarg);
+//            sprintf(path,"%s", optarg);
+            strcpy(path, optarg);
+           // ts_fprintf(stdout,"ok!\n"); 
+
+           break;
+
+        case 'f':
+            //check if dump file specified exists. Defaults to dump.bin
+            break;
+
+         case '?':
+           /* getopt_long already printed an error message. */
+
+            ts_fprintf(stderr,"\n\nhere comes the help.\n\n");
+            fatal("Ooops, read help first",1);
+           break;
+
+         default:
+           exit (1);
+         }
+     }
+
+    return TS_SUCCESS;
+
+}
+
 
 
 
@@ -417,11 +523,11 @@ ts_bool fprint_vertex_data(FILE *fh,ts_vertex_list *vlist){
         fprintf(fh," %.17E\t%.17E\t%.17E\t%.17E\t%.17E\t%u\n",
         vlist->vtx[i]->xk,vlist->vtx[i]->c,vlist->vtx[i]->energy,
         vlist->vtx[i]->energy_h, vlist->vtx[i]->curvature, 0);
-        for(j=0;j<vlist->vtx[i]->neigh_no;j++){
+        for(j=0;j<vlist->vtx[i]->bond_no;j++){
             fprintf(fh," %.17E", vlist->vtx[i]->bond[j]->bond_length_dual);
         }
             fprintf(fh,"\n");
-        for(j=0;j<vlist->vtx[i]->neigh_no;j++){
+        for(j=0;j<vlist->vtx[i]->bond_no;j++){
             fprintf(fh," %.17E", vlist->vtx[i]->bond[j]->bond_length);
         }
             fprintf(fh,"\n");
@@ -647,74 +753,63 @@ ts_bool write_vertex_vtk_file(ts_vesicle *vesicle,ts_char *filename, ts_char *te
 
 
 
-ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations){
-    long int nshell=17,ncxmax=60, ncymax=60, nczmax=60, npoly=10, nmono=20;  // THIS IS DUE TO CONFUSE BUG!
-    char *buf=malloc(255*sizeof(char));
-    long int brezveze0=1;
+ts_tape *parsetape(char *filename){
+  //  long int nshell=17,ncxmax=60, ncymax=60, nczmax=60, npoly=10, nmono=20, pswitch=0;  // THIS IS DUE TO CONFUSE BUG!
+    ts_tape *tape=(ts_tape *)calloc(1,sizeof(ts_tape));
+    tape->multiprocessing=calloc(255,sizeof(char));
+  /*  long int brezveze0=1;
     long int brezveze1=1;
     long int brezveze2=1;
-    ts_double xk0=25.0, dmax=1.67,stepsize=0.15,kspring=800.0;
+    ts_double xk0=25.0, dmax=1.67,stepsize=0.15,kspring=800.0,pressure=0.0;
 	long int iter=1000, init=1000, mcsw=1000;
-
+*/	
 
     cfg_opt_t opts[] = {
-        CFG_SIMPLE_INT("nshell", &nshell),
-        CFG_SIMPLE_INT("npoly", &npoly),
-        CFG_SIMPLE_INT("nmono", &nmono),
-        CFG_SIMPLE_FLOAT("dmax", &dmax),
-        CFG_SIMPLE_FLOAT("xk0",&xk0),
-        CFG_SIMPLE_FLOAT("k_spring",&kspring),
-        CFG_SIMPLE_FLOAT("stepsize",&stepsize),
-        CFG_SIMPLE_INT("nxmax", &ncxmax),
-        CFG_SIMPLE_INT("nymax", &ncymax),
-        CFG_SIMPLE_INT("nzmax", &nczmax),
-        CFG_SIMPLE_INT("iterations",&iter),
-	CFG_SIMPLE_INT("mcsweeps",&mcsw),
-	CFG_SIMPLE_INT("inititer", &init),
-        CFG_SIMPLE_BOOL("quiet",&quiet),
-        CFG_SIMPLE_STR("multiprocessing",buf),
-        CFG_SIMPLE_INT("smp_cores",&brezveze0),
-        CFG_SIMPLE_INT("cluster_nodes",&brezveze1),
-        CFG_SIMPLE_INT("distributed_processes",&brezveze2),
+        CFG_SIMPLE_INT("nshell", &tape->nshell),
+        CFG_SIMPLE_INT("npoly", &tape->npoly),
+        CFG_SIMPLE_INT("nmono", &tape->nmono),
+        CFG_SIMPLE_FLOAT("dmax", &tape->dmax),
+        CFG_SIMPLE_FLOAT("xk0",&tape->xk0),
+	CFG_SIMPLE_INT("pswitch",&tape->pswitch),
+	CFG_SIMPLE_FLOAT("pressure",&tape->pressure),
+	CFG_SIMPLE_FLOAT("k_spring",&tape->kspring),
+        CFG_SIMPLE_FLOAT("stepsize",&tape->stepsize),
+        CFG_SIMPLE_INT("nxmax", &tape->ncxmax),
+        CFG_SIMPLE_INT("nymax", &tape->ncymax),
+        CFG_SIMPLE_INT("nzmax", &tape->nczmax),
+        CFG_SIMPLE_INT("iterations",&tape->iterations),
+	CFG_SIMPLE_INT("mcsweeps",&tape->mcsweeps),
+	CFG_SIMPLE_INT("inititer", &tape->inititer),
+        CFG_SIMPLE_BOOL("quiet",&tape->quiet),
+        CFG_SIMPLE_STR("multiprocessing",tape->multiprocessing),
+        CFG_SIMPLE_INT("smp_cores",&tape->brezveze0),
+        CFG_SIMPLE_INT("cluster_nodes",&tape->brezveze1),
+        CFG_SIMPLE_INT("distributed_processes",&tape->brezveze2),
         CFG_END()
     };
     cfg_t *cfg;    
     ts_uint retval;
     cfg = cfg_init(opts, 0);
-    retval=cfg_parse(cfg, "tape");
+    retval=cfg_parse(cfg, filename);
     if(retval==CFG_FILE_ERROR){
 	fatal("No tape file.",100);
 	}
     else if(retval==CFG_PARSE_ERROR){
 	fatal("Invalid tape!",100);
 	}
-	ts_vesicle *vesicle;
-    	*iterations=iter;
-	*inititer=init;
-	*mcsweeps=mcsw;
-	vesicle=initial_distribution_dipyramid(nshell,ncxmax,ncymax,nczmax,stepsize);
-	vesicle->poly_list=init_poly_list(npoly,nmono, vesicle->vlist);
-	vesicle->spring_constant=kspring;
-	poly_assign_spring_const(vesicle);
-	
-
-    vesicle->nshell=nshell;
-    vesicle->dmax=dmax*dmax;
-    vesicle->bending_rigidity=xk0;
-    vesicle->stepsize=stepsize;
-    vesicle->clist->ncmax[0]=ncxmax;
-    vesicle->clist->ncmax[1]=ncymax;
-    vesicle->clist->ncmax[2]=nczmax;
-    vesicle->clist->max_occupancy=8;
 
     cfg_free(cfg);
-	free(buf);
-  //  fprintf(stderr,"NSHELL=%u\n",vesicle->nshell);
 
-			
 
-    return vesicle;
+	/* global variables are set automatically */
+	quiet=tape->quiet;
+	return tape;
+}
 
+ts_bool tape_free(ts_tape *tape){
+	free(tape->multiprocessing);
+	free(tape);
+	return TS_SUCCESS;
 }
 
 
