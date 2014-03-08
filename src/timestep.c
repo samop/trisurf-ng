@@ -22,7 +22,7 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 		centermass(vesicle);
 		cell_occupation(vesicle);
 		ts_fprintf(stdout,"Done %d out of %d iterations (x %d MC sweeps).\n",i+1,inititer+iterations,mcsweeps);
-            dump_state(vesicle);
+            dump_state(vesicle,i);
 		if(i>inititer){
 			write_vertex_xml_file(vesicle,i-inititer);
 		}

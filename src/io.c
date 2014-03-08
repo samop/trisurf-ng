@@ -18,7 +18,7 @@
 #include <errno.h>
 /** DUMP STATE TO DISK DRIVE **/
 
-ts_bool dump_state(ts_vesicle *vesicle){
+ts_bool dump_state(ts_vesicle *vesicle, ts_uint iteration){
 
     /* save current state with wrong pointers. Will fix that later */
     ts_uint i,j,k;
@@ -131,14 +131,15 @@ ts_bool dump_state(ts_vesicle *vesicle){
 */
 
 	fwrite(vesicle->clist, sizeof(ts_cell_list),1,  fh);
-
+	
+	fwrite(&iteration, sizeof(ts_uint),1,fh);
     fclose(fh);
     return TS_SUCCESS;
 }
 
 
 /** RESTORE DUMP FROM DISK **/
-ts_vesicle *restore_state(){
+ts_vesicle *restore_state(ts_uint *iteration){
     ts_uint i,j,k;
     FILE *fh=fopen("dump.bin","rb");
     ts_uint retval;
@@ -316,6 +317,7 @@ ts_vesicle *restore_state(){
         	vesicle->clist->cell[i]->idx=i+1; // We enumerate cells! Probably never required!
     	}
 
+	retval=fread(iteration,sizeof(ts_uint),1,fh);
     if(retval); 
     fclose(fh);
     return vesicle;
@@ -750,80 +752,63 @@ ts_bool write_vertex_vtk_file(ts_vesicle *vesicle,ts_char *filename, ts_char *te
 
 
 
-ts_vesicle *parsetape(ts_uint *mcsweeps, ts_uint *inititer, ts_uint *iterations){
-    long int nshell=17,ncxmax=60, ncymax=60, nczmax=60, npoly=10, nmono=20, pswitch=0;  // THIS IS DUE TO CONFUSE BUG!
-    char *buf=malloc(255*sizeof(char));
-    long int brezveze0=1;
+ts_tape *parsetape(char *filename){
+  //  long int nshell=17,ncxmax=60, ncymax=60, nczmax=60, npoly=10, nmono=20, pswitch=0;  // THIS IS DUE TO CONFUSE BUG!
+    ts_tape *tape=(ts_tape *)calloc(1,sizeof(ts_tape));
+    tape->multiprocessing=calloc(255,sizeof(char));
+  /*  long int brezveze0=1;
     long int brezveze1=1;
     long int brezveze2=1;
     ts_double xk0=25.0, dmax=1.67,stepsize=0.15,kspring=800.0,pressure=0.0;
 	long int iter=1000, init=1000, mcsw=1000;
-
+*/	
 
     cfg_opt_t opts[] = {
-        CFG_SIMPLE_INT("nshell", &nshell),
-        CFG_SIMPLE_INT("npoly", &npoly),
-        CFG_SIMPLE_INT("nmono", &nmono),
-        CFG_SIMPLE_FLOAT("dmax", &dmax),
-        CFG_SIMPLE_FLOAT("xk0",&xk0),
-	CFG_SIMPLE_INT("pswitch",&pswitch),
-	CFG_SIMPLE_FLOAT("pressure",&pressure),
-	CFG_SIMPLE_FLOAT("k_spring",&kspring),
-        CFG_SIMPLE_FLOAT("stepsize",&stepsize),
-        CFG_SIMPLE_INT("nxmax", &ncxmax),
-        CFG_SIMPLE_INT("nymax", &ncymax),
-        CFG_SIMPLE_INT("nzmax", &nczmax),
-        CFG_SIMPLE_INT("iterations",&iter),
-	CFG_SIMPLE_INT("mcsweeps",&mcsw),
-	CFG_SIMPLE_INT("inititer", &init),
-        CFG_SIMPLE_BOOL("quiet",&quiet),
-        CFG_SIMPLE_STR("multiprocessing",buf),
-        CFG_SIMPLE_INT("smp_cores",&brezveze0),
-        CFG_SIMPLE_INT("cluster_nodes",&brezveze1),
-        CFG_SIMPLE_INT("distributed_processes",&brezveze2),
+        CFG_SIMPLE_INT("nshell", &tape->nshell),
+        CFG_SIMPLE_INT("npoly", &tape->npoly),
+        CFG_SIMPLE_INT("nmono", &tape->nmono),
+        CFG_SIMPLE_FLOAT("dmax", &tape->dmax),
+        CFG_SIMPLE_FLOAT("xk0",&tape->xk0),
+	CFG_SIMPLE_INT("pswitch",&tape->pswitch),
+	CFG_SIMPLE_FLOAT("pressure",&tape->pressure),
+	CFG_SIMPLE_FLOAT("k_spring",&tape->kspring),
+        CFG_SIMPLE_FLOAT("stepsize",&tape->stepsize),
+        CFG_SIMPLE_INT("nxmax", &tape->ncxmax),
+        CFG_SIMPLE_INT("nymax", &tape->ncymax),
+        CFG_SIMPLE_INT("nzmax", &tape->nczmax),
+        CFG_SIMPLE_INT("iterations",&tape->iterations),
+	CFG_SIMPLE_INT("mcsweeps",&tape->mcsweeps),
+	CFG_SIMPLE_INT("inititer", &tape->inititer),
+        CFG_SIMPLE_BOOL("quiet",&tape->quiet),
+        CFG_SIMPLE_STR("multiprocessing",tape->multiprocessing),
+        CFG_SIMPLE_INT("smp_cores",&tape->brezveze0),
+        CFG_SIMPLE_INT("cluster_nodes",&tape->brezveze1),
+        CFG_SIMPLE_INT("distributed_processes",&tape->brezveze2),
         CFG_END()
     };
     cfg_t *cfg;    
     ts_uint retval;
     cfg = cfg_init(opts, 0);
-    retval=cfg_parse(cfg, "tape");
+    retval=cfg_parse(cfg, filename);
     if(retval==CFG_FILE_ERROR){
 	fatal("No tape file.",100);
 	}
     else if(retval==CFG_PARSE_ERROR){
 	fatal("Invalid tape!",100);
 	}
-	ts_vesicle *vesicle;
-    	*iterations=iter;
-	*inititer=init;
-	*mcsweeps=mcsw;
-	vesicle=initial_distribution_dipyramid(nshell,ncxmax,ncymax,nczmax,stepsize);
-	vesicle->poly_list=init_poly_list(npoly,nmono, vesicle->vlist);
-	vesicle->spring_constant=kspring;
-	poly_assign_spring_const(vesicle);
-	
 
-    vesicle->nshell=nshell;
-    vesicle->dmax=dmax*dmax;
-    vesicle->bending_rigidity=xk0;
-    vtx_set_global_values(vesicle); //copies xk0 to every vertex
-
-
-    vesicle->stepsize=stepsize;
-    vesicle->clist->ncmax[0]=ncxmax;
-    vesicle->clist->ncmax[1]=ncymax;
-    vesicle->clist->ncmax[2]=nczmax;
-    vesicle->clist->max_occupancy=8;
-	vesicle->pressure=pressure/vesicle->bending_rigidity;	//all energy contributions need to be divided by bending_rigidity!
-    vesicle->pswitch=pswitch;
     cfg_free(cfg);
-	free(buf);
-  //  fprintf(stderr,"NSHELL=%u\n",vesicle->nshell);
 
-			
 
-    return vesicle;
+	/* global variables are set automatically */
+	quiet=tape->quiet;
+	return tape;
+}
 
+ts_bool tape_free(ts_tape *tape){
+	free(tape->multiprocessing);
+	free(tape);
+	return TS_SUCCESS;
 }
 
 
