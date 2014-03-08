@@ -21,6 +21,10 @@
 int main(int argv, char *argc[]){
 ts_uint inititer,mcsweeps, iterations;
 ts_vesicle *vesicle, *vesicle1;
+
+
+parse_args(argv,argc);
+
 /* THIS SHOULD GO INTO UNIT TEST
 ts_bool retval;
     ts_vertex_list *vlist=init_vertex_list(5);
@@ -64,19 +68,22 @@ cell_list_free(clist);
 vtx_list_free(vlist1);
 printf("Tests complete.\n");
 */
+if(force_from_tape){
+ts_fprintf(stdout,"****************************************************\n");
+ts_fprintf(stdout,"**** Reinitializing initial geometry from tape *****\n");
+ts_fprintf(stdout,"****************************************************\n\n");
+vesicle=parsetape(&mcsweeps, &inititer, &iterations);
+} else {
+
+ts_fprintf(stdout,"**********************************************************************\n");
+ts_fprintf(stdout,"**** Recreating vesicle from dump file and continuing simulation *****\n");
+ts_fprintf(stdout,"**********************************************************************\n\n");
 vesicle1=parsetape(&mcsweeps, &inititer, &iterations);
-
-/*Testing */
-//vesicle->poly_list=init_poly_list(1400,20,vesicle->vlist);
-
-//poly_list_free(vesicle->poly_list);
-/*End testing*/
-
-dump_state(vesicle1);
-
 vesicle=restore_state();
-//vesicle_free(vesicle1);
-run_simulation(vesicle1, mcsweeps, inititer, iterations);
+vesicle_free(vesicle1);
+}
+
+run_simulation(vesicle, mcsweeps, inititer, iterations);
 write_master_xml_file("test.pvd");
 write_dout_fcompat_file(vesicle,"dout");
 vesicle_free(vesicle);
