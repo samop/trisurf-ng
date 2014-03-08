@@ -38,7 +38,7 @@ int main(int argv, char *argc[]){
 		tape=parsetape("tape");
 		vesicle=restore_state(&start_iteration);
 
-		if(command_line_args.reset_iteration_count) start_iteration=0;
+		if(command_line_args.reset_iteration_count) start_iteration=tape->inititer+1;
 		else start_iteration++;
 
 		if(start_iteration>=tape->iterations){
