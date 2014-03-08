@@ -9,6 +9,37 @@ static char tape[1024]; */
 char path[1024];
 int force_from_tape;
 
+
+typedef struct {
+	long int nshell;
+	long int ncxmax;
+	long int ncymax;
+	long int nczmax;
+	long int npoly;
+	long int nmono;
+	long int pswitch;
+    	char *multiprocessing;
+   	long int brezveze0;
+    	long int brezveze1;
+    	long int brezveze2;
+    	ts_double xk0;
+	ts_double dmax;
+	ts_double stepsize;
+	ts_double kspring;
+	ts_double pressure;
+	long int iterations;
+	long int inititer;
+	long int mcsweeps;
+	long int quiet;
+} ts_tape;
+
+typedef struct{
+	ts_int force_from_tape;
+	ts_int reset_iteration_count;
+} ts_args;
+
+ts_args command_line_args;
+
 ts_bool parse_args(int argc, char **argv);
 
 

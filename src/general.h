@@ -265,29 +265,6 @@ typedef struct {
 
 
 
-typedef struct {
-	long int nshell;
-	long int ncxmax;
-	long int ncymax;
-	long int nczmax;
-	long int npoly;
-	long int nmono;
-	long int pswitch;
-    	char *multiprocessing;
-   	long int brezveze0;
-    	long int brezveze1;
-    	long int brezveze2;
-    	ts_double xk0;
-	ts_double dmax;
-	ts_double stepsize;
-	ts_double kspring;
-	ts_double pressure;
-	long int iterations;
-	long int inititer;
-	long int mcsweeps;
-	long int quiet;
-} ts_tape;
-
 /* GLOBAL VARIABLES */
 
 int quiet;

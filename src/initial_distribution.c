@@ -10,6 +10,7 @@
 #include "initial_distribution.h"
 #include "energy.h"
 #include "poly.h"
+#include "io.h"
 
 ts_vesicle *initial_distribution_dipyramid(ts_uint nshell, ts_uint ncmax1, ts_uint ncmax2, ts_uint ncmax3, ts_double stepsize){
 	ts_fprintf(stdout,"Starting initial_distribution on vesicle with %u shells!...\n",nshell);

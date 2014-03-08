@@ -333,7 +333,8 @@ while (1)
      {
        static struct option long_options[] =
          {
-           {"force-from-tape", no_argument,       &force_from_tape, 1},
+           {"force-from-tape", no_argument,       &(command_line_args.force_from_tape), 1},
+	   {"reset-iteration-count", no_argument, &(command_line_args.reset_iteration_count), 1},
            {"tape",     no_argument,       0, 't'},
            {"output-file",  required_argument, 0, 'o'},
            {"directory",  required_argument, 0, 'd'},

@@ -21,33 +21,36 @@
 int main(int argv, char *argc[]){
 	ts_vesicle *vesicle;
 	ts_tape *tape;
-	ts_uint start_iteration=-1;
-	parse_args(argv,argc);
-	ts_fprintf(stdout,"\nStarting program...\n\n");
-if(force_from_tape){
-ts_fprintf(stdout,"****************************************************\n");
-ts_fprintf(stdout,"**** Reinitializing initial geometry from tape *****\n");
-ts_fprintf(stdout,"****************************************************\n\n");
-tape=parsetape("tape");
-vesicle=create_vesicle_from_tape(tape);
-} else {
+	ts_uint start_iteration=0;
+	parse_args(argv,argc); // sets global variable command_line_args (defined in io.h)
+	ts_fprintf(stdout,"Starting program...\n\n");
+	if(force_from_tape){
+		ts_fprintf(stdout,"************************************************\n");
+		ts_fprintf(stdout,"**** Generating initial geometry from tape *****\n");
+		ts_fprintf(stdout,"************************************************\n\n");
+		tape=parsetape("tape");
+		vesicle=create_vesicle_from_tape(tape);
+	} else {
 
-ts_fprintf(stdout,"**********************************************************************\n");
-ts_fprintf(stdout,"**** Recreating vesicle from dump file and continuing simulation *****\n");
-ts_fprintf(stdout,"**********************************************************************\n\n");
-tape=parsetape("tape");
-vesicle=restore_state(&start_iteration);
+		ts_fprintf(stdout,"**********************************************************************\n");
+		ts_fprintf(stdout,"**** Recreating vesicle from dump file and continuing simulation *****\n");
+		ts_fprintf(stdout,"**********************************************************************\n\n");
+		tape=parsetape("tape");
+		vesicle=restore_state(&start_iteration);
 
-if(start_iteration>=tape->iterations){
-	ts_fprintf(stdout, "Simulation already completed. if you want to rerun it try with --force-from-tape or --reset-iteration-count\n\n");
-	return 0;
-}
-}
+		if(command_line_args.reset_iteration_count) start_iteration=0;
+		else start_iteration++;
 
-run_simulation(vesicle, tape->mcsweeps, tape->inititer, tape->iterations, start_iteration+1);
-write_master_xml_file("test.pvd");
-write_dout_fcompat_file(vesicle,"dout");
-vesicle_free(vesicle);
-tape_free(tape);
-return 0; //program finished perfectly ok. We return 0.
+		if(start_iteration>=tape->iterations){
+			ts_fprintf(stdout, "Simulation already completed. if you want to rerun it try with --force-from-tape or --reset-iteration-count\n\n");
+			return 0;
+		}
+	}
+
+	run_simulation(vesicle, tape->mcsweeps, tape->inititer, tape->iterations, start_iteration);
+	write_master_xml_file("test.pvd");
+	write_dout_fcompat_file(vesicle,"dout");
+	vesicle_free(vesicle);
+	tape_free(tape);
+	return 0; //program finished perfectly ok. We return 0.
 } 
