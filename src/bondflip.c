@@ -11,6 +11,7 @@
 #include "bondflip.h"
 //#include "io.h"
 #include<stdio.h>
+#include<string.h>
 
 ts_bool single_bondflip_timestep(ts_vesicle *vesicle, ts_bond *bond, ts_double *rn){
 /*c  Vertex and triangle (lm and lp) indexing for bond flip:
@@ -113,6 +114,43 @@ if(lm==NULL || lp==NULL) fatal("ts_flip_bond: Cannot find triangles lm and lp!",
     }
 
 if(lm2==NULL || lp1==NULL) fatal("ts_flip_bond: Cannot find triangles lm2 and lp1!",999);
+
+
+/* backup old structure */
+/* need to backup:
+ * vertices k, kp, km, it
+ * triangles lm, lp, lm2, lp1
+ * bond
+ */
+ts_vertex *bck_vtx[4];
+ts_triangle *bck_tria[4];
+ts_bond *bck_bond;
+ts_vertex *orig_vtx[]={k,it,kp,km};
+ts_triangle *orig_tria[]={lm,lp, lm2,lp1};
+
+fprintf(stderr,"Backuping!!!\n");
+for(i=0;i<4;i++){
+	bck_vtx[i]=(ts_vertex *)malloc(sizeof(ts_vertex));
+	bck_tria[i]=(ts_triangle *)malloc(sizeof(ts_triangle));
+	bck_bond=(ts_bond *)malloc(sizeof(ts_bond));
+	/* level 2 pointers */
+	bck_vtx[i]->neigh=(ts_vertex **)malloc(orig_vtx[i]->neigh_no*sizeof(ts_vertex *));
+	bck_vtx[i]->tristar=(ts_triangle **)malloc(orig_vtx[i]->tristar_no*sizeof(ts_triangle *));
+	bck_vtx[i]->bond=(ts_bond **)malloc(orig_vtx[i]->bond_no*sizeof(ts_bond *));
+	bck_tria[i]->neigh=(ts_triangle **)malloc(orig_tria[i]->neigh_no*sizeof(ts_triangle *));
+
+	bck_vtx[i]=memcpy(bck_vtx[i],orig_vtx[i],sizeof(ts_vertex));
+	bck_vtx[i]->neigh=memcpy(bck_vtx[i]->neigh,orig_vtx[i]->neigh,orig_vtx[i]->neigh_no*sizeof(ts_vertex *));
+	bck_vtx[i]->tristar=memcpy(bck_vtx[i]->tristar,orig_vtx[i]->tristar,orig_vtx[i]->tristar_no*sizeof(ts_triangle *));
+	bck_vtx[i]->bond=memcpy(bck_vtx[i]->bond,orig_vtx[i]->bond,orig_vtx[i]->bond_no*sizeof(ts_bond *));
+
+		
+	bck_tria[i]=memcpy(bck_tria[i],orig_tria[i],sizeof(ts_triangle));
+	bck_tria[i]->neigh=memcpy(bck_tria[i]->neigh,orig_tria[i]->neigh,orig_tria[i]->neigh_no*sizeof(ts_triangle *));	
+}
+	bck_bond=memcpy(bck_bond,bond,sizeof(ts_bond));
+fprintf(stderr,"Backup complete!!!\n");
+/* end backup vertex */
 	
 /* Save old energy */
   oldenergy=0;
@@ -157,13 +195,52 @@ if(lm2==NULL || lp1==NULL) fatal("ts_flip_bond: Cannot find triangles lm2 and lp
             //not accepted, reverting changes
 //            fprintf(stderr,"Failed to move, due to MC\n");
 
-            ts_flip_bond(kp,km,k,it, bond, lm,lp,lm2,lp1);
+      //      ts_flip_bond(kp,km,k,it, bond, lm,lp,lm2,lp1);
 //    fprintf(stderr,"%e, %e, %e\n", lp->xnorm, lp->ynorm, lp->znorm);
+
+	//restore all backups
+            fprintf(stderr,"Restoring!!!\n");
+
+for(i=0;i<4;i++){
+	/* level 2 pointers */
+	orig_vtx[i]=memcpy(orig_vtx[i],bck_vtx[i],sizeof(ts_vertex));
+	orig_vtx[i]->neigh=memcpy(orig_vtx[i]->neigh,bck_vtx[i]->neigh,bck_vtx[i]->neigh_no*sizeof(ts_vertex *));
+	orig_vtx[i]->tristar=memcpy(orig_vtx[i]->tristar,bck_vtx[i]->tristar,bck_vtx[i]->tristar_no*sizeof(ts_triangle *));
+	orig_vtx[i]->bond=memcpy(orig_vtx[i]->bond,bck_vtx[i]->bond,bck_vtx[i]->bond_no*sizeof(ts_bond *));
+
+		
+	orig_tria[i]=memcpy(orig_tria[i],bck_tria[i],sizeof(ts_triangle));
+	orig_tria[i]->neigh=memcpy(orig_tria[i]->neigh,bck_tria[i]->neigh,bck_tria[i]->neigh_no*sizeof(ts_triangle *));	
+}
+	bond=memcpy(bond,bck_bond,sizeof(ts_bond));
+
+
+	for(i=0;i<4;i++){
+		vtx_free(bck_vtx[i]);
+
+ 	free(bck_tria[i]->neigh);
+        free(bck_tria[i]);
+		
+	}
+		free(bck_bond);
+
+            fprintf(stderr,"Restoration complete!!!\n");
+
             return TS_FAIL;
         }
     }
      /* IF BONDFLIP ACCEPTED, THEN RETURN SUCCESS! */
-//            fprintf(stderr,"SUCCESS!!!\n");
+            fprintf(stderr,"SUCCESS!!!\n");
+
+	// delete all backups
+	for(i=0;i<4;i++){
+		vtx_free(bck_vtx[i]);
+
+ 	free(bck_tria[i]->neigh);
+        free(bck_tria[i]);
+		
+	}
+		free(bck_bond);
     return TS_SUCCESS;
 }
 
