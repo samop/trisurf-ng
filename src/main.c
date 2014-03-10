@@ -39,10 +39,10 @@ int main(int argv, char *argc[]){
 		tape=parsetape("tape");
 		vesicle=restore_state(&start_iteration);
 		// nove vrednosti iz tapea...
-/*	vesicle->bending_stiffness=tape->xk0;
-		set_global_values(tape->xk0);
+		vesicle->bending_rigidity=tape->xk0;
+		vtx_set_global_values(vesicle);
 		vesicle->pressure=tape->pressure;
-*/
+
 		if(command_line_args.reset_iteration_count) start_iteration=tape->inititer+1;
 		else start_iteration++;
 
