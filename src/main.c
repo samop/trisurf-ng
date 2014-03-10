@@ -22,9 +22,10 @@ int main(int argv, char *argc[]){
 	ts_vesicle *vesicle;
 	ts_tape *tape;
 	ts_uint start_iteration=0;
+	force_from_tape=0;
 	parse_args(argv,argc); // sets global variable command_line_args (defined in io.h)
 	ts_fprintf(stdout,"Starting program...\n\n");
-	if(force_from_tape){
+	if(command_line_args.force_from_tape){
 		ts_fprintf(stdout,"************************************************\n");
 		ts_fprintf(stdout,"**** Generating initial geometry from tape *****\n");
 		ts_fprintf(stdout,"************************************************\n\n");
@@ -37,7 +38,11 @@ int main(int argv, char *argc[]){
 		ts_fprintf(stdout,"**********************************************************************\n\n");
 		tape=parsetape("tape");
 		vesicle=restore_state(&start_iteration);
-
+		// nove vrednosti iz tapea...
+/*	vesicle->bending_stiffness=tape->xk0;
+		set_global_values(tape->xk0);
+		vesicle->pressure=tape->pressure;
+*/
 		if(command_line_args.reset_iteration_count) start_iteration=tape->inititer+1;
 		else start_iteration++;
 
