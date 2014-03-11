@@ -38,6 +38,10 @@ int main(int argv, char *argc[]){
 		ts_fprintf(stdout,"**********************************************************************\n\n");
 		tape=parsetape("tape");
 		vesicle=restore_state(&start_iteration);
+        if(vesicle==NULL){
+            ts_fprintf(stderr, "Dump file does not exist or is not a regular file! Did you mean to invoke trisurf with --force-from-tape option?\n\n");
+            return 1;
+        }
 		// nove vrednosti iz tapea...
 		vesicle->bending_rigidity=tape->xk0;
 		vtx_set_global_values(vesicle);

@@ -142,6 +142,20 @@ ts_bool dump_state(ts_vesicle *vesicle, ts_uint iteration){
 ts_vesicle *restore_state(ts_uint *iteration){
     ts_uint i,j,k;
     FILE *fh=fopen("dump.bin","rb");
+
+    struct stat sb;
+    if (stat("dump.bin", &sb) == -1) {
+        //dump file does not exist.
+        return NULL;
+    }
+
+    //check if it is regular file
+    if((sb.st_mode & S_IFMT) != S_IFREG) {
+        //dump file is not a regular file.
+        ts_fprintf(stderr,"Dump file is not a regular file!\n");
+        return NULL;
+    }
+
     ts_uint retval;
 	ts_uint idx;
 
@@ -326,9 +340,14 @@ ts_vesicle *restore_state(ts_uint *iteration){
 
 
 ts_bool parse_args(int argc, char **argv){
- int c, retval;
- DIR *dir;
-    path[0]=0;
+    int c, retval;
+    struct stat sb;
+    sprintf(command_line_args.path, "./"); //clear string;
+    sprintf(command_line_args.output_fullfilename,"./output.pvd");
+    sprintf(command_line_args.dump_fullfilename,"./dump.bin");
+    sprintf(command_line_args.tape_fullfilename,"./tape");
+            FILE *file;
+    
 while (1)
      {
        static struct option long_options[] =
@@ -338,13 +357,13 @@ while (1)
            {"tape",     no_argument,       0, 't'},
            {"output-file",  required_argument, 0, 'o'},
            {"directory",  required_argument, 0, 'd'},
-           {"dump-file", required_argument,0, 'f'},
+           {"dump-filename", required_argument,0, 'f'},
            {0, 0, 0, 0}
          };
        /* getopt_long stores the option index here. */
        int option_index = 0;
 
-       c = getopt_long (argc, argv, "d:fot",
+       c = getopt_long (argc, argv, "d:f:o:t:",
                         long_options, &option_index);
 
        /* Detect the end of the options. */
@@ -365,46 +384,56 @@ while (1)
 
          case 't':
             //check if tape exists. If not, fail immediately.
-           puts ("option -t\n");
+            if (stat(optarg, &sb) == -1) {
+                ts_fprintf(stderr,"Tape '%s' does not exist!\n",optarg);
+                fatal("Please select correct tape",1);
+            } else {
+                strcpy(command_line_args.tape_fullfilename,optarg);
+            }
            break;
 
          case 'o':
             //set filename of master output file
-           printf ("option -o with value `%s'\n", optarg);
-           break;
+            if ((file = fopen(optarg, "w")) == NULL) {
+                fprintf(stderr,"Could not create output file!\n");
+                fatal("Please specify correct output file",1);
+                
+            } else {
+                fclose(file);
+            }
+            strcpy(command_line_args.output_fullfilename, optarg);
+            break;
 
          case 'd':
             //check if directory exists. If not create one. If creation is
             //successful, set directory for output files.
             //printf ("option -d with value `%s'\n", optarg);
-            dir = opendir(optarg);
-            if (dir)
-            {
-                /* Directory exists. */
-                closedir(dir);
-            }
-            else if (ENOENT == errno)
-            {
-                /* Directory does not exist. */
+            if (stat(optarg, &sb) == -1) {
+                //directory does not exist
                 retval=mkdir(optarg, 0700);
                 if(retval){
-                fatal("Could not create requested directory. Check if you have permissions",1);
+                    fatal("Could not create requested directory. Check if you have permissions",1);
                 }
             }
-            else
-            {
-                /* opendir() failed for some other reason. */
-                fatal("Could not check if directory exists. Reason unknown",1);
+            //check if is a proper directory
+            else if((sb.st_mode & S_IFMT) != S_IFDIR) {
+                //it is not a directory. fatal error.
+                ts_fprintf(stderr,"%s is not a directory!\n",optarg);
+                fatal("Cannot continue",1);
             }
-            ts_fprintf(stdout,"\n*** Using output directory: %s\n\n", optarg);
-//            sprintf(path,"%s", optarg);
-            strcpy(path, optarg);
-           // ts_fprintf(stdout,"ok!\n"); 
-
+            strcpy(command_line_args.path, optarg);
            break;
 
         case 'f':
             //check if dump file specified exists. Defaults to dump.bin
+            if ((file = fopen(optarg, "w")) == NULL) {
+                fprintf(stderr,"Could not create dump file!\n");
+                fatal("Please specify correct dump file",1);
+                
+            } else {
+                fclose(file);
+            }
+            strcpy(command_line_args.dump_fullfilename, optarg);
             break;
 
          case '?':

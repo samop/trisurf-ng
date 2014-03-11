@@ -6,7 +6,6 @@
 static char prefixname[1024];
 static ts_bool restore=0;
 static char tape[1024]; */
-char path[1024];
 int force_from_tape;
 
 
@@ -36,6 +35,10 @@ typedef struct {
 typedef struct{
 	ts_int force_from_tape;
 	ts_int reset_iteration_count;
+    char path[1024]; //path where all files should be added
+    char output_fullfilename[1024]; //name of the master file
+    char dump_fullfilename[1024]; //name of the dump file
+    char tape_fullfilename[1024]; //name of the tape file
 } ts_args;
 
 ts_args command_line_args;
