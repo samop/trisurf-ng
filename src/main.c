@@ -48,7 +48,7 @@ int main(int argv, char *argc[]){
 		vesicle->pressure=tape->pressure;
 		vesicle->dmax=tape->dmax*tape->dmax;
 
-		if(command_line_args.reset_iteration_count) start_iteration=tape->inititer+1;
+		if(command_line_args.reset_iteration_count) start_iteration=tape->inititer-1;
 		else start_iteration++;
 
 		if(start_iteration>=tape->iterations){
