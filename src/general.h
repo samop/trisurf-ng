@@ -256,11 +256,17 @@ typedef struct {
    	ts_double cm[3];
 	ts_double volume;
 	ts_spharm *sphHarmonics;
-
+// Polymers outside the vesicle and attached to the vesicle membrane (polymer brush):
 	ts_poly_list *poly_list;
+// Filaments inside the vesicle (not attached to the vesicel membrane:
+	ts_poly_list *filament_list;
+
 	ts_double spring_constant;
 	ts_double pressure;
 	ts_int pswitch;
+
+	ts_double R_nucleus;
+
 } ts_vesicle;
 
 

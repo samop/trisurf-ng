@@ -38,7 +38,7 @@ ts_vesicle *initial_distribution_dipyramid(ts_uint nshell, ts_uint ncmax1, ts_ui
 ts_vesicle *create_vesicle_from_tape(ts_tape *tape){
 	ts_vesicle *vesicle;
 	vesicle=initial_distribution_dipyramid(tape->nshell,tape->ncxmax,tape->ncymax,tape->nczmax,tape->stepsize);
-	vesicle->poly_list=init_poly_list(tape->npoly,tape->nmono, vesicle->vlist);
+	vesicle->poly_list=init_poly_list(tape->npoly,tape->nmono, vesicle->vlist, vesicle);
 	vesicle->spring_constant=tape->kspring;
 	poly_assign_spring_const(vesicle);
 	
