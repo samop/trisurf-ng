@@ -38,9 +38,24 @@ ts_vesicle *initial_distribution_dipyramid(ts_uint nshell, ts_uint ncmax1, ts_ui
 ts_vesicle *create_vesicle_from_tape(ts_tape *tape){
 	ts_vesicle *vesicle;
 	vesicle=initial_distribution_dipyramid(tape->nshell,tape->ncxmax,tape->ncymax,tape->nczmax,tape->stepsize);
+	// Nucleus:
+	vesicle->R_nucleus=tape->R_nucleus;
+	//Initialize grafted polymers (brush):
 	vesicle->poly_list=init_poly_list(tape->npoly,tape->nmono, vesicle->vlist, vesicle);
 	vesicle->spring_constant=tape->kspring;
 	poly_assign_spring_const(vesicle);
+	//Initialize filaments (polymers inside the vesicle):
+	vesicle->filament_list=init_poly_list(tape->nfil,tape->nfono, NULL, vesicle);
+ts_uint i,j;
+	for(i=0;i<vesicle->filament_list->n;i++){
+			for(j=0;j<vesicle->filament_list->poly[i]->vlist->n;j++){
+
+	fprintf(stderr,"%e %e %e\n", vesicle->filament_list->poly[i]->vlist->vtx[j]->x,vesicle->filament_list->poly[i]->vlist->vtx[j]->y, vesicle->filament_list->poly[i]->vlist->vtx[j]->z );
+	}
+	}
+//	vesicle->spring_constant=tape->kspring;
+//	poly_assign_spring_const(vesicle);
+
 	
 	vesicle->nshell=tape->nshell;
 	vesicle->dmax=tape->dmax*tape->dmax; /* dmax^2 in the vesicle dmax variable */

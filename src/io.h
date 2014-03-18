@@ -16,6 +16,9 @@ typedef struct {
 	long int nczmax;
 	long int npoly;
 	long int nmono;
+	long int nfil;
+	long int nfono;
+	long int R_nucleus;
 	long int pswitch;
     	char *multiprocessing;
    	long int brezveze0;

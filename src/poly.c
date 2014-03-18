@@ -97,14 +97,14 @@ ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vli
 	else
 	{
 	/* Make filaments inside the vesicle. Helix with radius... Dist. between poly vertices put to 1*/
-		dphi = 2*asin(1/2/vesicle->R_nucleus)*1.001;
-		dh = dphi/2/M_PI*1.001;
+		dphi = 2.0*asin(1.0/2.0/vesicle->R_nucleus)*1.001;
+		dh = dphi/2.0/M_PI*1.001;
 		for(i=0;i<poly_list->n;i++){
 			for (j=0;j<poly_list->poly[i]->vlist->n;j++){
 				ji = j + i*poly_list->poly[i]->vlist->n;
 				poly_list->poly[i]->vlist->vtx[j]->x = vesicle->R_nucleus*cos(ji*dphi);
 				poly_list->poly[i]->vlist->vtx[j]->y = vesicle->R_nucleus*sin(ji*dphi);
-				poly_list->poly[i]->vlist->vtx[j]->z = ji*dh;
+				poly_list->poly[i]->vlist->vtx[j]->z = ji*dh - (dh*poly_list->n*poly_list->poly[i]->vlist->n/2.0);
 			}
 		}
 	}

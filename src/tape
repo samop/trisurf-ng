@@ -23,12 +23,15 @@ nmono=10
 k_spring=800
 
 ####### Filament (inside the vesicle) definitions ###########
-# npoly is a number of polymers attached to npoly distinct vertices on vesicle
-nfil=0
-# nmono is a number of monomers in each filament
-nfono=10
+# nfil is a number of filaments inside the vesicle
+nfil=1
+# nfono is a number of monomers in each filament
+nfono=300
 # Spring constant between monomers of the filament
-k_sfring=800
+
+####### Nucleus (inside the vesicle) ###########
+# Radius of an impenetrable hard sphere inside the vesicle
+R_nucleus=5
 
 #######  Cell definitions ############
 nxmax=60
@@ -38,11 +41,11 @@ nzmax=60
 
 ####### Program Control ############
 #how many MC sweeps between subsequent records of states to disk
-mcsweeps=5000
+mcsweeps=300
 #how many initial mcsweeps*inititer MC sweeps before recording to disk?
-inititer=1
+inititer=0
 #how many records do you want on the disk iteration are there in a run?
-iterations=1000
+iterations=300
 
 
 #shut up if we are using cluster!!!

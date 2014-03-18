@@ -664,8 +664,8 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 	/* Here comes header of the file */
 
 	//find number of extra vtxs and bonds of polymeres
-	ts_uint monono=0, polyno=0, poly_idx=0;
-	ts_bool poly=0;
+	ts_uint monono=0, polyno=0, poly_idx=0, filno=0, fonono=0;
+	ts_bool poly=0, fil=0;
 	if(vesicle->poly_list!=NULL){
 		if(vesicle->poly_list->poly[0]!=NULL){
 		polyno=vesicle->poly_list->n;
@@ -673,8 +673,17 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 		poly=1;
 		}
 	}
+
+	if(vesicle->filament_list!=NULL){
+		if(vesicle->filament_list->poly[0]!=NULL){
+		filno=vesicle->filament_list->n;
+		fonono=vesicle->filament_list->poly[0]->vlist->n;
+		fil=1;
+		}
+	}
+
 	fprintf(fh, "<?xml version=\"1.0\"?>\n<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\" compressor=\"vtkZLibDataCompressor\">\n <UnstructuredGrid>\n");
-    fprintf(fh, "<Piece NumberOfPoints=\"%u\" NumberOfCells=\"%u\">\n",vlist->n+monono*polyno, blist->n+monono*polyno);
+    fprintf(fh, "<Piece NumberOfPoints=\"%u\" NumberOfCells=\"%u\">\n",vlist->n+monono*polyno+fonono*filno, blist->n+monono*polyno+filno*(fonono-1));
     fprintf(fh,"<PointData Scalars=\"scalars\">\n<DataArray type=\"Int64\" Name=\"scalars\" format=\"ascii\">");
    	for(i=0;i<vlist->n;i++){
 		fprintf(fh,"%u ",vtx[i]->idx);
@@ -684,6 +693,16 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 		poly_idx=vlist->n;
 		for(i=0;i<vesicle->poly_list->n;i++){
 			for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++,poly_idx++){
+				fprintf(fh,"%u ", poly_idx);
+			}
+		}
+	}
+	//filaments
+	if(fil){
+		poly_idx=vlist->n+monono*polyno;
+		for(i=0;i<vesicle->filament_list->n;i++){
+			for(j=0;j<vesicle->filament_list->poly[i]->vlist->n;j++,poly_idx++){
+	//	fprintf(stderr,"was here\n");
 				fprintf(fh,"%u ", poly_idx);
 			}
 		}
@@ -698,6 +717,14 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 		for(i=0;i<vesicle->poly_list->n;i++){
 			for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++){
 				fprintf(fh,"%e %e %e\n", vesicle->poly_list->poly[i]->vlist->vtx[j]->x,vesicle->poly_list->poly[i]->vlist->vtx[j]->y, vesicle->poly_list->poly[i]->vlist->vtx[j]->z );
+			}
+		}
+	}
+	//filaments
+	if(fil){
+		for(i=0;i<vesicle->filament_list->n;i++){
+			for(j=0;j<vesicle->filament_list->poly[i]->vlist->n;j++){
+				fprintf(fh,"%e %e %e\n", vesicle->filament_list->poly[i]->vlist->vtx[j]->x,vesicle->filament_list->poly[i]->vlist->vtx[j]->y, vesicle->filament_list->poly[i]->vlist->vtx[j]->z );
 			}
 		}
 	}
@@ -720,14 +747,26 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 
 	}
 	
+	//filaments
+	if(fil){
+		poly_idx=vlist->n+monono*polyno;
+		for(i=0;i<vesicle->filament_list->n;i++){
+			for(j=0;j<vesicle->filament_list->poly[i]->blist->n;j++){
+				fprintf(fh,"%u %u\n", vesicle->filament_list->poly[i]->blist->bond[j]->vtx1->idx+vlist->n+monono*polyno+i*fonono,vesicle->filament_list->poly[i]->blist->bond[j]->vtx2->idx+vlist->n+monono*polyno+i*fonono);
+//		fprintf(stderr,"was here\n");
+			
+			}
+		}
+
+	}
 
     fprintf(fh,"</DataArray>\n<DataArray type=\"Int64\" Name=\"offsets\" format=\"ascii\">");
-    for (i=2;i<(blist->n+monono*polyno)*2+1;i+=2){
+    for (i=2;i<(blist->n+monono*polyno+(fonono-1)*filno)*2+1;i+=2){
     fprintf(fh,"%u ",i);
     }
     fprintf(fh,"\n");
     fprintf(fh,"</DataArray>\n<DataArray type=\"UInt8\" Name=\"types\" format=\"ascii\">\n");
-     for (i=0;i<blist->n+monono*polyno;i++){
+     for (i=0;i<blist->n+monono*polyno+fonono*filno;i++){
         fprintf(fh,"3 ");
     }
 
@@ -797,7 +836,10 @@ ts_tape *parsetape(char *filename){
         CFG_SIMPLE_INT("nshell", &tape->nshell),
         CFG_SIMPLE_INT("npoly", &tape->npoly),
         CFG_SIMPLE_INT("nmono", &tape->nmono),
-        CFG_SIMPLE_FLOAT("dmax", &tape->dmax),
+	CFG_SIMPLE_INT("nfil",&tape->nfil),
+	CFG_SIMPLE_INT("nfono",&tape->nfono),
+	CFG_SIMPLE_INT("R_nucleus",&tape->R_nucleus),
+	CFG_SIMPLE_FLOAT("dmax", &tape->dmax),
         CFG_SIMPLE_FLOAT("xk0",&tape->xk0),
 	CFG_SIMPLE_INT("pswitch",&tape->pswitch),
 	CFG_SIMPLE_FLOAT("pressure",&tape->pressure),
