@@ -27,7 +27,8 @@ k_spring=800
 nfil=1
 # nfono is a number of monomers in each filament
 nfono=300
-# Spring constant between monomers of the filament
+# Persistence lenght of the filaments (in units l_min)
+xi=10
 
 ####### Nucleus (inside the vesicle) ###########
 # Radius of an impenetrable hard sphere inside the vesicle

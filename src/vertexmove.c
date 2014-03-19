@@ -262,12 +262,14 @@ ts_bool single_filament_vertex_move(ts_vesicle *vesicle,ts_poly *poly,ts_vertex 
 	ts_uint i;
 	ts_bool retval; 
 	ts_uint cellidx; 
-//	ts_double delta_energy;
+	ts_double delta_energy;
 	ts_double costheta,sintheta,phi,r;
 	ts_double dist[2];
 	//This will hold all the information of vtx and its neighbours
-	ts_vertex backupvtx;
+	ts_vertex backupvtx,backupneigh[2];
 	ts_bond backupbond[2];
+
+	//backup vertex:		
 	memcpy((void *)&backupvtx,(void *)vtx,sizeof(ts_vertex));
 
 	//random move in a sphere with radius stepsize:
@@ -305,26 +307,30 @@ ts_bool single_filament_vertex_move(ts_vesicle *vesicle,ts_poly *poly,ts_vertex 
 		memcpy(&backupbond[i],vtx->bond[i], sizeof(ts_bond));
 		vtx->bond[i]->bond_length=sqrt(dist[i]);
 		bond_vector(vtx->bond[i]);
-		
+	}
+
+	//backup neighboring vertices:
+	for(i=0;i<vtx->neigh_no;i++){
+		memcpy(&backupneigh[i],vtx->neigh[i], sizeof(ts_vertex));
 	}
 	
 	//if all the tests are successful, then energy for vtx and neighbours is calculated
-//	delta_energy=0;
-/*	for(i=0;i<vtx->neigh_no;i++){
-//		memcpy((void *)&backupbond[i],(void *)vtx->bond[i],sizeof(ts_bond));
-		xp = vtx->neigh[i]
-		vtx->bond[i]->bond_length=sqrt(vtx_distance_sq(vtx->bond[i]->vtx1,vtx->bond[i]->vtx2));
-		bond_energy(vtx->bond[i],poly);
-		delta_energy+= vtx->bond[i]->energy - backupbond[i].energy;
+	delta_energy=0;
+	
+	if(vtx->bond_no == 2){
+		vtx->energy = -(vtx->bond[0]->x*vtx->bond[1]->x + vtx->bond[0]->y*vtx->bond[1]->y + vtx->bond[0]->z*vtx->bond[1]->z)/vtx->bond[0]->bond_length/vtx->bond[1]->bond_length;
+		delta_energy += vtx->energy - backupvtx.energy;
 	}
 
-	if(vtx==poly->vlist->vtx[0]){
-		delta_energy+=
-			(pow(sqrt(vtx_distance_sq(vtx, poly->grafted_vtx)-1),2)-
-			pow(sqrt(vtx_distance_sq(&backupvtx, poly->grafted_vtx)-1),2)) *poly->k;
-		
+	for(i=0;i<vtx->neigh_no;i++){
+		if(vtx->neigh[i]->bond_no == 2){
+			vtx->neigh[i]->energy = -(vtx->neigh[i]->bond[0]->x*vtx->neigh[i]->bond[1]->x + vtx->neigh[i]->bond[0]->y*vtx->neigh[i]->bond[1]->y + vtx->neigh[i]->bond[0]->z*vtx->neigh[i]->bond[1]->z)/vtx->neigh[i]->bond[0]->bond_length/vtx->neigh[i]->bond[1]->bond_length;
+			delta_energy += vtx->neigh[i]->energy - backupneigh[i].energy;
+		}
 	}
 
+	// poly->k is filament persistence length (in units l_min)
+	delta_energy *= poly->k;
 
 	if(delta_energy>=0){
 #ifdef TS_DOUBLE_DOUBLE
@@ -339,15 +345,18 @@ ts_bool single_filament_vertex_move(ts_vesicle *vesicle,ts_poly *poly,ts_vertex 
     	{
 	//not accepted, reverting changes
 	vtx=memcpy((void *)vtx,(void *)&backupvtx,sizeof(ts_vertex));
+	for(i=0;i<vtx->neigh_no;i++){
+		memcpy(vtx->neigh[i],&backupneigh[i],sizeof(ts_vertex));
+	}
 	for(i=0;i<vtx->bond_no;i++){
-	vtx->bond[i]=memcpy((void *)vtx->bond[i],(void *)&backupbond[i],sizeof(ts_bond));
+		vtx->bond[i]=memcpy((void *)vtx->bond[i],(void *)&backupbond[i],sizeof(ts_bond));
 	}
 
     return TS_FAIL; 
 	}
 	}
 	
-*/	
+	
 //	oldcellidx=vertex_self_avoidance(vesicle, &backupvtx[0]);
 	if(vtx->cell!=vesicle->clist->cell[cellidx]){
 		retval=cell_add_vertex(vesicle->clist->cell[cellidx],vtx);
