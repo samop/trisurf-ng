@@ -38,9 +38,9 @@ ts_bond  *bond_add(ts_bond_list *blist, ts_vertex *vtx1, ts_vertex *vtx2){
 
 ts_bool bond_vector(ts_bond *bond){
 	
-	bond->x=bond->vtx1->x-bond->vtx2->x;
-	bond->y=bond->vtx1->y-bond->vtx2->y;
-	bond->z=bond->vtx1->z-bond->vtx2->z;
+	bond->x = bond->vtx1->x - bond->vtx2->x;
+	bond->y = bond->vtx1->y - bond->vtx2->y;
+	bond->z = bond->vtx1->z - bond->vtx2->z;
 
 	return TS_SUCCESS;	
 }

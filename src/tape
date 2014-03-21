@@ -26,9 +26,9 @@ k_spring=800
 # nfil is a number of filaments inside the vesicle
 nfil=1
 # nfono is a number of monomers in each filament
-nfono=300
+nfono=30
 # Persistence lenght of the filaments (in units l_min)
-xi=10
+xi=0
 
 ####### Nucleus (inside the vesicle) ###########
 # Radius of an impenetrable hard sphere inside the vesicle
@@ -46,7 +46,7 @@ mcsweeps=300
 #how many initial mcsweeps*inititer MC sweeps before recording to disk?
 inititer=0
 #how many records do you want on the disk iteration are there in a run?
-iterations=300
+iterations=30
 
 
 #shut up if we are using cluster!!!
