@@ -16,6 +16,9 @@ typedef struct {
 	long int nczmax;
 	long int npoly;
 	long int nmono;
+	long int nfil;
+	long int nfono;
+	long int R_nucleus;
 	long int pswitch;
     	char *multiprocessing;
    	long int brezveze0;
@@ -25,6 +28,7 @@ typedef struct {
 	ts_double dmax;
 	ts_double stepsize;
 	ts_double kspring;
+	ts_double xi;
 	ts_double pressure;
 	long int iterations;
 	long int inititer;

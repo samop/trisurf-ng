@@ -47,6 +47,7 @@ int main(int argv, char *argc[]){
 		vtx_set_global_values(vesicle);
 		vesicle->pressure=tape->pressure;
 		vesicle->dmax=tape->dmax*tape->dmax;
+		poly_assign_filament_xi(vesicle,tape);
 
 		if(command_line_args.reset_iteration_count) start_iteration=tape->inititer-1;
 		else start_iteration++;
