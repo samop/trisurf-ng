@@ -166,10 +166,11 @@ struct ts_bond {
     	ts_uint idx;
 	ts_vertex *vtx1;
 	ts_vertex *vtx2;
-    ts_double bond_length;
-    ts_double bond_length_dual;
-	ts_bool tainted;
+    	ts_double bond_length;
+    	ts_double bond_length_dual;
+	ts_bool tainted; //TODO: remove
 	ts_double energy;
+	ts_double x,y,z;
 };
 typedef struct ts_bond ts_bond;
 
@@ -256,11 +257,17 @@ typedef struct {
    	ts_double cm[3];
 	ts_double volume;
 	ts_spharm *sphHarmonics;
-
+// Polymers outside the vesicle and attached to the vesicle membrane (polymer brush):
 	ts_poly_list *poly_list;
+// Filaments inside the vesicle (not attached to the vesicel membrane:
+	ts_poly_list *filament_list;
+
 	ts_double spring_constant;
 	ts_double pressure;
 	ts_int pswitch;
+
+	ts_double R_nucleus;
+
 } ts_vesicle;
 
 

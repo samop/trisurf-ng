@@ -6,7 +6,6 @@
 static char prefixname[1024];
 static ts_bool restore=0;
 static char tape[1024]; */
-char path[1024];
 int force_from_tape;
 
 
@@ -17,6 +16,9 @@ typedef struct {
 	long int nczmax;
 	long int npoly;
 	long int nmono;
+	long int nfil;
+	long int nfono;
+	long int R_nucleus;
 	long int pswitch;
     	char *multiprocessing;
    	long int brezveze0;
@@ -26,6 +28,7 @@ typedef struct {
 	ts_double dmax;
 	ts_double stepsize;
 	ts_double kspring;
+	ts_double xi;
 	ts_double pressure;
 	long int iterations;
 	long int inititer;
@@ -36,6 +39,10 @@ typedef struct {
 typedef struct{
 	ts_int force_from_tape;
 	ts_int reset_iteration_count;
+    char path[1024]; //path where all files should be added
+    char output_fullfilename[1024]; //name of the master file
+    char dump_fullfilename[1024]; //name of the dump file
+    char tape_fullfilename[1024]; //name of the tape file
 } ts_args;
 
 ts_args command_line_args;

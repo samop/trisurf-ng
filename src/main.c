@@ -22,9 +22,10 @@ int main(int argv, char *argc[]){
 	ts_vesicle *vesicle;
 	ts_tape *tape;
 	ts_uint start_iteration=0;
+	force_from_tape=0;
 	parse_args(argv,argc); // sets global variable command_line_args (defined in io.h)
 	ts_fprintf(stdout,"Starting program...\n\n");
-	if(force_from_tape){
+	if(command_line_args.force_from_tape){
 		ts_fprintf(stdout,"************************************************\n");
 		ts_fprintf(stdout,"**** Generating initial geometry from tape *****\n");
 		ts_fprintf(stdout,"************************************************\n\n");
@@ -37,8 +38,18 @@ int main(int argv, char *argc[]){
 		ts_fprintf(stdout,"**********************************************************************\n\n");
 		tape=parsetape("tape");
 		vesicle=restore_state(&start_iteration);
+        if(vesicle==NULL){
+            ts_fprintf(stderr, "Dump file does not exist or is not a regular file! Did you mean to invoke trisurf with --force-from-tape option?\n\n");
+            return 1;
+        }
+		// nove vrednosti iz tapea...
+		vesicle->bending_rigidity=tape->xk0;
+		vtx_set_global_values(vesicle);
+		vesicle->pressure=tape->pressure;
+		vesicle->dmax=tape->dmax*tape->dmax;
+		poly_assign_filament_xi(vesicle,tape);
 
-		if(command_line_args.reset_iteration_count) start_iteration=0;
+		if(command_line_args.reset_iteration_count) start_iteration=tape->inititer-1;
 		else start_iteration++;
 
 		if(start_iteration>=tape->iterations){
