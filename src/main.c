@@ -48,6 +48,7 @@ int main(int argv, char *argc[]){
 		vesicle->pressure=tape->pressure;
 		vesicle->dmax=tape->dmax*tape->dmax;
 		poly_assign_filament_xi(vesicle,tape);
+		vesicle->clist->dmin_interspecies = tape->dmin_interspecies*tape->dmin_interspecies;
 
 		if(command_line_args.reset_iteration_count) start_iteration=tape->inititer;
 		else start_iteration++;

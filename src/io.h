@@ -26,6 +26,7 @@ typedef struct {
     	long int brezveze2;
     	ts_double xk0;
 	ts_double dmax;
+	ts_double dmin_interspecies;
 	ts_double stepsize;
 	ts_double kspring;
 	ts_double xi;

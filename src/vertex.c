@@ -6,6 +6,14 @@
 #include "bond.h"
 #include<stdio.h>
 
+ts_bool vertex_list_assign_id(ts_vertex_list *vlist, ts_uint id){
+	ts_uint i;	
+	for(i=0;i<vlist->n;i++){
+		vlist->vtx[i]->id = id;
+	}
+	return TS_SUCCESS;
+}
+
 ts_vertex_list *init_vertex_list(ts_uint N){	
 	ts_int i;
     ts_vertex_list *vlist=(ts_vertex_list *)malloc(sizeof(ts_vertex_list));

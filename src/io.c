@@ -970,6 +970,7 @@ ts_tape *parsetape(char *filename){
 	CFG_SIMPLE_INT("nfono",&tape->nfono),
 	CFG_SIMPLE_INT("R_nucleus",&tape->R_nucleus),
 	CFG_SIMPLE_FLOAT("dmax", &tape->dmax),
+	CFG_SIMPLE_FLOAT("dmin_interspecies", &tape->dmin_interspecies),
         CFG_SIMPLE_FLOAT("xk0",&tape->xk0),
 	CFG_SIMPLE_INT("pswitch",&tape->pswitch),
 	CFG_SIMPLE_FLOAT("pressure",&tape->pressure),

@@ -48,6 +48,8 @@
 
 /* CONSTANTS */
 
+#define TS_ID_FILAMENT 1
+
 /* DATA TYPES */
 /** @brief Sets the default datatype for ts_double
  *
@@ -213,6 +215,7 @@ typedef struct ts_cell_list{
     ts_double dcell;
     ts_double shift;
     ts_double max_occupancy;
+	ts_double dmin_interspecies;
 } ts_cell_list;
 
 

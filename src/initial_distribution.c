@@ -69,6 +69,9 @@ ts_vesicle *create_vesicle_from_tape(ts_tape *tape){
 		}
 	}
 
+	for(i=0;i<vesicle->filament_list->n;i++){
+		vertex_list_assign_id(vesicle->filament_list->poly[i]->vlist,TS_ID_FILAMENT);
+	}
 
 //	vesicle->spring_constant=tape->kspring;
 //	poly_assign_spring_const(vesicle);
@@ -76,6 +79,7 @@ ts_vesicle *create_vesicle_from_tape(ts_tape *tape){
 	
 	vesicle->nshell=tape->nshell;
 	vesicle->dmax=tape->dmax*tape->dmax; /* dmax^2 in the vesicle dmax variable */
+	vesicle->clist->dmin_interspecies = tape->dmin_interspecies*tape->dmin_interspecies;
 	vesicle->bending_rigidity=tape->xk0;
 	vtx_set_global_values(vesicle); /* make xk0 default value for every vertex */ 
 	ts_fprintf(stdout, "Tape setting: xk0=%e\n",tape->xk0);

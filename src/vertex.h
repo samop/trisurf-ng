@@ -1,6 +1,8 @@
 #ifndef _VERTEX_H
 #define _VERTEX_H
 
+ts_bool vertex_list_assign_id(ts_vertex_list *vlist, ts_uint id);
+
 /** @brief Creates initial vertex list
  *  
  *  Allocates memory and initializes the vertices.
