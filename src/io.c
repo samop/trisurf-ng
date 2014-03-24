@@ -918,6 +918,39 @@ ts_bool write_vertex_vtk_file(ts_vesicle *vesicle,ts_char *filename, ts_char *te
 
 
 
+ts_bool write_pov_file(ts_vesicle *vesicle, char *filename){
+	FILE *fh;
+	ts_uint i;
+	
+	fh=fopen(filename, "w");
+	if(fh==NULL){
+		err("Cannot open file %s for writing");
+		return TS_FAIL;
+	}
+
+	for(i=0;i<vesicle->tlist->n;i++){
+	
+	fprintf(fh,"\ttriangle {");
+	fprintf(fh,"\t<%e,%e,%e> <%e,%e,%e> <%e,%e,%e> }\n", 
+	vesicle->tlist->tria[i]->vertex[0]->x,
+	vesicle->tlist->tria[i]->vertex[0]->y,
+	vesicle->tlist->tria[i]->vertex[0]->z,
+
+	vesicle->tlist->tria[i]->vertex[1]->x,
+	vesicle->tlist->tria[i]->vertex[1]->y,
+	vesicle->tlist->tria[i]->vertex[1]->z,
+
+	vesicle->tlist->tria[i]->vertex[2]->x,
+	vesicle->tlist->tria[i]->vertex[2]->y,
+	vesicle->tlist->tria[i]->vertex[2]->z
+	);
+	}
+		
+	fclose(fh);
+	return TS_SUCCESS;
+}
+
+
 ts_tape *parsetape(char *filename){
   //  long int nshell=17,ncxmax=60, ncymax=60, nczmax=60, npoly=10, nmono=20, pswitch=0;  // THIS IS DUE TO CONFUSE BUG!
     ts_tape *tape=(ts_tape *)calloc(1,sizeof(ts_tape));

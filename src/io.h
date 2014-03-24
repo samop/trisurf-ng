@@ -98,6 +98,8 @@ ts_bool read_tape_fcompat_file(ts_vesicle *vesicle, ts_char *filename);
 ts_bool write_vertex_vtk_file(ts_vesicle *vesicle,ts_char *filename, ts_char *text);
 ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno);
 ts_bool write_master_xml_file(ts_char *filename);
+ts_bool write_pov_file(ts_vesicle *vesicle, char *filename);
+
 ts_tape *parsetape(char *filename);
 ts_bool tape_free(ts_tape *tape);
 

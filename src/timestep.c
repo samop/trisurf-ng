@@ -11,6 +11,7 @@
 
 ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, ts_uint iterations, ts_uint start_iteration){
 	ts_uint i, j;
+ 	char filename[255];
 
 	centermass(vesicle);
 	cell_occupation(vesicle);
@@ -25,6 +26,8 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
             dump_state(vesicle,i);
 		if(i>=inititer){
 			write_vertex_xml_file(vesicle,i-inititer);
+		//	sprintf(filename,"timestep-%05d.pov",i-inititer);
+			write_pov_file(vesicle,filename);
 		}
 	}
 	return TS_SUCCESS;

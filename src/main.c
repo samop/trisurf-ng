@@ -49,7 +49,7 @@ int main(int argv, char *argc[]){
 		vesicle->dmax=tape->dmax*tape->dmax;
 		poly_assign_filament_xi(vesicle,tape);
 
-		if(command_line_args.reset_iteration_count) start_iteration=tape->inititer-1;
+		if(command_line_args.reset_iteration_count) start_iteration=tape->inititer;
 		else start_iteration++;
 
 		if(start_iteration>=tape->iterations){
