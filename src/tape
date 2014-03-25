@@ -4,7 +4,7 @@ nshell=17
 # dmax is the max. bond length (in units l_min)
 dmax=1.7
 # dmin_interspecies in the min. dist. between different vertex species (in units l_min)
-dmin_interspecies=1
+dmin_interspecies=1.2
 # bending rigidity of the membrane (in units kT)
 xk0=10.0
 # max step size (in units l_min)
@@ -12,7 +12,7 @@ stepsize=0.15
 
 # Pressure calculations
 # (pswitch=1: calc. p*dV energy contribution)
-pswitch = 1
+pswitch = 0
 # pressure difference: p_inside - p_outside (in units kT/l_min^3):
 pressure=-2.0
 
@@ -26,7 +26,7 @@ k_spring=800
 
 ####### Filament (inside the vesicle) definitions ###########
 # nfil is a number of filaments inside the vesicle
-nfil=1
+nfil=2
 # nfono is a number of monomers in each filament
 nfono=300
 # Persistence lenght of the filaments (in units l_min)
@@ -44,11 +44,11 @@ nzmax=60
 
 ####### Program Control ############
 #how many MC sweeps between subsequent records of states to disk
-mcsweeps=100
+mcsweeps=1000
 #how many initial mcsweeps*inititer MC sweeps before recording to disk?
 inititer=0
 #how many records do you want on the disk iteration are there in a run?
-iterations=20
+iterations=100
 
 
 #shut up if we are using cluster!!!

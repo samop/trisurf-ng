@@ -41,7 +41,9 @@ ts_vesicle *create_vesicle_from_tape(ts_tape *tape){
 
 	vesicle=initial_distribution_dipyramid(tape->nshell,tape->ncxmax,tape->ncymax,tape->nczmax,tape->stepsize);
 	// Nucleus:
-	vesicle->R_nucleus=tape->R_nucleus;
+	vesicle->R_nucleus=tape->R_nucleus*tape->R_nucleus;
+
+	vesicle->clist->dmin_interspecies = tape->dmin_interspecies*tape->dmin_interspecies;
 
 	//Initialize grafted polymers (brush):
 	vesicle->poly_list=init_poly_list(tape->npoly,tape->nmono, vesicle->vlist, vesicle);
@@ -79,7 +81,6 @@ ts_vesicle *create_vesicle_from_tape(ts_tape *tape){
 	
 	vesicle->nshell=tape->nshell;
 	vesicle->dmax=tape->dmax*tape->dmax; /* dmax^2 in the vesicle dmax variable */
-	vesicle->clist->dmin_interspecies = tape->dmin_interspecies*tape->dmin_interspecies;
 	vesicle->bending_rigidity=tape->xk0;
 	vtx_set_global_values(vesicle); /* make xk0 default value for every vertex */ 
 	ts_fprintf(stdout, "Tape setting: xk0=%e\n",tape->xk0);

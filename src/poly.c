@@ -58,7 +58,6 @@ ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vli
 	ts_uint gvtxi;
 	ts_double xnorm,ynorm,znorm,normlength;
 	ts_double dphi,dh;
-	ts_uint ji;
 
 	// Grafting polymers:
 	if (vlist!=NULL){
@@ -108,14 +107,29 @@ ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vli
 	else
 	{
 	/* Make filaments inside the vesicle. Helix with radius... Dist. between poly vertices put to 1*/
-		dphi = 2.0*asin(1.0/2.0/vesicle->R_nucleus)*1.001;
+	ts_double a,R,H,tantheta,h,r,phi,A0=1.2;
+
+		a = A0*(ts_double)vesicle->nshell;
+		R = A0*((ts_double)vesicle->nshell)/(2.0*sin(M_PI/5.0));
+		H = sqrt(a*a - R*R);
+		tantheta = sqrt(R*R - a*a/4.0)/H;
+		
+		h = -H + sqrt(vesicle->clist->dmin_interspecies)*1.5;
+		r = (H-fabs(h))*tantheta - sqrt(vesicle->clist->dmin_interspecies)*1.5;
+		dphi = 2.0*asin(1.0/2.0/r)*1.001;
 		dh = dphi/2.0/M_PI*1.001;
+		phi=0.0;
 		for(i=0;i<poly_list->n;i++){
 			for (j=0;j<poly_list->poly[i]->vlist->n;j++){
-				ji = j + i*poly_list->poly[i]->vlist->n;
-				poly_list->poly[i]->vlist->vtx[j]->x = vesicle->R_nucleus*cos(ji*dphi);
-				poly_list->poly[i]->vlist->vtx[j]->y = vesicle->R_nucleus*sin(ji*dphi);
-				poly_list->poly[i]->vlist->vtx[j]->z = ji*dh - (dh*poly_list->n*poly_list->poly[i]->vlist->n/2.0);
+				h = h + dh;
+				r = (H-fabs(h))*tantheta - sqrt(vesicle->clist->dmin_interspecies)*1.5;
+				dphi = 2.0*asin(1.0/2.0/r)*1.001;
+				dh = dphi/2.0/M_PI*1.001;
+				phi+=dphi;
+				//ji = j + i*poly_list->poly[i]->vlist->n;
+				poly_list->poly[i]->vlist->vtx[j]->x = r*cos(phi);
+				poly_list->poly[i]->vlist->vtx[j]->y = r*sin(phi);
+				poly_list->poly[i]->vlist->vtx[j]->z = h;// ji*dh - (dh*poly_list->n*poly_list->poly[i]->vlist->n/2.0);
 			}
 		}
 	}
