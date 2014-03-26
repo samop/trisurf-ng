@@ -45,6 +45,7 @@ int main(int argv, char *argc[]){
 		// nove vrednosti iz tapea...
 		vesicle->bending_rigidity=tape->xk0;
 		vtx_set_global_values(vesicle);
+		vesicle->pswitch =tape->pswitch;
 		vesicle->pressure=tape->pressure;
 		vesicle->dmax=tape->dmax*tape->dmax;
 		poly_assign_filament_xi(vesicle,tape);
