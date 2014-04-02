@@ -310,7 +310,6 @@ ts_bool single_filament_vertex_move(ts_vesicle *vesicle,ts_poly *poly,ts_vertex 
 	cellidx=vertex_self_avoidance(vesicle, vtx);
 	//check occupation number
 	retval=cell_occupation_number_and_internal_proximity(vesicle->clist,cellidx,vtx);
-	
 	if(retval==TS_FAIL){
 		vtx=memcpy((void *)vtx,(void *)&backupvtx,sizeof(ts_vertex));
         return TS_FAIL;

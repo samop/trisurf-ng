@@ -149,10 +149,15 @@ ts_bool cell_occupation_number_and_internal_proximity(ts_cell_list *clist, ts_ui
                     for(l=0;l<cell_occupation;l++){
 
 				//carefull with this checks!
-                        if(clist->cell[neigh_cidx]->vertex[l]->idx!=vtx->idx){
+                        if(clist->cell[neigh_cidx]->vertex[l]!=vtx){
                     //        fprintf(stderr,"calling dist on vertex %i\n",l);
                            dist=vtx_distance_sq(clist->cell[neigh_cidx]->vertex[l],vtx);
-                    //        fprintf(stderr,"dist was %f\n",dist);
+
+//				if(vtx->idx==1)
+//				fprintf(stderr,"VTX(0) ima bliznji vertex z indeksom, %d, tipa %d \n", clist->cell[neigh_cidx]->vertex[l]->idx, clist->cell[neigh_cidx]->vertex[l]->id);
+//				if(vtx->idx==0 && clist->cell[neigh_cidx]->vertex[l]->idx==0)
+//                            fprintf(stderr,"*** dist was %f\n",dist);
+				
                             if(dist<=1.0 || (dist<=clist->dmin_interspecies && (clist->cell[neigh_cidx]->vertex[l]->id != vtx->id))) return TS_FAIL;
                         }
                     }
