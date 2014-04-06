@@ -8,9 +8,11 @@
 #include "bondflip.h"
 #include "frame.h"
 #include "io.h"
+#include "gyration.h"
 
 ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, ts_uint iterations, ts_uint start_iteration){
 	ts_uint i, j;
+	ts_double l1,l2,l3;
 // 	char filename[255];
 
 	centermass(vesicle);
@@ -22,6 +24,7 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 		}
 		centermass(vesicle);
 		cell_occupation(vesicle);
+		gyration_eigen(vesicle, &l1, &l2, &l3);
 		ts_fprintf(stdout,"Done %d out of %d iterations (x %d MC sweeps).\n",i+1,inititer+iterations,mcsweeps);
             dump_state(vesicle,i);
 		if(i>=inititer){

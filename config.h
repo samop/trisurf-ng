@@ -7,6 +7,12 @@
 /* Define to 1 if you have the `confuse' library (-lconfuse). */
 #define HAVE_LIBCONFUSE 1
 
+/* Define to 1 if you have the `gsl' library (-lgsl). */
+#define HAVE_LIBGSL 1
+
+/* Define to 1 if you have the `gslcblas' library (-lgslcblas). */
+#define HAVE_LIBGSLCBLAS 1
+
 /* Define to 1 if you have the `m' library (-lm). */
 #define HAVE_LIBM 1
 
