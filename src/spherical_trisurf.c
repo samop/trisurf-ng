@@ -61,10 +61,11 @@ calculateYlmi(vesicle);
 calculateUlm(vesicle);
 
 //preloop:
+ts_double vmsr, bfsr;
 for(i=0;i<1000;i++){
 	cell_occupation(vesicle);
 	for(j=0;j<1000;j++){
-		single_timestep(vesicle);
+		single_timestep(vesicle, &vmsr, &bfsr);
 	}	
 	centermass(vesicle);
 	fprintf(stderr, "Preloop %d completed.\n",i+1);
@@ -75,7 +76,7 @@ for(i=0;i<nmax;i++){
 	for(j=0;j<200;j++){
 		cell_occupation(vesicle);
 		for(k=0;k<5;k++){
-		single_timestep(vesicle);
+		single_timestep(vesicle, &vmsr, &bfsr);
 		}
 		centermass(vesicle);
 	}	

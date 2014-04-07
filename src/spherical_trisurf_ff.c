@@ -44,10 +44,11 @@ r0=getR0(vesicle);
 preparationSh(vesicle,r0);
 calculateYlmi(vesicle);
 calculateUlm(vesicle);
+ts_double vmsr,bfsr;
 for(i=0;i<500;i++){
 	cell_occupation(vesicle);
 	for(j=0;j<1000;j++){
-		single_timestep(vesicle);
+		single_timestep(vesicle,&vmsr,&bfsr);
 	}	
 	centermass(vesicle);
 	fprintf(stderr, "Preloop %d completed.\n",i+1);
@@ -62,7 +63,7 @@ for(i=0;i<vesicle->vlist->n;i++){
 for(i=0;i<10000;i++){
 	cell_occupation(vesicle);
 	for(j=0;j<1000;j++){
-		single_timestep(vesicle);
+		single_timestep(vesicle,&vmsr,&bfsr);
 	}	
 	centermass(vesicle);
     vesicle_volume(vesicle);
