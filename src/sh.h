@@ -13,4 +13,5 @@ ts_double getR0(ts_vesicle *vesicle);
 ts_bool preparationSh(ts_vesicle *vesicle, ts_double r0);
 ts_bool calculateYlmi(ts_vesicle *vesicle);
 ts_bool calculateUlm(ts_vesicle *vesicle);
+ts_bool saveAvgUlm2(ts_vesicle *vesicle);
 #endif

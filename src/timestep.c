@@ -9,9 +9,12 @@
 #include "frame.h"
 #include "io.h"
 #include "stats.h"
+#include "sh.h"
+#include "vesicle.h"
 
 ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, ts_uint iterations, ts_uint start_iteration){
 	ts_uint i, j;
+	ts_double r0;
 	ts_double l1,l2,l3,volume=0.0,area=0.0,vmsr,bfsr, vmsrt, bfsrt;
 	ts_ulong epochtime;
 // 	char filename[255];
@@ -43,6 +46,14 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 			epochtime=get_epoch();			
 			gyration_eigen(vesicle, &l1, &l2, &l3);
 			get_area_volume(vesicle, &area,&volume);
+			vesicle_volume(vesicle);
+			r0=getR0(vesicle);
+			preparationSh(vesicle,r0);
+			calculateYlmi(vesicle);
+			calculateUlm(vesicle);
+			storeUlm2(vesicle);
+			saveAvgUlm2(vesicle);
+
 			fprintf(fd, "%lu %u %e %e %e %e %e %e %e\n",epochtime,i,vmsr,bfsr,volume, area,l1,l2,l3);
 			
 		//	sprintf(filename,"timestep-%05d.pov",i-inititer);

@@ -11,6 +11,7 @@
 #include "frame.h"
 #include "timestep.h"
 #include "poly.h"
+#include "sh.h"
 
 /** Entrance function to the program
   * @param argv is a number of parameters used in program call (including the program name
@@ -50,6 +51,7 @@ int main(int argv, char *argc[]){
 		vesicle->dmax=tape->dmax*tape->dmax;
 		poly_assign_filament_xi(vesicle,tape);
 		vesicle->clist->dmin_interspecies = tape->dmin_interspecies*tape->dmin_interspecies;
+		vesicle->sphHarmonics=sph_init(vesicle->vlist,tape->shc);
 
 		if(command_line_args.reset_iteration_count) start_iteration=tape->inititer;
 		else start_iteration++;

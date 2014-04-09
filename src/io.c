@@ -988,6 +988,7 @@ ts_tape *parsetape(char *filename){
         CFG_SIMPLE_INT("smp_cores",&tape->brezveze0),
         CFG_SIMPLE_INT("cluster_nodes",&tape->brezveze1),
         CFG_SIMPLE_INT("distributed_processes",&tape->brezveze2),
+	CFG_SIMPLE_INT("spherical_harmonics_coefficients",&tape->shc),
         CFG_END()
     };
     cfg_t *cfg;    
