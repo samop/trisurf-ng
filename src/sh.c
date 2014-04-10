@@ -49,6 +49,7 @@ ts_spharm *sph_init(ts_vertex_list *vlist, ts_uint l){
 
 ts_bool sph_free(ts_spharm *sph){
     int i,j;
+    if(sph==NULL) return TS_FAIL;
     for(i=0;i<sph->l;i++){
         if(sph->ulm[i]!=NULL) free(sph->ulm[i]);
         if(sph->sumUlm2[i]!=NULL) free(sph->sumUlm2[i]);
@@ -189,7 +190,7 @@ ts_double shY(ts_int l,ts_int m,ts_double theta,ts_double fi){
 		K=-sqrt(1.0/(M_PI))*cos(m*fi);
 	}
 	
-	return K*sqrt((2.0*l+1.0)/2.0*fac1/fac2)*plgndr(l,abs(m),cos(theta));	
+	return K*sqrt((2.0*l+1.0)/2.0*(ts_double)(fac1/fac2))*plgndr(l,abs(m),cos(theta));	
 }
 
 

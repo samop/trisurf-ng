@@ -51,7 +51,13 @@ int main(int argv, char *argc[]){
 		vesicle->dmax=tape->dmax*tape->dmax;
 		poly_assign_filament_xi(vesicle,tape);
 		vesicle->clist->dmin_interspecies = tape->dmin_interspecies*tape->dmin_interspecies;
-		vesicle->sphHarmonics=sph_init(vesicle->vlist,tape->shc);
+        /* spherical harmonics */
+        if(tape->shc>0){
+	        vesicle->sphHarmonics=sph_init(vesicle->vlist,tape->shc);
+        }
+        else {
+            vesicle->sphHarmonics=NULL;
+        }
 
 		if(command_line_args.reset_iteration_count) start_iteration=tape->inititer;
 		else start_iteration++;

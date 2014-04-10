@@ -93,7 +93,12 @@ ts_vesicle *create_vesicle_from_tape(ts_tape *tape){
 
 	vesicle->pressure= tape->pressure;
 	vesicle->pswitch=tape->pswitch;
-	vesicle->sphHarmonics=sph_init(vesicle->vlist,tape->shc);
+    if(tape->shc>0){
+	    vesicle->sphHarmonics=sph_init(vesicle->vlist,tape->shc);
+    }
+    else {
+        vesicle->sphHarmonics=NULL;
+    }
     return vesicle;
 
 }

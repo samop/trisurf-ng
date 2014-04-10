@@ -6,6 +6,7 @@
 #include "cell.h"
 #include "stdlib.h"
 #include "poly.h"
+#include "sh.h"
 
 ts_vesicle *init_vesicle(ts_uint N, ts_uint ncmax1, ts_uint ncmax2, ts_uint
 ncmax3, ts_double stepsize){
@@ -35,6 +36,7 @@ ts_bool vesicle_free(ts_vesicle *vesicle){
     triangle_list_free(vesicle->tlist);
     cell_list_free(vesicle->clist);
     poly_list_free(vesicle->poly_list);
+    sph_free(vesicle->sphHarmonics);
     free(vesicle);
     return TS_SUCCESS;
 }
