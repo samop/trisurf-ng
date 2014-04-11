@@ -35,6 +35,7 @@ typedef struct {
 	long int inititer;
 	long int mcsweeps;
 	long int quiet;
+	long int shc;
 } ts_tape;
 
 typedef struct{

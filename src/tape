@@ -51,6 +51,9 @@ inititer=0
 iterations=500
 
 
+###### Spherical harmonics ###########
+spherical_harmonics_coefficients=21
+
 #shut up if we are using cluster!!!
 quiet=false
 

@@ -49,6 +49,7 @@ ts_spharm *sph_init(ts_vertex_list *vlist, ts_uint l){
 
 ts_bool sph_free(ts_spharm *sph){
     int i,j;
+    if(sph==NULL) return TS_FAIL;
     for(i=0;i<sph->l;i++){
         if(sph->ulm[i]!=NULL) free(sph->ulm[i]);
         if(sph->sumUlm2[i]!=NULL) free(sph->sumUlm2[i]);
@@ -189,7 +190,7 @@ ts_double shY(ts_int l,ts_int m,ts_double theta,ts_double fi){
 		K=-sqrt(1.0/(M_PI))*cos(m*fi);
 	}
 	
-	return K*sqrt((2.0*l+1.0)/2.0*fac1/fac2)*plgndr(l,abs(m),cos(theta));	
+	return K*sqrt((2.0*l+1.0)/2.0*(ts_double)(fac1/fac2))*plgndr(l,abs(m),cos(theta));	
 }
 
 
@@ -378,4 +379,29 @@ for(i=0;i<sph->l;i++){
 }
 	sph->N++;
 return TS_SUCCESS;
+}
+
+
+ts_bool saveAvgUlm2(ts_vesicle *vesicle){
+
+	FILE *fh;
+	
+	fh=fopen("sph2out.dat", "w");
+	if(fh==NULL){
+		err("Cannot open file %s for writing");
+		return TS_FAIL;
+	}
+
+	ts_spharm *sph=vesicle->sphHarmonics;
+	ts_int i,j;
+	fprintf(fh,"l,\tm,\tulm^2avg\n");
+	for(i=0;i<sph->l;i++){
+    		for(j=0;j<2*i+1;j++){
+		fprintf(fh,"%d,\t%d,\t%e\n", i, j-i, sph->sumUlm2[i][j]/(ts_double)sph->N);
+
+    		}
+    fprintf(fh,"\n");
+	}
+	fclose(fh);
+	return TS_SUCCESS;
 }
