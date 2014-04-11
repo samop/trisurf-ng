@@ -15,19 +15,25 @@ void gyration_eigen(ts_vesicle *vesicle, ts_double *l1, ts_double *l2, ts_double
 	ts_uint i,j,k;
 	ts_double mat[3][3];
 	ts_double vec[3];
+
 	for(i = 0; i < 3; i++)
         	for(j = 0; j < 3; j++)
             		mat[i][j]=0;
  
-
 	for(k=0;k<vesicle->vlist->n;k++){
 		vec[0]=vesicle->vlist->vtx[k]->x;
 		vec[1]=vesicle->vlist->vtx[k]->y;
 		vec[2]=vesicle->vlist->vtx[k]->z;
 		for(i = 0; i < 3; i++)
         		for(j = 0; j <= i; j++)
-				mat[i][j]+=vec[i]*vec[j];	
+				mat[i][j]+=vec[i]*vec[j];
 	}
+
+// Normalize gyration tensor:
+	for(i = 0; i < 3; i++)
+        	for(j = 0; j <= i; j++)
+			mat[i][j]=mat[i][j]/(ts_double)vesicle->vlist->n;
+
 
 // diagonal elements are copied twice!	
 	for(i = 0; i < 3; i++)
