@@ -13,10 +13,11 @@
 #include "vesicle.h"
 
 ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, ts_uint iterations, ts_uint start_iteration){
-	ts_uint i, j;
+	ts_uint i, j,k;
 	ts_double r0;
 	ts_double l1,l2,l3,volume=0.0,area=0.0,vmsr,bfsr, vmsrt, bfsrt;
 	ts_ulong epochtime;
+	FILE *fd1;
 // 	char filename[255];
 	FILE *fd=fopen("statistics.csv","w");
 	if(fd==NULL){
@@ -54,6 +55,18 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 			    calculateUlm(vesicle);
 			    storeUlm2(vesicle);
 			    saveAvgUlm2(vesicle);
+				fd1=fopen("state.dat","w");
+				fprintf(fd1,"%e %e\n",vesicle->volume, getR0(vesicle));
+				for(k=0;k<vesicle->vlist->n;k++){
+					fprintf(fd1,"%e %e %e %e %e\n",
+						vesicle->vlist->vtx[k]->x,
+						vesicle->vlist->vtx[k]->y,
+						vesicle->vlist->vtx[k]->z,
+						vesicle->vlist->vtx[k]->solAngle,
+						vesicle->vlist->vtx[k]->relR
+					);
+				}
+				fclose(fd1);
             }
 
 			fprintf(fd, "%lu %u %e %e %1.16e %1.16e %1.16e %1.16e %1.16e\n",epochtime,i,vmsr,bfsr,volume, area,l1,l2,l3);
