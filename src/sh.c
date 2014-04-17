@@ -201,7 +201,7 @@ ts_bool *cart2sph(ts_coord *coord, ts_double x, ts_double y, ts_double z){
 #ifdef TS_DOUBLE_DOUBLE
     coord->e1=sqrt(x*x+y*y+z*z);
     if(z==0) coord->e3=M_PI/2.0;
-    else coord->e3=atan(sqrt(x*x+y*y)/z);
+    else coord->e3=atan2(sqrt(x*x+y*y),z);
     coord->e2=atan2(y,x);
 #endif
 #ifdef TS_DOUBLE_FLOAT
@@ -219,6 +219,23 @@ ts_bool *cart2sph(ts_coord *coord, ts_double x, ts_double y, ts_double z){
 
     return TS_SUCCESS;
 }
+
+
+ts_bool sph2cart(ts_coord *coord){
+    coord->coord_type=TS_COORD_CARTESIAN;
+    ts_double x,y,z;
+
+    x=coord->e1*cos(coord->e2)*sin(coord->e3);
+    y=coord->e1*sin(coord->e2)*sin(coord->e3);
+    z=coord->e1*cos(coord->e3);
+
+    coord->e1=x;
+    coord->e2=y;
+    coord->e3=z;
+
+    return TS_SUCCESS;
+}
+
 
 /* Function returns radius of the sphere with the same volume as vesicle (r0) */
 ts_double getR0(ts_vesicle *vesicle){
