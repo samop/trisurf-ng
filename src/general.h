@@ -3,6 +3,7 @@
 
 #include<stdarg.h>
 #include<stdio.h>
+#include<gsl/gsl_complex.h>
 /* @brief This is a header file, defining general constants and structures.
   * @file header.h
   * @author Samo Penic
@@ -222,6 +223,7 @@ typedef struct ts_cell_list{
 typedef struct {
     ts_uint l;
     ts_double **ulm;
+    gsl_complex **ulmComplex;
     ts_double **sumUlm2;
     ts_uint N;
     ts_double **co;

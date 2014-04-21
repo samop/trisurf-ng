@@ -12,6 +12,7 @@
 #include "poly.h"
 #include "io.h"
 #include "sh.h"
+#include "shcomplex.h"
 
 ts_vesicle *initial_distribution_dipyramid(ts_uint nshell, ts_uint ncmax1, ts_uint ncmax2, ts_uint ncmax3, ts_double stepsize){
 	ts_fprintf(stdout,"Starting initial_distribution on vesicle with %u shells!...\n",nshell);
@@ -94,7 +95,7 @@ ts_vesicle *create_vesicle_from_tape(ts_tape *tape){
 	vesicle->pressure= tape->pressure;
 	vesicle->pswitch=tape->pswitch;
     if(tape->shc>0){
-	    vesicle->sphHarmonics=sph_init(vesicle->vlist,tape->shc);
+	    vesicle->sphHarmonics=complex_sph_init(vesicle->vlist,tape->shc);
     }
     else {
         vesicle->sphHarmonics=NULL;

@@ -10,6 +10,7 @@
 #include "io.h"
 #include "stats.h"
 #include "sh.h"
+#include "shcomplex.h"
 #include "vesicle.h"
 
 ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, ts_uint iterations, ts_uint start_iteration){
@@ -51,9 +52,9 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 			r0=getR0(vesicle);
             if(vesicle->sphHarmonics!=NULL){
 			    preparationSh(vesicle,r0);
-			    calculateYlmi(vesicle);
-			    calculateUlm(vesicle);
-			    storeUlm2(vesicle);
+			    //calculateYlmi(vesicle);
+			    calculateUlmComplex(vesicle);
+			    storeUlmComplex2(vesicle);
 			    saveAvgUlm2(vesicle);
 				fd1=fopen("state.dat","w");
 				fprintf(fd1,"%e %e\n",vesicle->volume, getR0(vesicle));

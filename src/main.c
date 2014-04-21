@@ -12,6 +12,7 @@
 #include "timestep.h"
 #include "poly.h"
 #include "sh.h"
+#include "shcomplex.h"
 
 /** Entrance function to the program
   * @param argv is a number of parameters used in program call (including the program name
@@ -53,7 +54,7 @@ int main(int argv, char *argc[]){
 		vesicle->clist->dmin_interspecies = tape->dmin_interspecies*tape->dmin_interspecies;
         /* spherical harmonics */
         if(tape->shc>0){
-	        vesicle->sphHarmonics=sph_init(vesicle->vlist,tape->shc);
+	        vesicle->sphHarmonics=complex_sph_init(vesicle->vlist,tape->shc);
         }
         else {
             vesicle->sphHarmonics=NULL;
