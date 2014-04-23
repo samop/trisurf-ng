@@ -12,7 +12,7 @@ stepsize=0.15
 
 # Pressure calculations
 # (pswitch=1: calc. p*dV energy contribution)
-pswitch = 1
+pswitch = 0
 # pressure difference: p_inside - p_outside (in units kT/l_min^3):
 pressure=0.0
 
@@ -26,7 +26,7 @@ k_spring=800
 
 ####### Filament (inside the vesicle) definitions ###########
 # nfil is a number of filaments inside the vesicle
-nfil=2
+nfil=0
 # nfono is a number of monomers in each filament
 nfono=300
 # Persistence lenght of the filaments (in units l_min)
@@ -34,7 +34,7 @@ xi=0
 
 ####### Nucleus (inside the vesicle) ###########
 # Radius of an impenetrable hard sphere inside the vesicle
-R_nucleus=5
+R_nucleus=0
 
 #######  Cell definitions ############
 nxmax=60
@@ -48,7 +48,7 @@ mcsweeps=250
 #how many initial mcsweeps*inititer MC sweeps before recording to disk?
 inititer=0
 #how many records do you want on the disk iteration are there in a run?
-iterations=1000
+iterations=15000
 
 
 ###### Spherical harmonics ###########

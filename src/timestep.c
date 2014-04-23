@@ -56,6 +56,7 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 			    calculateUlmComplex(vesicle);
 			    storeUlmComplex2(vesicle);
 			    saveAvgUlm2(vesicle);
+                calculateKc(vesicle);
 				fd1=fopen("state.dat","w");
 				fprintf(fd1,"%e %e\n",vesicle->volume, getR0(vesicle));
 				for(k=0;k<vesicle->vlist->n;k++){
