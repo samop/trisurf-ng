@@ -15,7 +15,7 @@
 
 ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, ts_uint iterations, ts_uint start_iteration){
 	ts_uint i, j,k;
-	ts_double r0;
+	ts_double r0,kc;
 	ts_double l1,l2,l3,volume=0.0,area=0.0,vmsr,bfsr, vmsrt, bfsrt;
 	ts_ulong epochtime;
 	FILE *fd1;
@@ -24,7 +24,7 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 	if(fd==NULL){
 		fatal("Cannot open statistics.csv file for writing",1);
 	}
-	fprintf(fd, "Epoch OuterLoop VertexMoveSucessRate BondFlipSuccessRate Volume Area lamdba1 lambda2 lambda3\n");
+	fprintf(fd, "Epoch OuterLoop VertexMoveSucessRate BondFlipSuccessRate Volume Area lamdba1 lambda2 lambda3 Kc\n");
 	centermass(vesicle);
 	cell_occupation(vesicle);
 	if(start_iteration<inititer) ts_fprintf(stdout, "Starting simulation (first %d x %d MC sweeps will not be recorded on disk)\n", inititer, mcsweeps);
@@ -56,7 +56,7 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 			    calculateUlmComplex(vesicle);
 			    storeUlmComplex2(vesicle);
 			    saveAvgUlm2(vesicle);
-                calculateKc(vesicle);
+                kc=calculateKc(vesicle);
 				fd1=fopen("state.dat","w");
 				fprintf(fd1,"%e %e\n",vesicle->volume, getR0(vesicle));
 				for(k=0;k<vesicle->vlist->n;k++){
@@ -71,7 +71,7 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 				fclose(fd1);
             }
 
-			fprintf(fd, "%lu %u %e %e %1.16e %1.16e %1.16e %1.16e %1.16e\n",epochtime,i,vmsr,bfsr,volume, area,l1,l2,l3);
+			fprintf(fd, "%lu %u %e %e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n",epochtime,i,vmsr,bfsr,volume, area,l1,l2,l3,kc);
 		    fflush(fd);	
 		//	sprintf(filename,"timestep-%05d.pov",i-inititer);
 		//	write_pov_file(vesicle,filename);

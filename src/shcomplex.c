@@ -130,31 +130,41 @@ ts_bool storeUlmComplex2(ts_vesicle *vesicle){
 }
 
 
-ts_bool calculateKc(ts_vesicle *vesicle){
+ts_double calculateKc(ts_vesicle *vesicle){
 
-    ts_int i;
-    gsl_matrix *A=gsl_matrix_alloc(vesicle->sphHarmonics->l,2);
+    ts_int i,j;
+    ts_double retval, bval;
+    gsl_matrix *A=gsl_matrix_alloc(vesicle->sphHarmonics->l-1,2);
     gsl_vector *tau=gsl_vector_alloc(2);
-    gsl_vector *b=gsl_vector_alloc(vesicle->sphHarmonics->l);
+    gsl_vector *b=gsl_vector_alloc(vesicle->sphHarmonics->l-1);
     gsl_vector *x=gsl_vector_alloc(2);
-    gsl_vector *res=gsl_vector_alloc(vesicle->sphHarmonics->l);
+    gsl_vector *res=gsl_vector_alloc(vesicle->sphHarmonics->l-1);
 
-    //solving (A^T*A)*x=A^T*UlmSqAvg
+    //solving (A^T*A)*x=A^T*b
     //fill the data for matrix A and vector b
-    for(i=1;i<=vesicle->sphHarmonics->l;i++){
+    for(i=1;i<vesicle->sphHarmonics->l;i++){
             gsl_matrix_set(A, i-1,0,(ts_double)((i-1)*(i+2)));
             gsl_matrix_set(A, i-1,1,(ts_double)((i-1)*(i+2)*(i+1)*i));
-            gsl_vector_set(b,i-1,(ts_double)vesicle->sphHarmonics->N/vesicle->sphHarmonics->sumUlm2[i-1][(i-1)*2]);
+
+            bval=0;
+            //average for m from 0..l (only positive m's)
+            for(j=0;j<i;j++){
+                bval+=vesicle->sphHarmonics->sumUlm2[i][(j+i)];
+            }
+                bval=bval/(ts_double)vesicle->sphHarmonics->N/(ts_double)i;
+
+            gsl_vector_set(b,i-1,1.0/bval);
     }
-    fprintf(stderr,"b[2]=%e\n",gsl_vector_get(b,1));
+//    fprintf(stderr,"b[2]=%e\n",gsl_vector_get(b,1));
     gsl_linalg_QR_decomp(A,tau);
     gsl_linalg_QR_lssolve(A,tau,b,x,res);
-    fprintf(stderr,"kc=%e\n",gsl_vector_get(x,1));
-
+//    fprintf(stderr,"kc=%e\n",gsl_vector_get(x,1));
+    retval=gsl_vector_get(x,1);
     gsl_matrix_free(A);
     gsl_vector_free(tau);
     gsl_vector_free(b);
     gsl_vector_free(x);
     gsl_vector_free(res);
-    return TS_SUCCESS;
+    
+    return retval;
 }
