@@ -131,29 +131,31 @@ ts_bool storeUlmComplex2(ts_vesicle *vesicle){
 
 
 ts_double calculateKc(ts_vesicle *vesicle){
-
-    ts_int i,j;
+    ts_int min=4;
+    ts_int max=vesicle->sphHarmonics->l-6;
+    ts_long i,j;
     ts_double retval, bval;
-    gsl_matrix *A=gsl_matrix_alloc(vesicle->sphHarmonics->l-1,2);
+    gsl_matrix *A=gsl_matrix_alloc(max-min,2);
     gsl_vector *tau=gsl_vector_alloc(2);
-    gsl_vector *b=gsl_vector_alloc(vesicle->sphHarmonics->l-1);
+    gsl_vector *b=gsl_vector_alloc(max-min);
     gsl_vector *x=gsl_vector_alloc(2);
-    gsl_vector *res=gsl_vector_alloc(vesicle->sphHarmonics->l-1);
+    gsl_vector *res=gsl_vector_alloc(max-min);
 
     //solving (A^T*A)*x=A^T*b
     //fill the data for matrix A and vector b
-    for(i=1;i<vesicle->sphHarmonics->l;i++){
-            gsl_matrix_set(A, i-1,0,(ts_double)((i-1)*(i+2)));
-            gsl_matrix_set(A, i-1,1,(ts_double)((i-1)*(i+2)*(i+1)*i));
-
-            bval=0;
+    for(i=min;i<max;i++){
+            gsl_matrix_set(A, i-min,0,(ts_double)((i-1)*(i+2)));
+            gsl_matrix_set(A, i-min,1,(ts_double)((i-1)*(i+2)*(i+1)*i));
+            fprintf(stderr,"%e %e\n", gsl_matrix_get(A,i-min,0), gsl_matrix_get(A,i-min,1));
+            bval=0.0;
             //average for m from 0..l (only positive m's)
-            for(j=0;j<i;j++){
+            for(j=0;j<=i;j++){
                 bval+=vesicle->sphHarmonics->sumUlm2[i][(j+i)];
             }
-                bval=bval/(ts_double)vesicle->sphHarmonics->N/(ts_double)i;
+                bval=bval/(ts_double)vesicle->sphHarmonics->N/(ts_double)(i+1);
 
-            gsl_vector_set(b,i-1,1.0/bval);
+            gsl_vector_set(b,i-min,1.0/bval);
+            fprintf(stderr,"%e\n", 1.0/gsl_vector_get(b,i-min));
     }
 //    fprintf(stderr,"b[2]=%e\n",gsl_vector_get(b,1));
     gsl_linalg_QR_decomp(A,tau);
