@@ -44,7 +44,7 @@ nzmax=60
 
 ####### Program Control ############
 #how many MC sweeps between subsequent records of states to disk
-mcsweeps=250
+mcsweeps=2500
 #how many initial mcsweeps*inititer MC sweeps before recording to disk?
 inititer=0
 #how many records do you want on the disk iteration are there in a run?
@@ -52,7 +52,7 @@ iterations=15000
 
 
 ###### Spherical harmonics ###########
-spherical_harmonics_coefficients=15
+spherical_harmonics_coefficients=21
 
 #shut up if we are using cluster!!!
 quiet=false
