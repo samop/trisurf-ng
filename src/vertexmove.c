@@ -23,7 +23,7 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
     ts_double delta_energy,oenergy,dvol=0.0;
     ts_double costheta,sintheta,phi,r;
 	//This will hold all the information of vtx and its neighbours
-	ts_vertex backupvtx[20], *constvol_vtx_moved, *constvol_vtx_backup;
+	ts_vertex backupvtx[20], *constvol_vtx_moved=NULL, *constvol_vtx_backup=NULL;
 	memcpy((void *)&backupvtx[0],(void *)vtx,sizeof(ts_vertex));
 
 	//Some stupid tests for debugging cell occupation!
@@ -157,7 +157,7 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
    for(i=0;i<vtx->tristar_no;i++) triangle_normal_vector(vtx->tristar[i]);
 
     if(vesicle->tape->constvolswitch == 1){
-        ts_bool constvolumerestore(constvol_vtx_backup);
+        constvolumerestore(constvol_vtx_moved,constvol_vtx_backup);
     }
 
     return TS_FAIL; 
@@ -173,7 +173,7 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
 	}
 
     if(vesicle->tape->constvolswitch == 1){
-        ts_bool constvolumeaccept(constvol_vtx_backup);
+        constvolumeaccept(constvol_vtx_moved,constvol_vtx_backup);
     }
 //	if(oldcellidx);
     //END MONTE CARLOOOOOOO
