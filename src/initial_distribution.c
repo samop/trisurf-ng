@@ -11,6 +11,8 @@
 #include "energy.h"
 #include "poly.h"
 #include "io.h"
+#include "sh.h"
+#include "shcomplex.h"
 
 ts_vesicle *initial_distribution_dipyramid(ts_uint nshell, ts_uint ncmax1, ts_uint ncmax2, ts_uint ncmax3, ts_double stepsize){
 	ts_fprintf(stdout,"Starting initial_distribution on vesicle with %u shells!...\n",nshell);
@@ -41,7 +43,9 @@ ts_vesicle *create_vesicle_from_tape(ts_tape *tape){
 
 	vesicle=initial_distribution_dipyramid(tape->nshell,tape->ncxmax,tape->ncymax,tape->nczmax,tape->stepsize);
 	// Nucleus:
-	vesicle->R_nucleus=tape->R_nucleus;
+	vesicle->R_nucleus=tape->R_nucleus*tape->R_nucleus;
+
+	vesicle->clist->dmin_interspecies = tape->dmin_interspecies*tape->dmin_interspecies;
 
 	//Initialize grafted polymers (brush):
 	vesicle->poly_list=init_poly_list(tape->npoly,tape->nmono, vesicle->vlist, vesicle);
@@ -69,6 +73,9 @@ ts_vesicle *create_vesicle_from_tape(ts_tape *tape){
 		}
 	}
 
+	for(i=0;i<vesicle->filament_list->n;i++){
+		vertex_list_assign_id(vesicle->filament_list->poly[i]->vlist,TS_ID_FILAMENT);
+	}
 
 //	vesicle->spring_constant=tape->kspring;
 //	poly_assign_spring_const(vesicle);
@@ -87,7 +94,12 @@ ts_vesicle *create_vesicle_from_tape(ts_tape *tape){
 
 	vesicle->pressure= tape->pressure;
 	vesicle->pswitch=tape->pswitch;
-
+    if(tape->shc>0){
+	    vesicle->sphHarmonics=complex_sph_init(vesicle->vlist,tape->shc);
+    }
+    else {
+        vesicle->sphHarmonics=NULL;
+    }
     return vesicle;
 
 }

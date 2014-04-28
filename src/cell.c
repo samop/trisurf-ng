@@ -44,7 +44,6 @@ ts_bool cell_list_free(ts_cell_list *clist){
 }
 
 
-//TODO: not debugged at all!
 inline ts_uint vertex_self_avoidance(ts_vesicle *vesicle, ts_vertex *vtx){
     ts_uint cellidx;
     ts_uint ncx, ncy,ncz;
@@ -68,7 +67,6 @@ inline ts_uint vertex_self_avoidance(ts_vesicle *vesicle, ts_vertex *vtx){
 }
 
 
-//TODO: looks ok, but debug anyway in the future
 inline ts_bool cell_add_vertex(ts_cell *cell, ts_vertex *vtx){
 	ts_uint i;
 	for(i=0;i<cell->nvertex;i++){
@@ -124,7 +122,7 @@ ts_bool cell_list_cell_occupation_clear(ts_cell_list *clist){
     return TS_SUCCESS;
 }
 
-// TODO: compiles ok, but it is completely untested and undebugged. It was debugged before rewrite, but this was long time ago.
+
 ts_bool cell_occupation_number_and_internal_proximity(ts_cell_list *clist, ts_uint cellidx, ts_vertex *vtx){
     ts_uint ncx,ncy,ncz,remainder,cell_occupation;
     ts_uint i,j,k,l,neigh_cidx;
@@ -151,11 +149,16 @@ ts_bool cell_occupation_number_and_internal_proximity(ts_cell_list *clist, ts_ui
                     for(l=0;l<cell_occupation;l++){
 
 				//carefull with this checks!
-                        if(clist->cell[neigh_cidx]->vertex[l]->idx!=vtx->idx){
+                        if(clist->cell[neigh_cidx]->vertex[l]!=vtx){
                     //        fprintf(stderr,"calling dist on vertex %i\n",l);
                            dist=vtx_distance_sq(clist->cell[neigh_cidx]->vertex[l],vtx);
-                    //        fprintf(stderr,"dist was %f\n",dist);
-                            if(dist<=1.0) return TS_FAIL;
+
+//				if(vtx->idx==1)
+//				fprintf(stderr,"VTX(0) ima bliznji vertex z indeksom, %d, tipa %d \n", clist->cell[neigh_cidx]->vertex[l]->idx, clist->cell[neigh_cidx]->vertex[l]->id);
+//				if(vtx->idx==0 && clist->cell[neigh_cidx]->vertex[l]->idx==0)
+//                            fprintf(stderr,"*** dist was %f\n",dist);
+				
+                            if(dist<=1.0 || (dist<=clist->dmin_interspecies && (clist->cell[neigh_cidx]->vertex[l]->id != vtx->id))) return TS_FAIL;
                         }
                     }
                 }

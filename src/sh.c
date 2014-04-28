@@ -49,6 +49,7 @@ ts_spharm *sph_init(ts_vertex_list *vlist, ts_uint l){
 
 ts_bool sph_free(ts_spharm *sph){
     int i,j;
+    if(sph==NULL) return TS_FAIL;
     for(i=0;i<sph->l;i++){
         if(sph->ulm[i]!=NULL) free(sph->ulm[i]);
         if(sph->sumUlm2[i]!=NULL) free(sph->sumUlm2[i]);
@@ -189,7 +190,7 @@ ts_double shY(ts_int l,ts_int m,ts_double theta,ts_double fi){
 		K=-sqrt(1.0/(M_PI))*cos(m*fi);
 	}
 	
-	return K*sqrt((2.0*l+1.0)/2.0*fac1/fac2)*plgndr(l,abs(m),cos(theta));	
+	return K*sqrt((2.0*l+1.0)/2.0*(ts_double)(fac1/fac2))*plgndr(l,abs(m),cos(theta));	
 }
 
 
@@ -200,7 +201,7 @@ ts_bool *cart2sph(ts_coord *coord, ts_double x, ts_double y, ts_double z){
 #ifdef TS_DOUBLE_DOUBLE
     coord->e1=sqrt(x*x+y*y+z*z);
     if(z==0) coord->e3=M_PI/2.0;
-    else coord->e3=atan(sqrt(x*x+y*y)/z);
+    else coord->e3=atan2(sqrt(x*x+y*y),z);
     coord->e2=atan2(y,x);
 #endif
 #ifdef TS_DOUBLE_FLOAT
@@ -218,6 +219,23 @@ ts_bool *cart2sph(ts_coord *coord, ts_double x, ts_double y, ts_double z){
 
     return TS_SUCCESS;
 }
+
+
+ts_bool sph2cart(ts_coord *coord){
+    coord->coord_type=TS_COORD_CARTESIAN;
+    ts_double x,y,z;
+
+    x=coord->e1*cos(coord->e2)*sin(coord->e3);
+    y=coord->e1*sin(coord->e2)*sin(coord->e3);
+    z=coord->e1*cos(coord->e3);
+
+    coord->e1=x;
+    coord->e2=y;
+    coord->e3=z;
+
+    return TS_SUCCESS;
+}
+
 
 /* Function returns radius of the sphere with the same volume as vesicle (r0) */
 ts_double getR0(ts_vesicle *vesicle){
@@ -378,4 +396,29 @@ for(i=0;i<sph->l;i++){
 }
 	sph->N++;
 return TS_SUCCESS;
+}
+
+
+ts_bool saveAvgUlm2(ts_vesicle *vesicle){
+
+	FILE *fh;
+	
+	fh=fopen("sph2out.dat", "w");
+	if(fh==NULL){
+		err("Cannot open file %s for writing");
+		return TS_FAIL;
+	}
+
+	ts_spharm *sph=vesicle->sphHarmonics;
+	ts_int i,j;
+	fprintf(fh,"l,\tm,\tulm^2avg\n");
+	for(i=0;i<sph->l;i++){
+    		for(j=0;j<2*i+1;j++){
+		fprintf(fh,"%d,\t%d,\t%e\n", i, j-i, sph->sumUlm2[i][j]/(ts_double)sph->N);
+
+    		}
+    fprintf(fh,"\n");
+	}
+	fclose(fh);
+	return TS_SUCCESS;
 }

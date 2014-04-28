@@ -3,6 +3,7 @@
 
 #include<stdarg.h>
 #include<stdio.h>
+#include<gsl/gsl_complex.h>
 /* @brief This is a header file, defining general constants and structures.
   * @file header.h
   * @author Samo Penic
@@ -47,6 +48,8 @@
 #define TS_FAIL 1
 
 /* CONSTANTS */
+
+#define TS_ID_FILAMENT 1
 
 /* DATA TYPES */
 /** @brief Sets the default datatype for ts_double
@@ -213,12 +216,14 @@ typedef struct ts_cell_list{
     ts_double dcell;
     ts_double shift;
     ts_double max_occupancy;
+	ts_double dmin_interspecies;
 } ts_cell_list;
 
 
 typedef struct {
     ts_uint l;
     ts_double **ulm;
+    gsl_complex **ulmComplex;
     ts_double **sumUlm2;
     ts_uint N;
     ts_double **co;

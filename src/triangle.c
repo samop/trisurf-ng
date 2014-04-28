@@ -5,6 +5,7 @@
 #include<math.h>
 
 /** @brief Prepares the list for triangles.
+  * @returns pointer to empty data structure for maintaining triangle list.
   *
   * Create empty list for holding the information on triangles. Triangles are
   * added later on with triangle_add().
@@ -27,14 +28,17 @@ ts_triangle_list *init_triangle_list(){
 }
 
 /** @brief Add the triangle to the triangle list and create necessary data
- * structures.
+  * structures.
+  * @param *tlist is a pointer to triangle list where triangle should be created
+  * @param *vtx1, *vtx2, *vtx3 are the three vertices defining the triangle
+  * @returns pointer to the newly created triangle on success and NULL if
+  * triangle could not be created. It breaks program execution if memory
+  * allocation of triangle list can't be done.
   *
-  * Add the triangle ts_triangle with ts_triangle_data to the ts_triangle_list.
+  * Add the triangle ts_triangle to the ts_triangle_list.
   * The triangle list is resized, the ts_triangle is allocated and
-  * ts_triangle_data is allocated and zeroed. The function receives 4 arguments:
-  * ts_triangle_list *tlist as list of triangles and 3 ts_vertex *vtx as
-  * vertices that are used to form a triangle. Returns a pointer to newly
-  * created triangle. This pointer doesn't need assigning, since it is
+  * triangle data is zeroed. Returned pointer to newly
+  * created triangle doesn't need assigning, since it is
   * referenced by triangle list.
   *
   * WARNING: Function can be accelerated a bit by removing the NULL checks.
@@ -57,7 +61,6 @@ ts_triangle *triangle_add(ts_triangle_list *tlist, ts_vertex *vtx1, ts_vertex *v
 
         tlist->tria[tlist->n-1]=(ts_triangle *)calloc(1,sizeof(ts_triangle));
         if(tlist->tria[tlist->n-1]==NULL) fatal("Cannot reallocate memory for additional ts_triangle.",5);
-  //      tlist->tria[tlist->n-1]->data=(ts_triangle_data *)calloc(1,sizeof(ts_triangle_data));
 
         //NOW insert vertices!
         tlist->tria[tlist->n - 1]->idx=tlist->n-1;
@@ -68,9 +71,14 @@ ts_triangle *triangle_add(ts_triangle_list *tlist, ts_vertex *vtx1, ts_vertex *v
 }
 
 /** @brief Add the neigbour to triangles.
+  * @param *tria is a first triangle.
+  * @param *ntria is a second triangle.
+  * @returns TS_SUCCES on sucessful adition to the list, TS_FAIL if triangles
+  * are NULL and breaks execution FATALY if memory allocation error occurs.
   *
   * Add the neigbour to the list of neighbouring triangles. The
-  * neighbouring triangles are those, who share two vertices. Function resizes
+  * neighbouring triangles are those, who share two vertices and corresponding
+  * bond. Function resizes
   * the list and adds the pointer to neighbour. It receives two arguments of
   * ts_triangle type. It then adds second triangle to the list of first
   * triangle, but not the opposite. Upon
@@ -84,42 +92,40 @@ ts_triangle *triangle_add(ts_triangle_list *tlist, ts_vertex *vtx1, ts_vertex *v
   * debugging stupid NULL pointers.
   *
   * Example of usage:
-  *		triangle_remove_neighbour(tlist->tria[3], tlist->tria[4]);
+  *		triangle_add_neighbour(tlist->tria[3], tlist->tria[4]);
   *
-  *	    Triangles 3 and 4 are not neighbours anymore.
+  *	    Triangle 4 is a neighbour of triangle 3, but (strangely) not the
+  *	    oposite. The function should be called again with the changed order of
+  *	    triangles to make neighbourship mutual.
   *		
   */
 
 ts_bool triangle_add_neighbour(ts_triangle *tria, ts_triangle *ntria){
     if(tria==NULL || ntria==NULL) return TS_FAIL;
-/*TODO: check if the neighbour already exists! Now there is no such check
- * because of the performance issue. */
 	tria->neigh_no++;
 	tria->neigh=realloc(tria->neigh,tria->neigh_no*sizeof(ts_triangle *));
 	if(tria->neigh == NULL)
 			fatal("Reallocation of memory failed during insertion of triangle neighbour in triangle_add_neighbour",3);
-	tria->neigh[tria->neigh_no-1]=ntria;
-  
- 
-/* we repeat the procedure for the neighbour */  
-/*	ntria->data->neigh_no++;
-	ntria->data->neigh=realloc(ntria->data->neigh,ntria->data->neigh_no*sizeof(ts_triangle *));
-	if(ntria->data->neigh == NULL)
-			fatal("Reallocation of memory failed during insertion of triangle neighbour in triangle_add_neighbour",3);
-	ntria->data->neigh[ntria->data->neigh_no-1]=tria;
-*/
+	tria->neigh[tria->neigh_no-1]=ntria; 
 	return TS_SUCCESS;
 }
 
 /** @brief Remove the neigbours from triangle.
+  * @param *tria is a first triangle.
+  * @param *ntria is neighbouring triangle.
+  * @returns TS_SUCCESS on successful removal, TS_FAIL if triangles are not
+  * neighbours and it breaks program execution FATALY if memory allocation
+  * problem occurs.
   *
   * Removes the neigbour from the list of neighbouring triangles. The
-  * neighbouring triangles are those, who share two vertices. Function resizes
+  * neighbouring triangles are those, who share two vertices and corresponding
+  * bond. Function resizes
   * the list and deletes the pointer to neighbour. It receives two arguments of
-  * ts_triangle type. It then removes eachother form eachother's list. Upon
+  * ts_triangle type. It then mutually removes triangles from eachouther
+  * neighbour list. Upon
   * success it returns TS_SUCCESS, upon failure to find the triangle in the
-  * neighbour list returns TS_FAIL and it FATALY ends when the datastructure
-  * cannot be resized.
+  * neighbour list returns TS_FAIL. It FATALY breaks program execution when the datastructure
+  * cannot be resized due to memory constrain problems.
   *
   * WARNING: The function doesn't check whether the pointer is NULL or invalid. It is the
   * job of programmer to make sure the pointer is valid.
@@ -144,10 +150,8 @@ ts_bool triangle_remove_neighbour(ts_triangle *tria, ts_triangle *ntria){
     }
     if(j==i) {
         return TS_FAIL; 
-        //fatal("In triangle_remove_neighbour: Specified neighbour does not exist for given triangle",3);
     }
     tria->neigh_no--;
-//	fprintf(stderr,"*** tria_number=%d\n",tria->neigh_no);
     tria->neigh=(ts_triangle **)realloc(tria->neigh,tria->neigh_no*sizeof(ts_triangle *));
 	if(tria->neigh == NULL){
 		fprintf(stderr,"Ooops: tria->neigh_no=%d\n",tria->neigh_no);
@@ -163,10 +167,8 @@ ts_bool triangle_remove_neighbour(ts_triangle *tria, ts_triangle *ntria){
     }
     if(j==i) {
         return TS_FAIL; 
-        //fatal("In triangle_remove_neighbour: Specified neighbour does not exist for given triangle",3);
     }
     ntria->neigh_no--;
-//	fprintf(stderr,"*** ntria_number=%d\n",ntria->neigh_no);
     ntria->neigh=(ts_triangle **)realloc(ntria->neigh,ntria->neigh_no*sizeof(ts_triangle *));
 	if(ntria->neigh == NULL){
 		fprintf(stderr,"Ooops: ntria->neigh_no=%d\n",ntria->neigh_no);
@@ -176,25 +178,33 @@ ts_bool triangle_remove_neighbour(ts_triangle *tria, ts_triangle *ntria){
 }
 
 
-/** @brief Calculates normal vector of the triangle.
-
+/** @brief Calculates normal vector of the triangle, its corresponding area and volume.
+  * @param *tria is a triangle pointer for which normal, area and volume is
+  * to be calculated.
+  * @returns TS_SUCCESS on success. (always)
   *
   * Calculate normal vector of the triangle (xnorm, ynorm and znorm) and stores
-  * information in underlying ts_triangle_data data_structure.
+  * information. At the same time
+  * triangle area is determined, since we already have the normal and volume of
+  * triangular pyramid with given triangle as a base and vesicle centroid as a
+  * tip. 
   *
   * Function receives one argument of type ts_triangle. It should be corectly
-  * initialized with underlying data structure of type ts_triangle_data. the
-  * result is stored in triangle->data->xnorm, triangle->data->ynorm,
-  * triangle->data->znorm. Returns TS_SUCCESS on completion. 
+  * initialized. The
+  * result is stored in triangle->xnorm, triangle->ynorm, triangle->znorm.
+  * Area and volume are stored into triangle->area and triangle->volume.
+  * Returns TS_SUCCESS on completion. 
   *
-  * NOTE: Function uses math.h library. pow function implementation is selected
-  * accordind to the setting in genreal.h
+  * NOTE: Function uses math.h library. Function pow implementation is selected
+  * accordind to the used TS_DOUBLE_* definition set in general.h, so it should
+  * be compatible with any type of floating point precision.
   *
   * Example of usage:
   *		triangle_normal_vector(tlist->tria[3]);
   *
   *	    Computes normals and stores information into tlist->tria[3]->xnorm,
-  *	    tlist->tria[3]->ynorm, tlist->tria[3]->znorm.
+  *	    tlist->tria[3]->ynorm, tlist->tria[3]->znorm tlist->tria[3]->area and
+  *	    tlist->tria[3]->volume.
   *		
   */
 ts_bool triangle_normal_vector(ts_triangle *tria){
@@ -239,13 +249,9 @@ ts_bool triangle_normal_vector(ts_triangle *tria){
 	return TS_SUCCESS;
 }
 
-
-
-
-
-
 /** @brief Frees the memory allocated for data structure of triangle list
- * (ts_triangle_list)
+  * @param *tlist is a pointer to datastructure triangle list to be freed.
+  * @returns TS_SUCCESS on success (always).
   *
   * Function frees the memory of ts_triangle_list previously allocated. It
   * accepts one argument, the address of data structure. It destroys all

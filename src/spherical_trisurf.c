@@ -61,10 +61,11 @@ calculateYlmi(vesicle);
 calculateUlm(vesicle);
 
 //preloop:
+ts_double vmsr, bfsr;
 for(i=0;i<1000;i++){
 	cell_occupation(vesicle);
 	for(j=0;j<1000;j++){
-		single_timestep(vesicle);
+		single_timestep(vesicle, &vmsr, &bfsr);
 	}	
 	centermass(vesicle);
 	fprintf(stderr, "Preloop %d completed.\n",i+1);
@@ -75,7 +76,7 @@ for(i=0;i<nmax;i++){
 	for(j=0;j<200;j++){
 		cell_occupation(vesicle);
 		for(k=0;k<5;k++){
-		single_timestep(vesicle);
+		single_timestep(vesicle, &vmsr, &bfsr);
 		}
 		centermass(vesicle);
 	}	
@@ -103,26 +104,3 @@ return 0; //program finished perfectly ok. We return 0.
 
 
 
-ts_bool saveAvgUlm2(ts_vesicle *vesicle){
-
-	FILE *fh;
-	
-	fh=fopen("sph2out.dat", "w");
-	if(fh==NULL){
-		err("Cannot open file %s for writing");
-		return TS_FAIL;
-	}
-
-	ts_spharm *sph=vesicle->sphHarmonics;
-	ts_int i,j;
-	fprintf(fh,"l,\tm,\tulm^2avg\n");
-	for(i=0;i<sph->l;i++){
-    		for(j=0;j<2*i+1;j++){
-		fprintf(fh,"%d,\t%d,\t%e\n", i, j-i, sph->sumUlm2[i][j]/(ts_double)sph->N);
-
-    		}
-    fprintf(fh,"\n");
-	}
-	fclose(fh);
-	return TS_SUCCESS;
-}

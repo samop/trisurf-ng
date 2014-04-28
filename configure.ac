@@ -15,6 +15,9 @@ AC_CHECK_LIB([confuse], [cfg_parse])
 # FIXME: Replace `main' with a function in `-lm':
 AC_CHECK_LIB([m], [pow])
 
+AC_CHECK_LIB([gslcblas],[cblas_dgemm])
+AC_CHECK_LIB([gsl],[gsl_blas_dgemm])
+
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h string.h])
 

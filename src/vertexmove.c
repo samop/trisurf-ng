@@ -67,11 +67,18 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
 		}
 	}
 
-    //self avoidance check with distant vertices
-     cellidx=vertex_self_avoidance(vesicle, vtx);
-    //check occupation number
-     retval=cell_occupation_number_and_internal_proximity(vesicle->clist,cellidx,vtx);
-	
+// TODO: Maybe faster if checks only nucleus-neighboring cells
+// Nucleus penetration check:
+	if (vtx->x*vtx->x + vtx->y*vtx->y + vtx->z*vtx->z < vesicle->R_nucleus){
+		vtx=memcpy((void *)vtx,(void *)&backupvtx[0],sizeof(ts_vertex));
+		return TS_FAIL;
+	}
+
+//self avoidance check with distant vertices
+	cellidx=vertex_self_avoidance(vesicle, vtx);
+	//check occupation number
+	retval=cell_occupation_number_and_internal_proximity(vesicle->clist,cellidx,vtx);
+
     if(retval==TS_FAIL){
 		vtx=memcpy((void *)vtx,(void *)&backupvtx[0],sizeof(ts_vertex));
         return TS_FAIL;
@@ -291,12 +298,18 @@ ts_bool single_filament_vertex_move(ts_vesicle *vesicle,ts_poly *poly,ts_vertex 
 		}
 	}
 
+// TODO: Maybe faster if checks only nucleus-neighboring cells
+// Nucleus penetration check:
+	if (vtx->x*vtx->x + vtx->y*vtx->y + vtx->z*vtx->z < vesicle->R_nucleus){
+		vtx=memcpy((void *)vtx,(void *)&backupvtx,sizeof(ts_vertex));
+		return TS_FAIL;
+	}
+
 
 	//self avoidance check with distant vertices
 	cellidx=vertex_self_avoidance(vesicle, vtx);
 	//check occupation number
 	retval=cell_occupation_number_and_internal_proximity(vesicle->clist,cellidx,vtx);
-	
 	if(retval==TS_FAIL){
 		vtx=memcpy((void *)vtx,(void *)&backupvtx,sizeof(ts_vertex));
         return TS_FAIL;

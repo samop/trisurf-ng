@@ -11,6 +11,8 @@
 #include "frame.h"
 #include "timestep.h"
 #include "poly.h"
+#include "sh.h"
+#include "shcomplex.h"
 
 /** Entrance function to the program
   * @param argv is a number of parameters used in program call (including the program name
@@ -45,11 +47,20 @@ int main(int argv, char *argc[]){
 		// nove vrednosti iz tapea...
 		vesicle->bending_rigidity=tape->xk0;
 		vtx_set_global_values(vesicle);
+		vesicle->pswitch =tape->pswitch;
 		vesicle->pressure=tape->pressure;
 		vesicle->dmax=tape->dmax*tape->dmax;
 		poly_assign_filament_xi(vesicle,tape);
+		vesicle->clist->dmin_interspecies = tape->dmin_interspecies*tape->dmin_interspecies;
+        /* spherical harmonics */
+        if(tape->shc>0){
+	        vesicle->sphHarmonics=complex_sph_init(vesicle->vlist,tape->shc);
+        }
+        else {
+            vesicle->sphHarmonics=NULL;
+        }
 
-		if(command_line_args.reset_iteration_count) start_iteration=tape->inititer-1;
+		if(command_line_args.reset_iteration_count) start_iteration=tape->inititer;
 		else start_iteration++;
 
 		if(start_iteration>=tape->iterations){
