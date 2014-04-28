@@ -145,7 +145,7 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
     return TS_FAIL; 
     }
 }
-		
+	//accepted	
 //	oldcellidx=vertex_self_avoidance(vesicle, &backupvtx[0]);
 	if(vtx->cell!=vesicle->clist->cell[cellidx]){
 		retval=cell_add_vertex(vesicle->clist->cell[cellidx],vtx);
@@ -153,6 +153,8 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
 		if(retval==TS_SUCCESS) cell_remove_vertex(backupvtx[0].cell,vtx);
 		
 	}
+
+    if(vesicle->tape->constvolswitch == 1);
 //	if(oldcellidx);
     //END MONTE CARLOOOOOOO
     return TS_SUCCESS;

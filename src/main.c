@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<math.h>
+#include<stdlib.h>
 #include "general.h"
 #include "vertex.h"
 #include "bond.h"
@@ -51,7 +52,7 @@ int main(int argv, char *argc[]){
 		vesicle->pressure=tape->pressure;
 		vesicle->dmax=tape->dmax*tape->dmax;
 		poly_assign_filament_xi(vesicle,tape);
-        tape_free(vesicle->tape);
+        free(vesicle->tape);
         vesicle->tape=tape;
 		vesicle->clist->dmin_interspecies = tape->dmin_interspecies*tape->dmin_interspecies;
         /* spherical harmonics */
