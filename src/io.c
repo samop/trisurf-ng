@@ -170,7 +170,8 @@ ts_bool dump_state(ts_vesicle *vesicle, ts_uint iteration){
 */
 
 	fwrite(vesicle->clist, sizeof(ts_cell_list),1,  fh);
-	
+/* write tape information on vesicle */
+    fwrite(vesicle->tape,sizeof(ts_tape),1,fh);
 	fwrite(&iteration, sizeof(ts_uint),1,fh);
     fclose(fh);
     return TS_SUCCESS;
@@ -428,6 +429,9 @@ ts_vesicle *restore_state(ts_uint *iteration){
         	vesicle->clist->cell[i]->idx=i+1; // We enumerate cells! Probably never required!
     	}
 
+//recreating stored tape information//
+    vesicle->tape=(ts_tape *)malloc(sizeof(ts_tape));
+    retval=fread(vesicle->tape, sizeof(ts_tape),1,fh);
 	retval=fread(iteration,sizeof(ts_uint),1,fh);
     if(retval); 
     fclose(fh);
@@ -973,6 +977,7 @@ ts_tape *parsetape(char *filename){
 	CFG_SIMPLE_FLOAT("dmin_interspecies", &tape->dmin_interspecies),
         CFG_SIMPLE_FLOAT("xk0",&tape->xk0),
 	CFG_SIMPLE_INT("pswitch",&tape->pswitch),
+	CFG_SIMPLE_INT("constvolswitch",&tape->constvolswitch),
 	CFG_SIMPLE_FLOAT("pressure",&tape->pressure),
 	CFG_SIMPLE_FLOAT("k_spring",&tape->kspring),
 	CFG_SIMPLE_FLOAT("xi",&tape->xi),

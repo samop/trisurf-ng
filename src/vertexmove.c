@@ -9,6 +9,7 @@
 #include "timestep.h"
 #include "cell.h"
 //#include "io.h"
+#include "io.h"
 #include<stdio.h>
 #include "vertexmove.h"
 #include <string.h>
@@ -90,7 +91,7 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
 	memcpy((void *)&backupvtx[i+1],(void *)vtx->neigh[i],sizeof(ts_vertex));
 	}
 
-	if(vesicle->pswitch == 1){
+	if(vesicle->pswitch == 1 || vesicle->tape->constvolswitch == 1){
 		for(i=0;i<vtx->tristar_no;i++) dvol-=vtx->tristar[i]->volume;
 	};
 
@@ -107,9 +108,9 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
         delta_energy+=vtx->neigh[i]->xk*(vtx->neigh[i]->energy-oenergy);
     }
 
-	if(vesicle->pswitch == 1){
+	if(vesicle->pswitch == 1 || vesicle->tape->constvolswitch == 1){
 		for(i=0;i<vtx->tristar_no;i++) dvol+=vtx->tristar[i]->volume;
-		delta_energy-=vesicle->pressure*dvol;
+        if(vesicle->pswitch == 1) delta_energy-=vesicle->pressure*dvol;
 	};
 
 /* No poly-bond energy for now!

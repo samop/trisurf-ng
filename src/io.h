@@ -9,35 +9,6 @@ static char tape[1024]; */
 int force_from_tape;
 
 
-typedef struct {
-	long int nshell;
-	long int ncxmax;
-	long int ncymax;
-	long int nczmax;
-	long int npoly;
-	long int nmono;
-	long int nfil;
-	long int nfono;
-	long int R_nucleus;
-	long int pswitch;
-    	char *multiprocessing;
-   	long int brezveze0;
-    	long int brezveze1;
-    	long int brezveze2;
-    	ts_double xk0;
-	ts_double dmax;
-	ts_double dmin_interspecies;
-	ts_double stepsize;
-	ts_double kspring;
-	ts_double xi;
-	ts_double pressure;
-	long int iterations;
-	long int inititer;
-	long int mcsweeps;
-	long int quiet;
-	long int shc;
-} ts_tape;
-
 typedef struct{
 	ts_int force_from_tape;
 	ts_int reset_iteration_count;

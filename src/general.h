@@ -249,6 +249,38 @@ typedef struct ts_poly_list ts_poly_list;
 
 
 
+typedef struct {
+	long int nshell;
+	long int ncxmax;
+	long int ncymax;
+	long int nczmax;
+	long int npoly;
+	long int nmono;
+	long int nfil;
+	long int nfono;
+	long int R_nucleus;
+	long int pswitch;
+    long int constvolswitch;
+    	char *multiprocessing;
+   	long int brezveze0;
+    	long int brezveze1;
+    	long int brezveze2;
+    	ts_double xk0;
+	ts_double dmax;
+	ts_double dmin_interspecies;
+	ts_double stepsize;
+	ts_double kspring;
+	ts_double xi;
+	ts_double pressure;
+	long int iterations;
+	long int inititer;
+	long int mcsweeps;
+	long int quiet;
+	long int shc;
+} ts_tape;
+
+
+
 
 typedef struct {
 	ts_vertex_list *vlist;
@@ -270,7 +302,7 @@ typedef struct {
 	ts_double spring_constant;
 	ts_double pressure;
 	ts_int pswitch;
-
+    ts_tape *tape;
 	ts_double R_nucleus;
 
 } ts_vesicle;

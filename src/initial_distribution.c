@@ -42,6 +42,7 @@ ts_vesicle *create_vesicle_from_tape(ts_tape *tape){
 	ts_vertex *vtx;
 
 	vesicle=initial_distribution_dipyramid(tape->nshell,tape->ncxmax,tape->ncymax,tape->nczmax,tape->stepsize);
+    vesicle->tape=tape;
 	// Nucleus:
 	vesicle->R_nucleus=tape->R_nucleus*tape->R_nucleus;
 
