@@ -1,6 +1,6 @@
 trisurfdir=../
 trisurf_PROGRAMS = trisurf
-trisurf_SOURCES = general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c frame.c energy.c timestep.c vertexmove.c bondflip.c main.c poly.c stats.c sh.c shcomplex.c
+trisurf_SOURCES = general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c frame.c energy.c timestep.c vertexmove.c bondflip.c main.c poly.c stats.c sh.c shcomplex.c constvol.c
 AM_CFLAGS = -Wall -Werror
 #trisurf_LDFLAGS = -lm -lconfuse
 #shdiscoverdir=../

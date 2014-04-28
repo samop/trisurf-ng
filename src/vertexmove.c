@@ -13,6 +13,7 @@
 #include<stdio.h>
 #include "vertexmove.h"
 #include <string.h>
+#include "constvol.h"
 
 ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *rn){
     ts_uint i;
@@ -22,7 +23,7 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
     ts_double delta_energy,oenergy,dvol=0.0;
     ts_double costheta,sintheta,phi,r;
 	//This will hold all the information of vtx and its neighbours
-	ts_vertex backupvtx[20];
+	ts_vertex backupvtx[20], *constvol_vtx_moved, *constvol_vtx_backup;
 	memcpy((void *)&backupvtx[0],(void *)vtx,sizeof(ts_vertex));
 
 	//Some stupid tests for debugging cell occupation!
@@ -91,11 +92,23 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
 	memcpy((void *)&backupvtx[i+1],(void *)vtx->neigh[i],sizeof(ts_vertex));
 	}
 
-	if(vesicle->pswitch == 1 || vesicle->tape->constvolswitch == 1){
+	if(vesicle->pswitch == 1){
 		for(i=0;i<vtx->tristar_no;i++) dvol-=vtx->tristar[i]->volume;
 	};
 
     delta_energy=0;
+
+    if(vesicle->tape->constvolswitch == 1){
+        retval=constvolume(vesicle, vtx, dvol, &delta_energy, constvol_vtx_moved,constvol_vtx_backup);
+        if(retval==TS_FAIL){ // if we couldn't move the vertex to assure constant volume
+            vtx=memcpy((void *)vtx,(void *)&backupvtx[0],sizeof(ts_vertex));
+	        for(i=0;i<vtx->neigh_no;i++){
+		        vtx->neigh[i]=memcpy((void *)vtx->neigh[i],(void *)&backupvtx[i+1],sizeof(ts_vertex));
+	        }
+            return TS_FAIL;
+        }
+    }
+
     //update the normals of triangles that share bead i.
     for(i=0;i<vtx->tristar_no;i++) triangle_normal_vector(vtx->tristar[i]);
 	oenergy=vtx->energy;
@@ -108,10 +121,11 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
         delta_energy+=vtx->neigh[i]->xk*(vtx->neigh[i]->energy-oenergy);
     }
 
-	if(vesicle->pswitch == 1 || vesicle->tape->constvolswitch == 1){
+	if(vesicle->pswitch == 1){
 		for(i=0;i<vtx->tristar_no;i++) dvol+=vtx->tristar[i]->volume;
-        if(vesicle->pswitch == 1) delta_energy-=vesicle->pressure*dvol;
+        delta_energy-=vesicle->pressure*dvol;
 	};
+
 
 /* No poly-bond energy for now!
 	if(vtx->grafted_poly!=NULL){
@@ -142,6 +156,10 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
     //update the normals of triangles that share bead i.
    for(i=0;i<vtx->tristar_no;i++) triangle_normal_vector(vtx->tristar[i]);
 
+    if(vesicle->tape->constvolswitch == 1){
+        ts_bool constvolumerestore(constvol_vtx_backup);
+    }
+
     return TS_FAIL; 
     }
 }
@@ -154,7 +172,9 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
 		
 	}
 
-    if(vesicle->tape->constvolswitch == 1);
+    if(vesicle->tape->constvolswitch == 1){
+        ts_bool constvolumeaccept(constvol_vtx_backup);
+    }
 //	if(oldcellidx);
     //END MONTE CARLOOOOOOO
     return TS_SUCCESS;

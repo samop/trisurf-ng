@@ -261,6 +261,7 @@ typedef struct {
 	long int R_nucleus;
 	long int pswitch;
     long int constvolswitch;
+    ts_double constvolprecision;
     	char *multiprocessing;
    	long int brezveze0;
     	long int brezveze1;

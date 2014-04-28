@@ -978,6 +978,7 @@ ts_tape *parsetape(char *filename){
         CFG_SIMPLE_FLOAT("xk0",&tape->xk0),
 	CFG_SIMPLE_INT("pswitch",&tape->pswitch),
 	CFG_SIMPLE_INT("constvolswitch",&tape->constvolswitch),
+	CFG_SIMPLE_FLOAT("constvolprecision",&tape->constvolprecision),
 	CFG_SIMPLE_FLOAT("pressure",&tape->pressure),
 	CFG_SIMPLE_FLOAT("k_spring",&tape->kspring),
 	CFG_SIMPLE_FLOAT("xi",&tape->xi),

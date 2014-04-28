@@ -18,7 +18,7 @@ pressure=0.0
 
 #Constant volume constraint (0 disable constant volume, 1 enable)
 constvolswitch=1
-
+constvolprecision=1e-3
 
 
 ####### Polymer (brush) definitions ###########
