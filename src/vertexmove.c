@@ -119,7 +119,7 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
 	};
 
    if(vesicle->tape->constvolswitch == 1){
-        retval=constvolume(vesicle, vtx, -dvol, &delta_energy_cv, &constvol_vtx_moved,&constvol_vtx_backup);
+        retval=constvolume(vesicle, vtx, dvol, &delta_energy_cv, &constvol_vtx_moved,&constvol_vtx_backup);
         if(retval==TS_FAIL){ // if we couldn't move the vertex to assure constant volume
             vtx=memcpy((void *)vtx,(void *)&backupvtx[0],sizeof(ts_vertex));
 	        for(i=0;i<vtx->neigh_no;i++){

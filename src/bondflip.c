@@ -189,9 +189,8 @@ for(i=0;i<4;i++){
 		if(vesicle->pswitch==1) delta_energy-= vesicle->pressure*dvol;
 	}
 
-    retval=TS_SUCCESS;
     if(vesicle->tape->constvolswitch == 1){
-        retval=constvolume(vesicle, it, -dvol, &delta_energy_cv, &constvol_vtx_moved,&constvol_vtx_backup);
+        retval=constvolume(vesicle, it, dvol, &delta_energy_cv, &constvol_vtx_moved,&constvol_vtx_backup);
         if(retval==TS_FAIL){
 /* restoration procedure copied from few lines below */
 		for(i=0;i<4;i++){
@@ -206,7 +205,6 @@ for(i=0;i<4;i++){
 			/* level 2 pointers are redirected*/
 		}
 		memcpy(bond,bck_bond,sizeof(ts_bond));
-
 		for(i=0;i<4;i++){
 			free(bck_vtx[i]);
 			free(bck_tria[i]);
@@ -214,13 +212,11 @@ for(i=0;i<4;i++){
 			for(j=0;j<orig_vtx[i]->neigh_no;j++) fprintf(stderr," %d", orig_vtx[i]->neigh[j]->idx);
 			fprintf(stderr,"\n"); */
 		}
-
 		free(bck_bond);
         return TS_FAIL;
-
         }
-    
-    delta_energy+=delta_energy_cv;
+
+        delta_energy+=delta_energy_cv;
     }
 
 
@@ -239,6 +235,9 @@ for(i=0;i<4;i++){
             //not accepted, reverting changes
 	    //restore all backups
 //		fprintf(stderr,"Restoring!!!\n");
+        if(vesicle->tape->constvolswitch == 1){
+            constvolumerestore(constvol_vtx_moved,constvol_vtx_backup);
+        }
 
 		for(i=0;i<4;i++){
 //			fprintf(stderr,"Restoring vtx neigh[%d] with neighbours %d\n",i, orig_vtx[i]->neigh_no );
@@ -263,9 +262,6 @@ for(i=0;i<4;i++){
 
 		free(bck_bond);
 
-        if(vesicle->tape->constvolswitch == 1){
-            constvolumerestore(constvol_vtx_moved,constvol_vtx_backup);
-        }
 //		fprintf(stderr,"Restoration complete!!!\n");
 
 		return TS_FAIL;
@@ -274,6 +270,9 @@ for(i=0;i<4;i++){
      /* IF BONDFLIP ACCEPTED, THEN RETURN SUCCESS! */
 //            fprintf(stderr,"SUCCESS!!!\n");
 
+    if(vesicle->tape->constvolswitch == 1){
+        constvolumeaccept(vesicle,constvol_vtx_moved,constvol_vtx_backup);
+    }
 	// delete all backups
 	for(i=0;i<4;i++){
 	free(bck_vtx[i]->neigh);
@@ -288,9 +287,6 @@ for(i=0;i<4;i++){
 */	
 	}
 	free(bck_bond);
-    if(vesicle->tape->constvolswitch == 1){
-        constvolumeaccept(vesicle,constvol_vtx_moved,constvol_vtx_backup);
-    }
 
     return TS_SUCCESS;
 }

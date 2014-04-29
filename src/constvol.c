@@ -15,7 +15,6 @@ ts_bool constvolume(ts_vesicle *vesicle, ts_vertex *vtx_avoid, ts_double Vol, ts
     ts_uint Ntries=20;
 	ts_vertex *backupvtx;
     ts_double Rv, dh, dvol, voldiff, oenergy,delta_energy;
-
     backupvtx=(ts_vertex *)calloc(sizeof(ts_vertex),10);
     ts_double l0 = (1.0 + sqrt(vesicle->dmax))/2.0; //make this a global constant if necessary
     for(i=0;i<Ntries;i++){
@@ -25,6 +24,11 @@ ts_bool constvolume(ts_vesicle *vesicle, ts_vertex *vtx_avoid, ts_double Vol, ts
 
         for(j=0;j<vtx_moved->neigh_no;j++){
             if(vtx_moved->neigh[j]==vtx_avoid) continue;
+/*            for(k=0;k<vtx_moved->neigh[j]->neigh_no;k++){
+                if(vtx_moved->neigh[j]->neigh[k]==vtx_avoid) continue;
+            }   
+*/
+
         }
          
 	    memcpy((void *)&backupvtx[0],(void *)vtx_moved,sizeof(ts_vertex));
@@ -46,8 +50,8 @@ ts_bool constvolume(ts_vesicle *vesicle, ts_vertex *vtx_avoid, ts_double Vol, ts
 //        fprintf(stderr,"Sprejet.\n");
 
         // All checks OK!
+            fprintf(stderr, "Step 1 success\n");
 
-        // doing second and final move.
         for(j=0;j<vtx_moved->neigh_no;j++){
         	memcpy((void *)&backupvtx[j+1],(void *)vtx_moved->neigh[j],sizeof(ts_vertex));
 	    }
@@ -74,8 +78,10 @@ ts_bool constvolume(ts_vesicle *vesicle, ts_vertex *vtx_avoid, ts_double Vol, ts
             *retEnergy=delta_energy;
             *vtx_backup=backupvtx;
             *vtx_moved_retval=vtx_moved;
+            fprintf(stderr, "Preliminary success\n");
             return TS_SUCCESS;
         }        
+            fprintf(stderr, "Step 2 success\n");
         //do it again ;)
         dh=Vol*dh/dvol;
 		vtx_moved=memcpy((void *)vtx_moved,(void *)&backupvtx[0],sizeof(ts_vertex));
@@ -91,7 +97,16 @@ ts_bool constvolume(ts_vesicle *vesicle, ts_vertex *vtx_avoid, ts_double Vol, ts
             continue;
         }
 
+        dvol=0.0;
+        for(j=0;j<vtx_moved->tristar_no;j++){
+            dvol-=vtx_moved->tristar[j]->volume;
+            triangle_normal_vector(vtx_moved->tristar[j]);
+            dvol+=vtx_moved->tristar[j]->volume;
+        }
+
+            fprintf(stderr, "Step 3a success voldiff=%e\n",voldiff);
         voldiff=dvol-Vol;
+            fprintf(stderr, "Step 3b success voldiff=%e\n",voldiff);
         if(fabs(voldiff)/vesicle->volume < vesicle->tape->constvolprecision){
             //calculate energy, return change in energy...
             oenergy=vtx_moved->energy;
@@ -106,12 +121,14 @@ ts_bool constvolume(ts_vesicle *vesicle, ts_vertex *vtx_avoid, ts_double Vol, ts
             *retEnergy=delta_energy;
             *vtx_backup=backupvtx;
             *vtx_moved_retval=vtx_moved;
+            fprintf(stderr, "DVOL=%e\n",voldiff);
             return TS_SUCCESS;
         }        
 
 
     }
     free(backupvtx);
+            fprintf(stderr, "fail\n");
     return TS_FAIL;
 }
 
