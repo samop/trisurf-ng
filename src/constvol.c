@@ -9,15 +9,15 @@
 #include "vertex.h"
 #include "cell.h"
 
-ts_bool constvolume(ts_vesicle *vesicle, ts_vertex *vtx_avoid, ts_double Vol, ts_double *retEnergy, ts_vertex *vtx_moved, ts_vertex *vtx_backup){
-
+ts_bool constvolume(ts_vesicle *vesicle, ts_vertex *vtx_avoid, ts_double Vol, ts_double *retEnergy, ts_vertex **vtx_moved_retval, ts_vertex **vtx_backup){
+    ts_vertex *vtx_moved;
     ts_uint vtxind,i,j;
     ts_uint Ntries=20;
 	ts_vertex *backupvtx;
     ts_double Rv, dh, dvol, voldiff, oenergy,delta_energy;
 
     backupvtx=(ts_vertex *)calloc(sizeof(ts_vertex),10);
-
+    ts_double l0 = (1.0 + sqrt(vesicle->dmax))/2.0; //make this a global constant if necessary
     for(i=0;i<Ntries;i++){
         vtxind=rand() % vesicle->vlist->n;
         vtx_moved=vesicle->vlist->vtx[vtxind];
@@ -26,21 +26,24 @@ ts_bool constvolume(ts_vesicle *vesicle, ts_vertex *vtx_avoid, ts_double Vol, ts
         for(j=0;j<vtx_moved->neigh_no;j++){
             if(vtx_moved->neigh[j]==vtx_avoid) continue;
         }
-        
+         
 	    memcpy((void *)&backupvtx[0],(void *)vtx_moved,sizeof(ts_vertex));
         //move vertex in specified direction. first try, test move!
 
         Rv=sqrt(pow(vtx_moved->x,2)+pow(vtx_moved->y,2)+pow(vtx_moved->z,2));
-        dh=2*Rv*vesicle->dmax/sqrt(3);
-	    vtx_moved->x=vtx_moved->x*(1-dh/Rv);
-	    vtx_moved->y=vtx_moved->y*(1-dh/Rv);
-	    vtx_moved->z=vtx_moved->z*(1-dh/Rv);
+        dh=2.0*Vol/(sqrt(3.0)*l0*l0);
+//        fprintf(stderr,"Prej (x,y,z)=(%e,%e,%e).\n",vtx_moved->x,vtx_moved->y,vtx_moved->z);
+	    vtx_moved->x=vtx_moved->x*(1.0-dh/Rv);
+	    vtx_moved->y=vtx_moved->y*(1.0-dh/Rv);
+	    vtx_moved->z=vtx_moved->z*(1.0-dh/Rv);
+//        fprintf(stderr,"Potem (x,y,z)=(%e,%e,%e). Vol=%e\n",vtx_moved->x,vtx_moved->y,vtx_moved->z,Vol);
 
         //check for constraints
           if(constvolConstraintCheck(vesicle, vtx_moved)==TS_FAIL){
 		    vtx_moved=memcpy((void *)vtx_moved,(void *)&backupvtx[0],sizeof(ts_vertex));
             continue;
         }
+//        fprintf(stderr,"Sprejet.\n");
 
         // All checks OK!
 
@@ -69,7 +72,8 @@ ts_bool constvolume(ts_vesicle *vesicle, ts_vertex *vtx_avoid, ts_double Vol, ts
                 delta_energy+=vtx_moved->neigh[i]->xk*(vtx_moved->neigh[i]->energy-oenergy);
             }
             *retEnergy=delta_energy;
-            vtx_backup=backupvtx;
+            *vtx_backup=backupvtx;
+            *vtx_moved_retval=vtx_moved;
             return TS_SUCCESS;
         }        
         //do it again ;)
@@ -100,7 +104,8 @@ ts_bool constvolume(ts_vesicle *vesicle, ts_vertex *vtx_avoid, ts_double Vol, ts
                 delta_energy+=vtx_moved->neigh[i]->xk*(vtx_moved->neigh[i]->energy-oenergy);
             }
             *retEnergy=delta_energy;
-            vtx_backup=backupvtx;
+            *vtx_backup=backupvtx;
+            *vtx_moved_retval=vtx_moved;
             return TS_SUCCESS;
         }        
 
@@ -145,16 +150,23 @@ ts_bool constvolConstraintCheck(ts_vesicle *vesicle, ts_vertex *vtx){
 
 ts_bool constvolumerestore(ts_vertex *vtx_moved,ts_vertex *vtx_backup){
     ts_uint j;
-    for(j=0;j<vtx_moved->neigh_no;j++){
+	 memcpy((void *)vtx_moved,(void *)&vtx_backup[0],sizeof(ts_vertex));
+     for(j=0;j<vtx_moved->neigh_no;j++){
         	    memcpy((void *)vtx_moved->neigh[j],(void *)&vtx_backup[j+1],sizeof(ts_vertex));
-	        }
-	        vtx_moved=memcpy((void *)vtx_moved,(void *)&vtx_backup[0],sizeof(ts_vertex));
-
+	}
+    free(vtx_backup);
     return TS_SUCCESS;
 }
 
-ts_bool constvolumeaccept(ts_vertex *vtx_moved, ts_vertex *vtx_backup){
-
+ts_bool constvolumeaccept(ts_vesicle *vesicle,ts_vertex *vtx_moved, ts_vertex *vtx_backup){
+    ts_bool retval;
+	ts_uint cellidx=vertex_self_avoidance(vesicle, vtx_moved);
+    if(vtx_moved->cell!=vesicle->clist->cell[cellidx]){
+		retval=cell_add_vertex(vesicle->clist->cell[cellidx],vtx_moved);
+		if(retval==TS_SUCCESS) cell_remove_vertex(vtx_backup[0].cell,vtx_moved);
+		
+	}
+    free(vtx_backup);
 
     return TS_SUCCESS;
 }

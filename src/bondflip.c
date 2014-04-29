@@ -12,6 +12,7 @@
 //#include "io.h"
 #include<stdio.h>
 #include<string.h>
+#include "constvol.h"
 
 ts_bool single_bondflip_timestep(ts_vesicle *vesicle, ts_bond *bond, ts_double *rn){
 /*c  Vertex and triangle (lm and lp) indexing for bond flip:
@@ -34,6 +35,10 @@ c
     ts_triangle *lm=NULL,*lp=NULL, *lp1=NULL, *lm2=NULL;
 
     ts_vertex *kp,*km;
+
+    ts_double delta_energy_cv;
+    ts_vertex *constvol_vtx_moved, *constvol_vtx_backup;
+    ts_bool retval;
 
     if(it->neigh_no< 3) return TS_FAIL;
     if(k->neigh_no< 3) return TS_FAIL;
@@ -164,7 +169,7 @@ for(i=0;i<4;i++){
   oldenergy+=it->xk* it->energy;
   //Neigbours of k, it, km, kp don't change its energy.
 
-	if(vesicle->pswitch == 1){dvol = -lm->volume - lp->volume;}
+	if(vesicle->pswitch == 1 || vesicle->tape->constvolswitch==1){dvol = -lm->volume - lp->volume;}
 
 /* fix data structure for flipped bond */
     ts_flip_bond(k,it,km,kp, bond,lm, lp, lm2, lp1);
@@ -178,16 +183,51 @@ for(i=0;i<4;i++){
   delta_energy+=it->xk* it->energy;
   //Neigbours of k, it, km, kp don't change its energy.
 
-  delta_energy-=oldenergy;
-	if(vesicle->pswitch == 1){
+    delta_energy-=oldenergy;
+	if(vesicle->pswitch == 1 || vesicle->tape->constvolswitch==1){
 		dvol = dvol + lm->volume + lp->volume;
-		delta_energy-= vesicle->pressure*dvol;
+		if(vesicle->pswitch==1) delta_energy-= vesicle->pressure*dvol;
 	}
+
+    retval=TS_SUCCESS;
+    if(vesicle->tape->constvolswitch == 1){
+        retval=constvolume(vesicle, it, -dvol, &delta_energy_cv, &constvol_vtx_moved,&constvol_vtx_backup);
+        if(retval==TS_FAIL){
+/* restoration procedure copied from few lines below */
+		for(i=0;i<4;i++){
+//			fprintf(stderr,"Restoring vtx neigh[%d] with neighbours %d\n",i, orig_vtx[i]->neigh_no );
+			free(orig_vtx[i]->neigh);
+			free(orig_vtx[i]->tristar);
+			free(orig_vtx[i]->bond);
+			free(orig_tria[i]->neigh);
+			memcpy((void *)orig_vtx[i],(void *)bck_vtx[i],sizeof(ts_vertex));
+			memcpy((void *)orig_tria[i],(void *)bck_tria[i],sizeof(ts_triangle));
+//			fprintf(stderr,"Restored vtx neigh[%d] with neighbours %d\n",i, orig_vtx[i]->neigh_no );
+			/* level 2 pointers are redirected*/
+		}
+		memcpy(bond,bck_bond,sizeof(ts_bond));
+
+		for(i=0;i<4;i++){
+			free(bck_vtx[i]);
+			free(bck_tria[i]);
+/*			fprintf(stderr,"Restoring vtx neigh[%d] with neighbours %d =",i, orig_vtx[i]->neigh_no );
+			for(j=0;j<orig_vtx[i]->neigh_no;j++) fprintf(stderr," %d", orig_vtx[i]->neigh[j]->idx);
+			fprintf(stderr,"\n"); */
+		}
+
+		free(bck_bond);
+        return TS_FAIL;
+
+        }
+    
+    delta_energy+=delta_energy_cv;
+    }
+
 
 /* MONTE CARLO */
     if(delta_energy>=0){
 #ifdef TS_DOUBLE_DOUBLE
-        if(exp(-delta_energy)< drand48() )
+        if(exp(-delta_energy)< drand48())
 #endif
 #ifdef TS_DOUBLE_FLOAT
         if(expf(-delta_energy)< (ts_float)drand48())
@@ -222,13 +262,17 @@ for(i=0;i<4;i++){
 		}
 
 		free(bck_bond);
+
+        if(vesicle->tape->constvolswitch == 1){
+            constvolumerestore(constvol_vtx_moved,constvol_vtx_backup);
+        }
 //		fprintf(stderr,"Restoration complete!!!\n");
 
 		return TS_FAIL;
         }
     }
      /* IF BONDFLIP ACCEPTED, THEN RETURN SUCCESS! */
-  //          fprintf(stderr,"SUCCESS!!!\n");
+//            fprintf(stderr,"SUCCESS!!!\n");
 
 	// delete all backups
 	for(i=0;i<4;i++){
@@ -244,6 +288,9 @@ for(i=0;i<4;i++){
 */	
 	}
 	free(bck_bond);
+    if(vesicle->tape->constvolswitch == 1){
+        constvolumeaccept(vesicle,constvol_vtx_moved,constvol_vtx_backup);
+    }
 
     return TS_SUCCESS;
 }
