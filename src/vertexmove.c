@@ -174,6 +174,8 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
         constvolumerestore(constvol_vtx_moved,constvol_vtx_backup);
     }
 //    fprintf(stderr, "after vtx(x,y,z)=%e,%e,%e\n",constvol_vtx_moved->x, constvol_vtx_moved->y, constvol_vtx_moved->z);
+//    vesicle_volume(vesicle);
+//    fprintf(stderr,"Volume after fail=%1.16e\n", vesicle->volume);
     return TS_FAIL; 
     }
 }
@@ -192,6 +194,8 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
     }
 //	if(oldcellidx);
     //END MONTE CARLOOOOOOO
+//    vesicle_volume(vesicle);
+//    fprintf(stderr,"Volume after success=%1.16e\n", vesicle->volume);
     return TS_SUCCESS;
 }
 

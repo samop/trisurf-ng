@@ -105,7 +105,6 @@ ts_bool single_timestep(ts_vesicle *vesicle,ts_double *vmsr, ts_double *bfsr){
         //find a bond and return a pointer to a bond...
         //call single_bondflip_timestep...
         retval=single_bondflip_timestep(vesicle,vesicle->blist->bond[b],rnvec);
-    retval=TS_FAIL;
 	if(retval==TS_SUCCESS) bfsrcnt++;        
     }
 
