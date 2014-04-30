@@ -150,7 +150,7 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
     //MONTE CARLOOOOOOOO
     if(delta_energy>=0){
 #ifdef TS_DOUBLE_DOUBLE
-        if(exp(-delta_energy)< drand48() )
+        if(exp(-delta_energy)< drand48())
 #endif
 #ifdef TS_DOUBLE_FLOAT
         if(expf(-delta_energy)< (ts_float)drand48())

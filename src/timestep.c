@@ -32,11 +32,16 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 	for(i=start_iteration;i<inititer+iterations;i++){
 		vmsr=0.0;
 		bfsr=0.0;
+/*    vesicle_volume(vesicle);
+    fprintf(stderr,"Volume before TS=%1.16e\n", vesicle->volume); */
 		for(j=0;j<mcsweeps;j++){
 			single_timestep(vesicle, &vmsrt, &bfsrt);
 			vmsr+=vmsrt;
 			bfsr+=bfsrt;
 		}
+/*
+    vesicle_volume(vesicle);
+    fprintf(stderr,"Volume after TS=%1.16e\n", vesicle->volume); */
 		vmsr/=(ts_double)mcsweeps;
 		bfsr/=(ts_double)mcsweeps;
 		centermass(vesicle);
@@ -87,6 +92,8 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 }
 
 ts_bool single_timestep(ts_vesicle *vesicle,ts_double *vmsr, ts_double *bfsr){
+//    vesicle_volume(vesicle);
+//    fprintf(stderr,"Volume before TS=%1.16e\n", vesicle->volume);
     ts_bool retval;
     ts_double rnvec[3];
     ts_uint i,j, b;
@@ -105,6 +112,7 @@ ts_bool single_timestep(ts_vesicle *vesicle,ts_double *vmsr, ts_double *bfsr){
         //find a bond and return a pointer to a bond...
         //call single_bondflip_timestep...
         retval=single_bondflip_timestep(vesicle,vesicle->blist->bond[b],rnvec);
+       //     b++; retval=TS_FAIL;
 	if(retval==TS_SUCCESS) bfsrcnt++;        
     }
 
@@ -131,6 +139,8 @@ ts_bool single_timestep(ts_vesicle *vesicle,ts_double *vmsr, ts_double *bfsr){
 //	printf("Bondflip success rate in one sweep: %d/%d=%e\n", cnt,3*vesicle->blist->n,(double)cnt/(double)vesicle->blist->n/3.0);
 	*vmsr=(ts_double)vmsrcnt/(ts_double)vesicle->vlist->n;
 	*bfsr=(ts_double)bfsrcnt/(ts_double)vesicle->vlist->n/3.0;
+//    vesicle_volume(vesicle);
+//    fprintf(stderr,"Volume after TS=%1.16e\n", vesicle->volume);
     return TS_SUCCESS;
 }
 

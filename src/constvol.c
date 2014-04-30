@@ -43,9 +43,6 @@ ts_bool constvolume(ts_vesicle *vesicle, ts_vertex *vtx_avoid, ts_double Vol, ts
         }
         // All checks OK!
 
-        for(j=0;j<vtx_moved->neigh_no;j++){
-        	memcpy((void *)&backupvtx[j+1],(void *)vtx_moved->neigh[j],sizeof(ts_vertex));
-	    }
         dvol=0.0;
         for(j=0;j<vtx_moved->tristar_no;j++){
             dvol-=vtx_moved->tristar[j]->volume;
@@ -86,9 +83,6 @@ ts_bool constvolume(ts_vesicle *vesicle, ts_vertex *vtx_avoid, ts_double Vol, ts
 	    vtx_moved->z=vtx_moved->z*(1-dh/Rv);
         //check for constraints
         if(constvolConstraintCheck(vesicle, vtx_moved)==TS_FAIL){
-	        for(j=0;j<vtx_moved->neigh_no;j++){
-        	    memcpy((void *)vtx_moved->neigh[j],(void *)&backupvtx[j+1],sizeof(ts_vertex));
-	        }
 	        vtx_moved=memcpy((void *)vtx_moved,(void *)&backupvtx[0],sizeof(ts_vertex));
             //also, restore normals
             for(j=0;j<vtx_moved->tristar_no;j++) triangle_normal_vector(vtx_moved->tristar[j]);
@@ -104,6 +98,10 @@ ts_bool constvolume(ts_vesicle *vesicle, ts_vertex *vtx_avoid, ts_double Vol, ts
         if(fabs(voldiff)/vesicle->volume < vesicle->tape->constvolprecision){
             //calculate energy, return change in energy...
 //            fprintf(stderr, "Constvol success! %e\n",voldiff);
+            for(j=0;j<vtx_moved->neigh_no;j++){
+        	memcpy((void *)&backupvtx[j+1],(void *)vtx_moved->neigh[j],sizeof(ts_vertex));
+    	    }
+
             oenergy=vtx_moved->energy;
             energy_vertex(vtx_moved);
             delta_energy=vtx_moved->xk*(vtx_moved->energy - oenergy);
@@ -159,10 +157,11 @@ ts_bool constvolConstraintCheck(ts_vesicle *vesicle, ts_vertex *vtx){
 ts_bool constvolumerestore(ts_vertex *vtx_moved,ts_vertex *vtx_backup){
     ts_uint j;
 	 memcpy((void *)vtx_moved,(void *)&vtx_backup[0],sizeof(ts_vertex));
-     for(j=0;j<vtx_moved->neigh_no;j++){
-        	    memcpy((void *)vtx_moved->neigh[j],(void *)&vtx_backup[j+1],sizeof(ts_vertex));
-	}
     for(j=0;j<vtx_moved->tristar_no;j++) triangle_normal_vector(vtx_moved->tristar[j]);
+     for(j=0;j<vtx_moved->neigh_no;j++){
+        	   // memcpy((void *)vtx_moved->neigh[j],(void *)&vtx_backup[j+1],sizeof(ts_vertex));
+                 energy_vertex(vtx_moved->neigh[j]);
+	}
 
     free(vtx_backup);
     return TS_SUCCESS;

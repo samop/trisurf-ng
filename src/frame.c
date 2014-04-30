@@ -3,6 +3,8 @@
 #include "cell.h"
 #include "frame.h"
 
+
+#include "triangle.h"
 ts_bool centermass(ts_vesicle *vesicle){
     ts_uint i,j, n=vesicle->vlist->n;
     ts_vertex **vtx=vesicle->vlist->vtx;
@@ -43,6 +45,11 @@ ts_bool centermass(ts_vesicle *vesicle){
     vesicle->cm[0]=0.0;
     vesicle->cm[1]=0.0;
     vesicle->cm[2]=0.0;
+
+    for(i=0;i<vesicle->tlist->n;i++){
+        triangle_normal_vector(vesicle->tlist->tria[i]);
+    }
+
 
     return TS_SUCCESS;
 }
