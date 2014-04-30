@@ -27,6 +27,7 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 	fprintf(fd, "Epoch OuterLoop VertexMoveSucessRate BondFlipSuccessRate Volume Area lamdba1 lambda2 lambda3 Kc(2-9) Kc(6-9) Kc(2-end) Kc(3-6)\n");
 	centermass(vesicle);
 	cell_occupation(vesicle);
+	vesicle_volume(vesicle); //needed for constant volume at this moment
 	if(start_iteration<inititer) ts_fprintf(stdout, "Starting simulation (first %d x %d MC sweeps will not be recorded on disk)\n", inititer, mcsweeps);
 	for(i=start_iteration;i<inititer+iterations;i++){
 		vmsr=0.0;
@@ -88,7 +89,7 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 ts_bool single_timestep(ts_vesicle *vesicle,ts_double *vmsr, ts_double *bfsr){
     ts_bool retval;
     ts_double rnvec[3];
-    ts_uint i,j;//b;
+    ts_uint i,j, b;
     ts_uint vmsrcnt=0;
     for(i=0;i<vesicle->vlist->n;i++){
         rnvec[0]=drand48();
@@ -100,10 +101,10 @@ ts_bool single_timestep(ts_vesicle *vesicle,ts_double *vmsr, ts_double *bfsr){
 
 	ts_int bfsrcnt=0;
     for(i=0;i<3*vesicle->vlist->n;i++){
-//	b=rand() % vesicle->blist->n;
+	b=rand() % vesicle->blist->n;
         //find a bond and return a pointer to a bond...
         //call single_bondflip_timestep...
-     //   retval=single_bondflip_timestep(vesicle,vesicle->blist->bond[b],rnvec);
+        retval=single_bondflip_timestep(vesicle,vesicle->blist->bond[b],rnvec);
     retval=TS_FAIL;
 	if(retval==TS_SUCCESS) bfsrcnt++;        
     }

@@ -97,9 +97,9 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
 	};
 
     delta_energy=0;
-
- 
-//    fprintf(stderr,"Success for now.\n");
+    
+//    vesicle_volume(vesicle);
+//    fprintf(stderr,"Volume in the beginning=%1.16e\n", vesicle->volume);
 
     //update the normals of triangles that share bead i.
     for(i=0;i<vtx->tristar_no;i++) triangle_normal_vector(vtx->tristar[i]);
@@ -118,17 +118,26 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
         if(vesicle->pswitch==1) delta_energy-=vesicle->pressure*dvol;
 	};
 
+//    vesicle_volume(vesicle);
+//    fprintf(stderr,"Volume before=%1.16e\n", vesicle->volume);
    if(vesicle->tape->constvolswitch == 1){
-        retval=constvolume(vesicle, vtx, dvol, &delta_energy_cv, &constvol_vtx_moved,&constvol_vtx_backup);
+        retval=constvolume(vesicle, vtx, -dvol, &delta_energy_cv, &constvol_vtx_moved,&constvol_vtx_backup);
         if(retval==TS_FAIL){ // if we couldn't move the vertex to assure constant volume
             vtx=memcpy((void *)vtx,(void *)&backupvtx[0],sizeof(ts_vertex));
 	        for(i=0;i<vtx->neigh_no;i++){
 		        vtx->neigh[i]=memcpy((void *)vtx->neigh[i],(void *)&backupvtx[i+1],sizeof(ts_vertex));
 	        }
             for(i=0;i<vtx->tristar_no;i++) triangle_normal_vector(vtx->tristar[i]); 
+ //           fprintf(stderr,"fajlam!\n");
             return TS_FAIL;
         }
+//    vesicle_volume(vesicle);
+//    fprintf(stderr,"Volume after=%1.16e\n", vesicle->volume);
+//    fprintf(stderr,"Volume after-dvol=%1.16e\n", vesicle->volume-dvol);
+//    fprintf(stderr,"Denergy before=%e\n",delta_energy);
+    
     delta_energy+=delta_energy_cv;
+//    fprintf(stderr,"Denergy after=%e\n",delta_energy);
     }
 /* No poly-bond energy for now!
 	if(vtx->grafted_poly!=NULL){
@@ -160,9 +169,11 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
     //update the normals of triangles that share bead i.
    for(i=0;i<vtx->tristar_no;i++) triangle_normal_vector(vtx->tristar[i]);
 
+//    fprintf(stderr, "before vtx(x,y,z)=%e,%e,%e\n",constvol_vtx_moved->x, constvol_vtx_moved->y, constvol_vtx_moved->z);
     if(vesicle->tape->constvolswitch == 1){
         constvolumerestore(constvol_vtx_moved,constvol_vtx_backup);
     }
+//    fprintf(stderr, "after vtx(x,y,z)=%e,%e,%e\n",constvol_vtx_moved->x, constvol_vtx_moved->y, constvol_vtx_moved->z);
     return TS_FAIL; 
     }
 }
