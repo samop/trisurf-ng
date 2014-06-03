@@ -38,7 +38,9 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 
 	}
 
-
+/* RANDOM SEED SET BY CURRENT TIME */
+	epochtime=get_epoch();			
+	srand48(epochtime);
 
 	centermass(vesicle);
 	cell_occupation(vesicle);
