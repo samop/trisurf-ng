@@ -12,7 +12,7 @@
 ts_bool constvolume(ts_vesicle *vesicle, ts_vertex *vtx_avoid, ts_double Vol, ts_double *retEnergy, ts_vertex **vtx_moved_retval, ts_vertex **vtx_backup){
     ts_vertex *vtx_moved;
     ts_uint vtxind,i,j;
-    ts_uint Ntries=3;
+    ts_uint Ntries=100;
 	ts_vertex *backupvtx;
     ts_double Rv, dh, dvol, volFirst, voldiff, oenergy,delta_energy;
     backupvtx=(ts_vertex *)calloc(sizeof(ts_vertex),10);
@@ -20,13 +20,22 @@ ts_bool constvolume(ts_vesicle *vesicle, ts_vertex *vtx_avoid, ts_double Vol, ts
     for(i=0;i<Ntries;i++){
         vtxind=rand() % vesicle->vlist->n;
         vtx_moved=vesicle->vlist->vtx[vtxind];
-        /* chosen vertex must not be a nearest neighbour. TODO: probably must
+        /* chosen vertex must not be a nearest neighbour. WASTODO: probably must.
+         * DONE: solved below, when using different algorithm.
          * extend search in case of bondflip */
-        if(vtx_moved==vtx_avoid) continue;
+/*        if(vtx_moved==vtx_avoid) continue;
         for(j=0;j<vtx_moved->neigh_no;j++){
             if(vtx_moved->neigh[j]==vtx_avoid) continue;
         }
-         
+*/
+/* different check of nearest neighbour (and second nearest neighbour) check.
+ * Checking the distance between vertex and vertex to be moved to assure
+ * constant volume. Solves upper todo problem. */
+
+        if(vtx_distance_sq(vtx_moved,vtx_avoid)<16.0*vesicle->dmax){
+            continue;
+        }
+        
 	    memcpy((void *)&backupvtx[0],(void *)vtx_moved,sizeof(ts_vertex));
 
         //move vertex in specified direction. first try, test move!
@@ -36,11 +45,14 @@ ts_bool constvolume(ts_vesicle *vesicle, ts_vertex *vtx_avoid, ts_double Vol, ts
 	    vtx_moved->y=vtx_moved->y*(1.0-dh/Rv);
 	    vtx_moved->z=vtx_moved->z*(1.0-dh/Rv);
 
+
+//SKIPPING FIRST CHECK of CONSTRAINTS. This is not a final move.
         //check for constraints
-          if(constvolConstraintCheck(vesicle, vtx_moved)==TS_FAIL){
+/*          if(constvolConstraintCheck(vesicle, vtx_moved)==TS_FAIL){
 		    vtx_moved=memcpy((void *)vtx_moved,(void *)&backupvtx[0],sizeof(ts_vertex));
-            continue;
-        }
+//            continue;
+                break;
+        }  */
         // All checks OK!
 
         dvol=0.0;
@@ -86,7 +98,8 @@ ts_bool constvolume(ts_vesicle *vesicle, ts_vertex *vtx_avoid, ts_double Vol, ts
 	        vtx_moved=memcpy((void *)vtx_moved,(void *)&backupvtx[0],sizeof(ts_vertex));
             //also, restore normals
             for(j=0;j<vtx_moved->tristar_no;j++) triangle_normal_vector(vtx_moved->tristar[j]);
-            continue;
+//            continue;
+                break;
         }
 
         dvol=volFirst;
