@@ -422,7 +422,7 @@ ts_vesicle *restore_state(ts_uint *iteration){
     vesicle->tape=parsetape("tape");
 // recreating space for cells // 
     vesicle->clist=init_cell_list(vesicle->tape->ncxmax, vesicle->tape->ncymax, vesicle->tape->nczmax, vesicle->tape->stepsize);
-
+	vesicle->clist->max_occupancy=8;
 //    vesicle->tape=(ts_tape *)malloc(sizeof(ts_tape));
 //    retval=fread(vesicle->tape, sizeof(ts_tape),1,fh);
 	retval=fread(iteration,sizeof(ts_uint),1,fh);
