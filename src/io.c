@@ -10,7 +10,7 @@
 #include <dirent.h>
 #include "initial_distribution.h"
 #include "poly.h"
-
+#include "cell.h"
 #include <getopt.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -421,18 +421,8 @@ ts_vesicle *restore_state(ts_uint *iteration){
     }
     vesicle->tape=parsetape("tape");
 // recreating space for cells // 
-	vesicle->clist=(ts_cell_list *)malloc(sizeof(ts_cell_list));
-	retval=fread(vesicle->clist, sizeof(ts_cell_list), 1,fh);
-    vesicle->clist->ncmax[0]=vesicle->tape->ncxmax; 
-    vesicle->clist->ncmax[1]=vesicle->tape->ncymax; 
-    vesicle->clist->ncmax[2]=vesicle->tape->nczmax; 
-	vesicle->clist->cellno=vesicle->clist->ncmax[0]*vesicle->clist->ncmax[1]*vesicle->clist->ncmax[2];
-	vesicle->clist->cell=(ts_cell **)malloc(sizeof(ts_cell *)*vesicle->clist->ncmax[0]*vesicle->clist->ncmax[1]*vesicle->clist->ncmax[2]);
-	for(i=0;i<vesicle->clist->ncmax[0]*vesicle->clist->ncmax[1]*vesicle->clist->ncmax[2];i++){
-        	vesicle->clist->cell[i]=(ts_cell *)calloc(1,sizeof(ts_cell));
-        	vesicle->clist->cell[i]->idx=i+1; // We enumerate cells! Probably never required!
-    	}
-//recreating stored tape information//
+    vesicle->clist=init_cell_list(vesicle->tape->ncxmax, vesicle->tape->ncymax, vesicle->tape->nczmax, vesicle->tape->stepsize);
+
 //    vesicle->tape=(ts_tape *)malloc(sizeof(ts_tape));
 //    retval=fread(vesicle->tape, sizeof(ts_tape),1,fh);
 	retval=fread(iteration,sizeof(ts_uint),1,fh);
