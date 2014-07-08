@@ -419,19 +419,21 @@ ts_vesicle *restore_state(ts_uint *iteration){
                 vesicle->filament_list->poly[i]->blist->bond[j]->vtx2=vesicle->filament_list->poly[i]->vlist->vtx[idx];
         }
     }
-
+    vesicle->tape=parsetape("tape");
 // recreating space for cells // 
 	vesicle->clist=(ts_cell_list *)malloc(sizeof(ts_cell_list));
-	retval=fread(vesicle->clist, sizeof(ts_cell_list), 1,fh); 
+	retval=fread(vesicle->clist, sizeof(ts_cell_list), 1,fh);
+    vesicle->clist->ncmax[0]=vesicle->tape->ncxmax; 
+    vesicle->clist->ncmax[1]=vesicle->tape->ncymax; 
+    vesicle->clist->ncmax[2]=vesicle->tape->nczmax; 
 	vesicle->clist->cell=(ts_cell **)malloc(sizeof(ts_cell *)*vesicle->clist->ncmax[0]*vesicle->clist->ncmax[1]*vesicle->clist->ncmax[2]);
 	for(i=0;i<vesicle->clist->ncmax[0]*vesicle->clist->ncmax[1]*vesicle->clist->ncmax[2];i++){
         	vesicle->clist->cell[i]=(ts_cell *)calloc(1,sizeof(ts_cell));
         	vesicle->clist->cell[i]->idx=i+1; // We enumerate cells! Probably never required!
     	}
-
 //recreating stored tape information//
-    vesicle->tape=(ts_tape *)malloc(sizeof(ts_tape));
-    retval=fread(vesicle->tape, sizeof(ts_tape),1,fh);
+//    vesicle->tape=(ts_tape *)malloc(sizeof(ts_tape));
+//    retval=fread(vesicle->tape, sizeof(ts_tape),1,fh);
 	retval=fread(iteration,sizeof(ts_uint),1,fh);
     if(retval); 
     fclose(fh);

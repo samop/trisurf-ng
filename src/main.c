@@ -55,6 +55,9 @@ int main(int argv, char *argc[]){
         free(vesicle->tape);
         vesicle->tape=tape;
 		vesicle->clist->dmin_interspecies = tape->dmin_interspecies*tape->dmin_interspecies;
+
+
+
         /* spherical harmonics */
         if(tape->shc>0){
 	        vesicle->sphHarmonics=complex_sph_init(vesicle->vlist,tape->shc);
