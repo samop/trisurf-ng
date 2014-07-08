@@ -426,6 +426,7 @@ ts_vesicle *restore_state(ts_uint *iteration){
     vesicle->clist->ncmax[0]=vesicle->tape->ncxmax; 
     vesicle->clist->ncmax[1]=vesicle->tape->ncymax; 
     vesicle->clist->ncmax[2]=vesicle->tape->nczmax; 
+	vesicle->clist->cellno=vesicle->clist->ncmax[0]*vesicle->clist->ncmax[1]*vesicle->clist->ncmax[2];
 	vesicle->clist->cell=(ts_cell **)malloc(sizeof(ts_cell *)*vesicle->clist->ncmax[0]*vesicle->clist->ncmax[1]*vesicle->clist->ncmax[2]);
 	for(i=0;i<vesicle->clist->ncmax[0]*vesicle->clist->ncmax[1]*vesicle->clist->ncmax[2];i++){
         	vesicle->clist->cell[i]=(ts_cell *)calloc(1,sizeof(ts_cell));
