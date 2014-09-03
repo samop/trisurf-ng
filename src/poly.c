@@ -61,7 +61,7 @@ ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vli
 
 	// Grafting polymers:
 	if (vlist!=NULL){
-		if (n_poly > vlist->n){fatal("Number of polymers larger then numbero f vertices on a vesicle.",310);}
+		if (n_poly > vlist->n){fatal("Number of polymers larger than numbero f vertices on a vesicle.",310);}
 	
 		while(i<n_poly){
 			gvtxi = rand() % vlist->n;
@@ -172,3 +172,42 @@ ts_bool poly_list_free(ts_poly_list *poly_list){
 	
 	return TS_SUCCESS;
 }
+
+
+ts_poly *remove_poly_with_index(ts_poly_list *poly_list, ts_uint idx){
+	ts_uint i;
+	ts_poly *removed_poly=poly_list->poly[idx];
+
+	poly_list->n--; //decrease the total number of polymeres
+	for(i=idx;i<poly_list->n;i++){ //move the rest of the polymeres up.
+		poly_list->poly[i]=poly_list->poly[i+1];
+//		poly_list->poly[idx]->idx=idx;
+	}
+	
+	return removed_poly;
+}
+
+
+ts_bool remove_random_polymeres(ts_poly_list *poly_list, ts_uint number){
+
+	ts_uint i, idx;
+	ts_poly *poly;
+
+	ts_poly **new_poly_array;
+	if(number>poly_list->n) fatal("The number of polymeres to be removed from the list is greater than the number of total polymeres in the list",999);
+	for(i=number;i>0;i--){
+		idx=rand() % poly_list->n;
+		poly=remove_poly_with_index(poly_list, idx);
+		poly_free(poly);
+	}
+	printf("Addr before %ld\n", (long)poly_list->poly);
+	new_poly_array=(ts_poly **)calloc(poly_list->n,sizeof(ts_poly *));
+	for(i=0;i<poly_list->n;i++){
+		new_poly_array[i]=poly_list->poly[i];
+	}
+	free(poly_list->poly);
+	poly_list->poly=new_poly_array;
+	printf("Addr after %ld\n", (long)poly_list->poly);
+	return TS_SUCCESS;
+}
+

@@ -73,6 +73,20 @@ int main(int argv, char *argc[]){
 			ts_fprintf(stdout, "Simulation already completed. if you want to rerun it try with --force-from-tape or --reset-iteration-count\n\n");
 			return 0;
 		}
+
+	/* if requested in tape, we can have smaller number of polymeres attached to membrane than the number of polymeres in dump file */
+		if(vesicle->tape->npoly != vesicle->poly_list->n){
+
+		ts_fprintf(stdout,"(INFO) the number of polymeres attached to membrane in tape is different than a number of polymeres in dump file!\n");
+		if(vesicle->tape->npoly > vesicle->poly_list->n){
+			ts_fprintf(stdout,"(INFO) It is possible to decrease the number of polymeres on the membrane, but it is not allowed to increase its number. The maximal allowed number in tape is %d The execution of program will terminate!\n",vesicle->poly_list->n);
+			fatal("Terminating due to increase of number of polymeres",1);
+		} else {
+			remove_random_polymeres(vesicle->poly_list, vesicle->poly_list->n - vesicle->tape->npoly);
+			ts_fprintf(stdout,"(INFO)\n(INFO) The new number of polymeres from tape is %d.\n\n",vesicle->poly_list->n);
+
+		}
+		}
 	}
 
 	run_simulation(vesicle, tape->mcsweeps, tape->inititer, tape->iterations, start_iteration);
