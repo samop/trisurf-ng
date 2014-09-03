@@ -169,9 +169,9 @@ ts_bool dump_state(ts_vesicle *vesicle, ts_uint iteration){
         poly_list->poly->bond
 */
 
-	fwrite(vesicle->clist, sizeof(ts_cell_list),1,  fh);
+//	fwrite(vesicle->clist, sizeof(ts_cell_list),1,  fh);
 /* write tape information on vesicle */
-    fwrite(vesicle->tape,sizeof(ts_tape),1,fh);
+//    fwrite(vesicle->tape,sizeof(ts_tape),1,fh);
 	fwrite(&iteration, sizeof(ts_uint),1,fh);
     fclose(fh);
     return TS_SUCCESS;
