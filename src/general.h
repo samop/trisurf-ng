@@ -313,7 +313,8 @@ typedef struct {
 /* GLOBAL VARIABLES */
 
 int quiet;
-
+ts_double V0;
+ts_double epsvol;
 
 /* FUNCTIONS */
 

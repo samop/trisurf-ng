@@ -92,7 +92,7 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
 	memcpy((void *)&backupvtx[i+1],(void *)vtx->neigh[i],sizeof(ts_vertex));
 	}
 
-	if(vesicle->pswitch == 1 || vesicle->tape->constvolswitch==1){
+	if(vesicle->pswitch == 1 || vesicle->tape->constvolswitch>0){
 		for(i=0;i<vtx->tristar_no;i++) dvol-=vtx->tristar[i]->volume;
 	};
 
@@ -113,11 +113,27 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
         delta_energy+=vtx->neigh[i]->xk*(vtx->neigh[i]->energy-oenergy);
     }
 
-	if(vesicle->pswitch == 1 || vesicle->tape->constvolswitch == 1){
+	if(vesicle->pswitch == 1 || vesicle->tape->constvolswitch >0){
 		for(i=0;i<vtx->tristar_no;i++) dvol+=vtx->tristar[i]->volume;
         if(vesicle->pswitch==1) delta_energy-=vesicle->pressure*dvol;
 	};
 
+
+	if(vesicle->tape->constvolswitch==2){
+		/*check whether the dvol is gt than epsvol */
+			//fprintf(stderr,"DVOL=%1.16e\n",dvol);
+		if(fabs(vesicle->volume+dvol-V0)>epsvol){
+			//restore old state.
+ 			vtx=memcpy((void *)vtx,(void *)&backupvtx[0],sizeof(ts_vertex));
+	        	for(i=0;i<vtx->neigh_no;i++){
+		        	vtx->neigh[i]=memcpy((void *)vtx->neigh[i],(void *)&backupvtx[i+1],sizeof(ts_vertex));
+	        	}
+            		for(i=0;i<vtx->tristar_no;i++) triangle_normal_vector(vtx->tristar[i]); 
+            		//fprintf(stderr,"fajlam!\n");
+            		return TS_FAIL;
+		}
+
+	} else
 //    vesicle_volume(vesicle);
 //    fprintf(stderr,"Volume before=%1.16e\n", vesicle->volume);
    if(vesicle->tape->constvolswitch == 1){
@@ -189,6 +205,9 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
 		
 	}
 
+    if(vesicle->tape->constvolswitch == 2){
+	vesicle->volume+=dvol;
+    } else
     if(vesicle->tape->constvolswitch == 1){
         constvolumeaccept(vesicle,constvol_vtx_moved,constvol_vtx_backup);
     }
