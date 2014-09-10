@@ -46,7 +46,8 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 	cell_occupation(vesicle);
 	vesicle_volume(vesicle); //needed for constant volume at this moment
 	V0=vesicle->volume; 
-	epsvol=V0*0.003e-2; //TODO! Follow Miha's derivation for exact formula;
+	epsvol=4.0*sqrt(2.0*M_PI)/pow(3.0,3.0/4.0)*V0/pow(vesicle->tlist->n,3.0/2.0);
+  //  fprintf(stderr, "DVol=%1.16f (%1.16f), V0=%1.16f\n", epsvol,0.003e-2*V0,V0);
 	if(start_iteration<inititer) ts_fprintf(stdout, "Starting simulation (first %d x %d MC sweeps will not be recorded on disk)\n", inititer, mcsweeps);
 	for(i=start_iteration;i<inititer+iterations;i++){
 		vmsr=0.0;
