@@ -1,8 +1,6 @@
-trisurfdir=/usr/local/bin
-trisurf_PROGRAMS = trisurf
+bin_PROGRAMS = trisurf
 trisurf_SOURCES = general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c frame.c energy.c timestep.c vertexmove.c bondflip.c main.c poly.c stats.c sh.c shcomplex.c constvol.c
 AM_CFLAGS = -Wall -Werror
-#trisurf_LDFLAGS = -lm -lconfuse
 #shdiscoverdir=../
 #shdiscover_PROGRAMS= shdiscover
 #shdiscover_SOURCES= general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c energy.c sh.c shdiscover.c poly.c stats.c shcomplex.c
