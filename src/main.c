@@ -32,14 +32,14 @@ int main(int argv, char *argc[]){
 		ts_fprintf(stdout,"************************************************\n");
 		ts_fprintf(stdout,"**** Generating initial geometry from tape *****\n");
 		ts_fprintf(stdout,"************************************************\n\n");
-		tape=parsetape("tape");
+		tape=parsetape(command_line_args.tape_fullfilename);
 		vesicle=create_vesicle_from_tape(tape);
 	} else {
 
 		ts_fprintf(stdout,"**********************************************************************\n");
 		ts_fprintf(stdout,"**** Recreating vesicle from dump file and continuing simulation *****\n");
 		ts_fprintf(stdout,"**********************************************************************\n\n");
-		tape=parsetape("tape");
+		tape=parsetape(command_line_args.tape_fullfilename);
 		vesicle=restore_state(&start_iteration);
         if(vesicle==NULL){
             ts_fprintf(stderr, "Dump file does not exist or is not a regular file! Did you mean to invoke trisurf with --force-from-tape option?\n\n");
@@ -90,7 +90,7 @@ int main(int argv, char *argc[]){
 	}
 
 	run_simulation(vesicle, tape->mcsweeps, tape->inititer, tape->iterations, start_iteration);
-	write_master_xml_file("test.pvd");
+	write_master_xml_file(command_line_args.output_fullfilename);
 	write_dout_fcompat_file(vesicle,"dout");
 	vesicle_free(vesicle);
 	tape_free(tape);

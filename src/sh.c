@@ -2,7 +2,8 @@
 #include<stdlib.h>
 #include "general.h"
 #include "sh.h"
-
+#include "io.h"
+#include <string.h>
 
 
 ts_spharm *sph_init(ts_vertex_list *vlist, ts_uint l){
@@ -402,8 +403,10 @@ return TS_SUCCESS;
 ts_bool saveAvgUlm2(ts_vesicle *vesicle){
 
 	FILE *fh;
-	
-	fh=fopen("sph2out.dat", "w");
+    char filename[10000];
+    strcpy(filename, command_line_args.path);
+    strcat(filename, "sph2out.dat");
+	fh=fopen(filename, "w");
 	if(fh==NULL){
 		err("Cannot open file %s for writing");
 		return TS_FAIL;

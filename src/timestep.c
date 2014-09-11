@@ -14,7 +14,7 @@
 #include "vesicle.h"
 #include<gsl/gsl_complex.h>
 #include<gsl/gsl_complex_math.h>
-
+#include<string.h>
 
 ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, ts_uint iterations, ts_uint start_iteration){
 	ts_uint i, j,k,l,m;
@@ -22,15 +22,19 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 	ts_double l1,l2,l3,volume=0.0,area=0.0,vmsr,bfsr, vmsrt, bfsrt;
 	ts_ulong epochtime;
 	FILE *fd1,*fd2=NULL;
-// 	char filename[255];
-	FILE *fd=fopen("statistics.csv","w");
+ 	char filename[10000];
+    strcpy(filename,command_line_args.path);
+    strcat(filename,"statistics.csv");
+	FILE *fd=fopen(filename,"w");
 	if(fd==NULL){
 		fatal("Cannot open statistics.csv file for writing",1);
 	}
 	fprintf(fd, "Epoch OuterLoop VertexMoveSucessRate BondFlipSuccessRate Volume Area lamdba1 lambda2 lambda3 Kc(2-9) Kc(6-9) Kc(2-end) Kc(3-6)\n");
 
 	 if(vesicle->sphHarmonics!=NULL){
-		fd2=fopen("ulm2.csv","w");
+        strcpy(filename,command_line_args.path);
+        strcat(filename,"ulm2.csv"); 
+		fd2=fopen(filename,"w");
 		if(fd2==NULL){
 			fatal("Cannot open ulm2.csv file for writing",1);
 		}
@@ -70,7 +74,7 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
             dump_state(vesicle,i);
 		if(i>=inititer){
 			write_vertex_xml_file(vesicle,i-inititer);
-			write_master_xml_file("test.pvd");
+			write_master_xml_file(command_line_args.output_fullfilename);
 			epochtime=get_epoch();			
 			gyration_eigen(vesicle, &l1, &l2, &l3);
 			vesicle_volume(vesicle); //calculates just volume. Area is not added to ts_vesicle yet!
@@ -86,8 +90,9 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
                 kc2=calculateKc(vesicle, 6,9);
                 kc3=calculateKc(vesicle, 2,vesicle->sphHarmonics->l);
                 kc4=calculateKc(vesicle, 3,6);
-            
-				fd1=fopen("state.dat","w");
+                strcpy(filename,command_line_args.path);
+                strcat(filename,"state.dat");  
+				fd1=fopen(filename,"w");
 				fprintf(fd1,"%e %e\n",vesicle->volume, getR0(vesicle));
 				for(k=0;k<vesicle->vlist->n;k++){
 					fprintf(fd1,"%e %e %e %e %e\n",

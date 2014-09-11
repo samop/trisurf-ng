@@ -21,7 +21,7 @@ ts_bool dump_state(ts_vesicle *vesicle, ts_uint iteration){
 
     /* save current state with wrong pointers. Will fix that later */
     ts_uint i,j,k;
-    FILE *fh=fopen("dump.bin","wb");
+    FILE *fh=fopen(command_line_args.dump_fullfilename,"wb");
 
     /* dump vesicle */
     fwrite(vesicle, sizeof(ts_vesicle),1,fh);
@@ -180,10 +180,10 @@ ts_bool dump_state(ts_vesicle *vesicle, ts_uint iteration){
 /** RESTORE DUMP FROM DISK **/
 ts_vesicle *restore_state(ts_uint *iteration){
     ts_uint i,j,k;
-    FILE *fh=fopen("dump.bin","rb");
+    FILE *fh=fopen(command_line_args.dump_fullfilename,"rb");
 
     struct stat sb;
-    if (stat("dump.bin", &sb) == -1) {
+    if (stat(command_line_args.dump_fullfilename, &sb) == -1) {
         //dump file does not exist.
         return NULL;
     }
@@ -418,7 +418,7 @@ ts_vesicle *restore_state(ts_uint *iteration){
                 vesicle->filament_list->poly[i]->blist->bond[j]->vtx2=vesicle->filament_list->poly[i]->vlist->vtx[idx];
         }
     }
-    vesicle->tape=parsetape("tape");
+    vesicle->tape=parsetape(command_line_args.tape_fullfilename);
 // recreating space for cells // 
     vesicle->clist=init_cell_list(vesicle->tape->ncxmax, vesicle->tape->ncymax, vesicle->tape->nczmax, vesicle->tape->stepsize);
 	vesicle->clist->max_occupancy=8;
@@ -745,7 +745,7 @@ ts_bool write_master_xml_file(ts_char *filename){
         }
 
 	fprintf(fh,"<?xml version=\"1.0\"?>\n<VTKFile type=\"Collection\" version=\"0.1\" byte_order=\"LittleEndian\" compressor=\"vtkZLibDataCompressor\">\n<Collection>");
-	DIR *dir = opendir(".");
+	DIR *dir = opendir(command_line_args.path);
 	if(dir){
 		struct dirent *ent;
         tstep=0;
@@ -774,10 +774,13 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 	ts_bond_list *blist=vesicle->blist;
 	ts_vertex **vtx=vlist->vtx;
     ts_uint i,j;
-    	char filename[255];
+    	char filename[10000];
+        char just_name[255];
 	FILE *fh;
+        strcpy(filename,command_line_args.path);
+    	sprintf(just_name,"timestep_%.6u.vtu",timestepno);
+        strcat(filename,just_name);
 
-    	sprintf(filename,"timestep_%.6u.vtu",timestepno);
 	fh=fopen(filename, "w");
 	if(fh==NULL){
 		err("Cannot open file %s for writing");
