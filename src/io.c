@@ -439,6 +439,7 @@ ts_bool parse_args(int argc, char **argv){
     sprintf(command_line_args.output_fullfilename,"output.pvd");
     sprintf(command_line_args.dump_fullfilename,"dump.bin");
     sprintf(command_line_args.tape_fullfilename,"tape");
+    sprintf(command_line_args.tape_templatefull,"./tape");
             FILE *file;
     
 while (1)
@@ -452,6 +453,7 @@ while (1)
            {"directory",  required_argument, 0, 'd'},
            {"dump-filename", required_argument,0, 'f'},
            {"tape-options",required_argument,0,'c'},
+           {"tape-template", required_argument,0,0},
            {0, 0, 0, 0}
          };
        /* getopt_long stores the option index here. */
@@ -470,10 +472,14 @@ while (1)
            /* If this option set a flag, do nothing else now. */
            if (long_options[option_index].flag != 0)
              break;
-           printf ("option %s", long_options[option_index].name);
+/*           printf ("option %s", long_options[option_index].name);
            if (optarg)
-             printf (" with arg %s", optarg);
-           printf ("\n");
+             printf (" with arg %s", optarg); 
+           printf ("\n"); */
+            //TODO: find a better way.
+            if(strcmp(long_options[option_index].name,"tape-template")==0){
+                strcpy(command_line_args.tape_templatefull,optarg);
+            }
            break;
 
          case 'c':
@@ -534,6 +540,7 @@ while (1)
     if ((file = fopen(buffer, "w")) == NULL) {
                 fprintf(stderr,"Could not create output file %s!\n", buffer);
                 fatal("Please specify correct output file or check permissions of the file",1);
+                //there is a tape template. make a copy into desired directory
                 
             } else {
                 fclose(file);
@@ -544,8 +551,15 @@ while (1)
     strcpy(buffer,command_line_args.path);
     strcat(buffer,command_line_args.tape_fullfilename);
     if (stat(buffer, &sb) == -1) {
-                ts_fprintf(stderr,"Tape '%s' does not exist!\n",buffer);
-                fatal("Please select correct tape or check permissions of the file",1);
+
+                //tape does not exist. does tape template exist?
+                if(stat(command_line_args.tape_templatefull, &sb)==-1){ 
+                    ts_fprintf(stderr,"Tape '%s' does not exist and no tape template was specified (or does not exist)!\n",buffer);
+                    fatal("Please select correct tape or check permissions of the file",1);
+                } else {
+                    //tape template found
+                    fatal("Samo did not program template copy yet",1); 
+                }
             } else {
                 strcpy(command_line_args.tape_fullfilename,buffer);
             }
@@ -573,7 +587,6 @@ while (1)
     return TS_SUCCESS;
 
 }
-
 
 
 
