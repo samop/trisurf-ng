@@ -22,13 +22,13 @@ int main(void)
     cfg = cfg_init(opts, 0);
     retval=cfg_parse(cfg, "tape_new");
 
-      printf("nshell: %i\n", nshell);
+      printf("nshell: %li\n", nshell);
     printf("dmax: %f\n", dmax);
     printf("xk0: %f\n", xk0);
     printf("stepsize: %f\n", stepsize);
-    printf("nxmax: %i\n", ncxmax);
-    printf("nymax: %i\n", ncymax);
-    printf("nzmax: %i\n", nczmax);
+    printf("nxmax: %li\n", ncxmax);
+    printf("nymax: %li\n", ncymax);
+    printf("nzmax: %li\n", nczmax);
     return 0;
 }
 
