@@ -6,13 +6,12 @@ int main(int argv, char *argc[]){
 
 	char *commands, *backup, *saveptr, *saveopptr, *command, *operator[2], *operand;
 	int i,j;
-	commands=(char *)malloc(10000*sizeof(char));
-	backup=commands;
 	if(argv!=2){
 		fprintf(stderr, "Error. Usage: parsecmdline cmd1=1,cmd2=2,...\n");
 		exit(1);
 	}
-
+	commands=(char *)malloc(10000*sizeof(char));
+    backup=commands;
 	strcpy(commands,argc[1]);
 	
 
@@ -37,6 +36,5 @@ int main(int argv, char *argc[]){
 	}
 
 	free(backup);
-
-return 0;
+    return 0;
 }

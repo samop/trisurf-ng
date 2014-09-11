@@ -1,13 +1,12 @@
 #ifndef _IO_H
 #define _IO_H
-
+#include <confuse.h>
 /** @ Global variables for I/O operations like filenames etc. */
 /*static char mastername[1024];
 static char prefixname[1024];
 static ts_bool restore=0;
 static char tape[1024]; */
 int force_from_tape;
-
 
 typedef struct{
 	ts_int force_from_tape;
@@ -16,6 +15,7 @@ typedef struct{
     char output_fullfilename[1024]; //name of the master file
     char dump_fullfilename[1024]; //name of the dump file
     char tape_fullfilename[1024]; //name of the tape file
+    char tape_opts[1000]; //commandline tape options
 } ts_args;
 
 ts_args command_line_args;
@@ -75,6 +75,8 @@ ts_bool write_pov_file(ts_vesicle *vesicle, char *filename);
 
 ts_tape *parsetape(char *filename);
 ts_bool tape_free(ts_tape *tape);
+ts_bool getcmdline_tape(cfg_t *cfg, char *opts);
+ts_bool cmdline_to_tape(cfg_t *cfg, char *key, char *val);
 
 ts_bool dump_state(ts_vesicle *vesicle, ts_uint iteration);
 ts_vesicle *restore_state(ts_uint *iteration);

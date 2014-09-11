@@ -17,7 +17,7 @@ pswitch = 0
 pressure=0.0
 
 #Constant volume constraint (0 disable constant volume, 1 enable wiht additional vertex move, 2 enable with epsvol)
-constvolswitch=1
+constvolswitch=2
 constvolprecision=1e-14
 
 

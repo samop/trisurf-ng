@@ -1,7 +1,6 @@
 #include "general.h"
 #include<stdio.h>
 #include "io.h"
-#include <confuse.h>
 #include "vertex.h"
 #include "bond.h"
 #include<string.h>
@@ -437,9 +436,9 @@ ts_bool parse_args(int argc, char **argv){
     int c, retval;
     struct stat sb;
     sprintf(command_line_args.path, "./"); //clear string;
-    sprintf(command_line_args.output_fullfilename,"./output.pvd");
-    sprintf(command_line_args.dump_fullfilename,"./dump.bin");
-    sprintf(command_line_args.tape_fullfilename,"./tape");
+    sprintf(command_line_args.output_fullfilename,"output.pvd");
+    sprintf(command_line_args.dump_fullfilename,"dump.bin");
+    sprintf(command_line_args.tape_fullfilename,"tape");
             FILE *file;
     
 while (1)
@@ -452,12 +451,13 @@ while (1)
            {"output-file",  required_argument, 0, 'o'},
            {"directory",  required_argument, 0, 'd'},
            {"dump-filename", required_argument,0, 'f'},
+           {"tape-options",required_argument,0,'c'},
            {0, 0, 0, 0}
          };
        /* getopt_long stores the option index here. */
        int option_index = 0;
 
-       c = getopt_long (argc, argv, "d:f:o:t:",
+       c = getopt_long (argc, argv, "d:f:o:t:c:",
                         long_options, &option_index);
 
        /* Detect the end of the options. */
@@ -476,25 +476,14 @@ while (1)
            printf ("\n");
            break;
 
-         case 't':
-            //check if tape exists. If not, fail immediately.
-            if (stat(optarg, &sb) == -1) {
-                ts_fprintf(stderr,"Tape '%s' does not exist!\n",optarg);
-                fatal("Please select correct tape",1);
-            } else {
+         case 'c':
+              strcpy(command_line_args.tape_opts,optarg);
+            break;
+         case 't': //tape
                 strcpy(command_line_args.tape_fullfilename,optarg);
-            }
            break;
 
-         case 'o':
-            //set filename of master output file
-            if ((file = fopen(optarg, "w")) == NULL) {
-                fprintf(stderr,"Could not create output file!\n");
-                fatal("Please specify correct output file",1);
-                
-            } else {
-                fclose(file);
-            }
+         case 'o':  //set filename of master pvd output file
             strcpy(command_line_args.output_fullfilename, optarg);
             break;
 
@@ -519,14 +508,6 @@ while (1)
            break;
 
         case 'f':
-            //check if dump file specified exists. Defaults to dump.bin
-            if ((file = fopen(optarg, "w")) == NULL) {
-                fprintf(stderr,"Could not create dump file!\n");
-                fatal("Please specify correct dump file",1);
-                
-            } else {
-                fclose(file);
-            }
             strcpy(command_line_args.dump_fullfilename, optarg);
             break;
 
@@ -542,6 +523,53 @@ while (1)
          }
      }
 
+//Here we set correct values for full filenames!
+    char *buffer=(char *)malloc(10000*sizeof(char));
+    //correct the path and add trailing /
+    if(command_line_args.path[strlen(command_line_args.path)-1]!='/') strcat(command_line_args.path,"/");
+   
+/* master pvd output file */ 
+    strcpy(buffer,command_line_args.path);
+    strcat(buffer,command_line_args.output_fullfilename);
+    if ((file = fopen(buffer, "w")) == NULL) {
+                fprintf(stderr,"Could not create output file %s!\n", buffer);
+                fatal("Please specify correct output file or check permissions of the file",1);
+                
+            } else {
+                fclose(file);
+                strcpy(command_line_args.output_fullfilename,buffer);
+            }
+
+/* tape file */
+    strcpy(buffer,command_line_args.path);
+    strcat(buffer,command_line_args.tape_fullfilename);
+    if (stat(buffer, &sb) == -1) {
+                ts_fprintf(stderr,"Tape '%s' does not exist!\n",buffer);
+                fatal("Please select correct tape or check permissions of the file",1);
+            } else {
+                strcpy(command_line_args.tape_fullfilename,buffer);
+            }
+
+
+/* dump file */
+            strcpy(buffer,command_line_args.path);
+            strcat(buffer,command_line_args.dump_fullfilename);
+            //check if dump file exist first.
+            if (stat(buffer, &sb) == -1) {
+                //no dump file. check if we can create one.
+                if ((file = fopen(buffer, "w")) == NULL) {
+                    fprintf(stderr,"Could not create dump file '%s'!\n",buffer);
+                    fatal("Please specify correct dump file or check permissions of the file",1);
+                } else {
+                    fclose(file);
+                    //good, file is writeable. delete it for now.
+                    remove(buffer);
+                }
+            }
+            strcpy(command_line_args.dump_fullfilename, buffer);
+
+
+    free(buffer);
     return TS_SUCCESS;
 
 }
@@ -949,15 +977,8 @@ ts_bool write_pov_file(ts_vesicle *vesicle, char *filename){
 
 
 ts_tape *parsetape(char *filename){
-  //  long int nshell=17,ncxmax=60, ncymax=60, nczmax=60, npoly=10, nmono=20, pswitch=0;  // THIS IS DUE TO CONFUSE BUG!
     ts_tape *tape=(ts_tape *)calloc(1,sizeof(ts_tape));
     tape->multiprocessing=calloc(255,sizeof(char));
-  /*  long int brezveze0=1;
-    long int brezveze1=1;
-    long int brezveze2=1;
-    ts_double xk0=25.0, dmax=1.67,stepsize=0.15,kspring=800.0,pressure=0.0;
-	long int iter=1000, init=1000, mcsw=1000;
-*/	
 
     cfg_opt_t opts[] = {
         CFG_SIMPLE_INT("nshell", &tape->nshell),
@@ -1001,6 +1022,8 @@ ts_tape *parsetape(char *filename){
 	fatal("Invalid tape!",100);
 	}
 
+    /* here we override all values read from tape with values from commandline*/
+    getcmdline_tape(cfg,command_line_args.tape_opts);
     cfg_free(cfg);
 
 
@@ -1014,6 +1037,65 @@ ts_bool tape_free(ts_tape *tape){
 	free(tape);
 	return TS_SUCCESS;
 }
+
+
+
+ts_bool getcmdline_tape(cfg_t *cfg, char *opts){
+
+	char *commands, *backup, *saveptr, *saveopptr, *command, *operator[2];
+	ts_uint i,j;
+	commands=(char *)malloc(10000*sizeof(char));
+    backup=commands; //since the pointer to commands will be lost, we acquire a pointer that will serve as backup.
+	strcpy(commands,opts);
+	for(i=0; ;i++, commands=NULL){
+		//breaks comma separated list of commands into specific commands.
+		command=strtok_r(commands,",",&saveptr);	
+		if(command==NULL) break;
+//		fprintf(stdout,"Command %d: %s\n",i,command);	
+		//extracts name of command and value of command into operator[2] array.
+		for(j=0; j<2;j++,command=NULL){
+			operator[j]=strtok_r(command,"=",&saveopptr);
+			if(operator[j]==NULL) break;
+//			fprintf(stdout," ---> Operator %d: %s\n",j,operator[j]);		
+		}
+		//1. check: must have 2 operators.
+		if(j!=2) fatal("Error. Command line tape options are not formatted properly",1);
+
+    //    cfg_setstr(cfg,operator[0],operator[1]);
+        cmdline_to_tape(cfg,operator[0],operator[1]);
+		//2. check: must be named properly.
+		//3. check: must be of right format (integer, double, string, ...)
+        
+	}
+	free(backup);
+    return TS_SUCCESS;
+}
+
+
+ts_bool cmdline_to_tape(cfg_t *cfg, char *key, char *val){
+
+    cfg_opt_t *cfg_opt=cfg_getopt(cfg,key);
+    if(cfg_opt==NULL) fatal("Commandline tape option not recognised",1); //return TS_FAIL; 
+    switch (cfg_opt->type){
+        case CFGT_INT:
+            cfg_setint(cfg,key,atol(val));
+            break;
+        case CFGT_FLOAT:
+            cfg_setfloat(cfg,key,atof(val));
+            break;
+/*        case CFGT_BOOL:
+            cfg_setbool(cfg,operator[0],operator[1]);
+            break; */
+        case CFGT_STR:
+            cfg_setstr(cfg,key,val);
+            break;
+        default:
+            break;
+
+    }
+    return TS_SUCCESS;
+}
+
 
 
 ts_bool read_geometry_file(char *fname, ts_vesicle *vesicle){
