@@ -24,7 +24,7 @@ ts_bool dump_state(ts_vesicle *vesicle, ts_uint iteration){
     FILE *fh=fopen(command_line_args.dump_fullfilename,"wb");
 
     /* dump vesicle */
-    fwrite(vesicle, sizeof(ts_vesicle),1,fh);
+    fwrite(vesicle, sizeof(ts_vesicle)-sizeof(ts_double),1,fh);
     /* dump vertex list */
     fwrite(vesicle->vlist, sizeof(ts_vertex_list),1,fh);
     /* dump bond list */
@@ -201,7 +201,7 @@ ts_vesicle *restore_state(ts_uint *iteration){
 /* we restore all the data from the dump */
     /* restore vesicle */
     ts_vesicle *vesicle=(ts_vesicle *)calloc(1,sizeof(ts_vesicle));
-    retval=fread(vesicle, sizeof(ts_vesicle),1,fh);
+    retval=fread(vesicle, sizeof(ts_vesicle)-sizeof(ts_double),1,fh);
 //	fprintf(stderr,"was here! %e\n",vesicle->dmax);
 
     /* restore vertex list */
