@@ -20,7 +20,7 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
     ts_double dist;
     ts_bool retval; 
     ts_uint cellidx; 
-    ts_double delta_energy, delta_energy_cv,oenergy,dvol=0.0;
+    ts_double delta_energy, delta_energy_cv,oenergy,dvol=0.0, darea=0.0;
     ts_double costheta,sintheta,phi,r;
 	//This will hold all the information of vtx and its neighbours
 	ts_vertex backupvtx[20], *constvol_vtx_moved=NULL, *constvol_vtx_backup=NULL;
@@ -41,7 +41,7 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
 //    	vtx->y=vtx->y+vesicle->stepsize*(2.0*rn[1]-1.0);
 //    	vtx->z=vtx->z+vesicle->stepsize*(2.0*rn[2]-1.0);
 
-	//random move in a sphere with radius stepsize:
+//random move in a sphere with radius stepsize:
 	r=vesicle->stepsize*rn[0];
 	phi=rn[1]*2*M_PI;
 	costheta=2*rn[2]-1;
@@ -51,12 +51,12 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
 	vtx->z=vtx->z+r*costheta;
 
 
-    	//distance with neighbours check
+//distance with neighbours check
     for(i=0;i<vtx->neigh_no;i++){
         dist=vtx_distance_sq(vtx,vtx->neigh[i]);
         if(dist<1.0 || dist>vesicle->dmax) {
-		vtx=memcpy((void *)vtx,(void *)&backupvtx[0],sizeof(ts_vertex));
-		return TS_FAIL;
+		    vtx=memcpy((void *)vtx,(void *)&backupvtx[0],sizeof(ts_vertex));
+    		return TS_FAIL;
 		}
     }
 
@@ -87,14 +87,19 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
     } 
    
  
-    //if all the tests are successful, then energy for vtx and neighbours is calculated
+//if all the tests are successful, then energy for vtx and neighbours is calculated
 	for(i=0;i<vtx->neigh_no;i++){
 	memcpy((void *)&backupvtx[i+1],(void *)vtx->neigh[i],sizeof(ts_vertex));
 	}
 
 	if(vesicle->pswitch == 1 || vesicle->tape->constvolswitch>0){
 		for(i=0;i<vtx->tristar_no;i++) dvol-=vtx->tristar[i]->volume;
-	};
+	}
+
+    if(vesicle->tape->constareaswitch==2){
+		for(i=0;i<vtx->tristar_no;i++) darea-=vtx->tristar[i]->area;
+    
+    }
 
     delta_energy=0;
     
@@ -118,6 +123,22 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
         if(vesicle->pswitch==1) delta_energy-=vesicle->pressure*dvol;
 	};
 
+    if(vesicle->tape->constareaswitch==2){
+        /* check whether the darea is gt epsarea */
+		for(i=0;i<vtx->tristar_no;i++) darea+=vtx->tristar[i]->area;
+        if(fabs(vesicle->area+darea-A0)>epsarea){
+	        //restore old state.
+ 			vtx=memcpy((void *)vtx,(void *)&backupvtx[0],sizeof(ts_vertex));
+	        	for(i=0;i<vtx->neigh_no;i++){
+		        	vtx->neigh[i]=memcpy((void *)vtx->neigh[i],(void *)&backupvtx[i+1],sizeof(ts_vertex));
+	        	}
+            		for(i=0;i<vtx->tristar_no;i++) triangle_normal_vector(vtx->tristar[i]); 
+            		//fprintf(stderr,"fajlam!\n");
+            		return TS_FAIL;
+		}
+
+
+    }
 
 	if(vesicle->tape->constvolswitch==2){
 		/*check whether the dvol is gt than epsvol */
@@ -210,6 +231,10 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
     } else
     if(vesicle->tape->constvolswitch == 1){
         constvolumeaccept(vesicle,constvol_vtx_moved,constvol_vtx_backup);
+    }
+
+    if(vesicle->tape->constareaswitch==2){
+        vesicle->area+=darea;
     }
 //	if(oldcellidx);
     //END MONTE CARLOOOOOOO

@@ -20,10 +20,12 @@ pressure=0.0
 constvolswitch=2
 constvolprecision=1e-14
 
+#Constant area constraint (0 disable constant area, 2 enable constant area with epsarea)
+constareaswitch=2
 
 ####### Polymer (brush) definitions ###########
 # npoly is a number of polymers attached to npoly distinct vertices on vesicle
-npoly=5
+npoly=0
 # nmono is a number of monomers in each polymer
 nmono=10
 # Spring constant between monomers of the polymer

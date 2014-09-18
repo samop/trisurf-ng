@@ -261,6 +261,7 @@ typedef struct {
 	long int R_nucleus;
 	long int pswitch;
     long int constvolswitch;
+    long int constareaswitch;
     ts_double constvolprecision;
     	char *multiprocessing;
    	long int brezveze0;
@@ -305,7 +306,7 @@ typedef struct {
 	ts_int pswitch;
     ts_tape *tape;
 	ts_double R_nucleus;
-
+    ts_double area;
 } ts_vesicle;
 
 
@@ -314,8 +315,9 @@ typedef struct {
 
 int quiet;
 ts_double V0;
+ts_double A0;
 ts_double epsvol;
-
+ts_double epsarea;
 /* FUNCTIONS */
 
 /** Non-fatal error function handler:

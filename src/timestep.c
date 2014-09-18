@@ -19,7 +19,7 @@
 ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, ts_uint iterations, ts_uint start_iteration){
 	ts_uint i, j,k,l,m;
 	ts_double r0,kc1,kc2,kc3,kc4;
-	ts_double l1,l2,l3,volume=0.0,area=0.0,vmsr,bfsr, vmsrt, bfsrt;
+	ts_double l1,l2,l3,vmsr,bfsr, vmsrt, bfsrt;
 	ts_ulong epochtime;
 	FILE *fd1,*fd2=NULL;
  	char filename[10000];
@@ -49,8 +49,11 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 	centermass(vesicle);
 	cell_occupation(vesicle);
 	vesicle_volume(vesicle); //needed for constant volume at this moment
+    vesicle_area(vesicle); //needed for constant area at this moment
 	V0=vesicle->volume; 
+    A0=vesicle->area;
 	epsvol=4.0*sqrt(2.0*M_PI)/pow(3.0,3.0/4.0)*V0/pow(vesicle->tlist->n,3.0/2.0);
+    epsarea=A0/(ts_double)vesicle->tlist->n;
   //  fprintf(stderr, "DVol=%1.16f (%1.16f), V0=%1.16f\n", epsvol,0.003e-2*V0,V0);
 	if(start_iteration<inititer) ts_fprintf(stdout, "Starting simulation (first %d x %d MC sweeps will not be recorded on disk)\n", inititer, mcsweeps);
 	for(i=start_iteration;i<inititer+iterations;i++){
@@ -77,8 +80,8 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 			write_master_xml_file(command_line_args.output_fullfilename);
 			epochtime=get_epoch();			
 			gyration_eigen(vesicle, &l1, &l2, &l3);
-			vesicle_volume(vesicle); //calculates just volume. Area is not added to ts_vesicle yet!
-			get_area_volume(vesicle, &area,&volume); //that's why I must recalculate area (and volume for no particular reason).
+			vesicle_volume(vesicle); //calculates just volume. 
+            vesicle_area(vesicle); //calculates area.
 			r0=getR0(vesicle);
             if(vesicle->sphHarmonics!=NULL){
 			    preparationSh(vesicle,r0);
@@ -117,7 +120,7 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 
             }
 
-			fprintf(fd, "%lu %u %e %e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n",epochtime,i,vmsr,bfsr,volume, area,l1,l2,l3,kc1, kc2, kc3,kc4);
+			fprintf(fd, "%lu %u %e %e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n",epochtime,i,vmsr,bfsr,vesicle->volume, vesicle->area,l1,l2,l3,kc1, kc2, kc3,kc4);
 
 		    fflush(fd);	
 		//	sprintf(filename,"timestep-%05d.pov",i-inititer);

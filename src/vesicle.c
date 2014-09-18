@@ -60,3 +60,20 @@ ts_bool vesicle_volume(ts_vesicle *vesicle){
     vesicle->volume=volume;
     return TS_SUCCESS;
 }
+
+/* @brief Function makes a sum of partial areas of each triangle.
+ *
+ *
+ *
+ */
+ts_bool vesicle_area(ts_vesicle *vesicle){
+    ts_double area;
+    ts_uint i;
+    ts_triangle **tria=vesicle->tlist->tria;
+    area=0;
+    for(i=0;i<vesicle->tlist->n;i++){
+        area=area+tria[i]->area;
+    }
+    vesicle->area=area;
+    return TS_SUCCESS;
+}

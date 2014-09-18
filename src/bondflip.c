@@ -31,7 +31,7 @@ c
     ts_vertex *k=bond->vtx2;
     ts_uint nei,neip,neim;
     ts_uint i,j;
-    ts_double oldenergy, delta_energy, dvol=0.0;
+    ts_double oldenergy, delta_energy, dvol=0.0, darea=0.0;
     ts_triangle *lm=NULL,*lp=NULL, *lp1=NULL, *lm2=NULL;
 
     ts_vertex *kp,*km;
@@ -170,7 +170,7 @@ for(i=0;i<4;i++){
   //Neigbours of k, it, km, kp don't change its energy.
 
 	if(vesicle->pswitch == 1 || vesicle->tape->constvolswitch>0){dvol = -lm->volume - lp->volume;}
-      
+    if(vesicle->tape->constareaswitch==2){darea=-lm->area-lp->area;} 
 /*    vesicle_volume(vesicle);
     fprintf(stderr,"Volume in the beginning=%1.16e\n", vesicle->volume);
 */
@@ -192,6 +192,39 @@ for(i=0;i<4;i++){
 		dvol = dvol + lm->volume + lp->volume;
 		if(vesicle->pswitch==1) delta_energy-= vesicle->pressure*dvol;
 	}
+    if(vesicle->tape->constareaswitch==2){
+        darea=darea+lm->area+lp->area; 
+/*check whether the dvol is gt than epsvol */
+		if(fabs(vesicle->area+darea-A0)>epsarea){
+			//restore old state.
+			/* restoration procedure copied from few lines below */
+			    for(i=0;i<4;i++){
+			//			fprintf(stderr,"Restoring vtx neigh[%d] with neighbours %d\n",i, orig_vtx[i]->neigh_no );
+				free(orig_vtx[i]->neigh);
+				free(orig_vtx[i]->tristar);
+				free(orig_vtx[i]->bond);
+				free(orig_tria[i]->neigh);
+				memcpy((void *)orig_vtx[i],(void *)bck_vtx[i],sizeof(ts_vertex));
+				memcpy((void *)orig_tria[i],(void *)bck_tria[i],sizeof(ts_triangle));
+			//			fprintf(stderr,"Restored vtx neigh[%d] with neighbours %d\n",i, orig_vtx[i]->neigh_no );
+				/* level 2 pointers are redirected*/
+			    }
+			    memcpy(bond,bck_bond,sizeof(ts_bond));
+			    for(i=0;i<4;i++){
+				free(bck_vtx[i]);
+				free(bck_tria[i]);
+			/*			fprintf(stderr,"Restoring vtx neigh[%d] with neighbours %d =",i, orig_vtx[i]->neigh_no );
+				for(j=0;j<orig_vtx[i]->neigh_no;j++) fprintf(stderr," %d", orig_vtx[i]->neigh[j]->idx);
+				fprintf(stderr,"\n"); */
+			    }
+			    free(bck_bond);
+			    return TS_FAIL;
+
+		}
+    }
+
+
+
 
 	if(vesicle->tape->constvolswitch == 2){
 		/*check whether the dvol is gt than epsvol */
@@ -305,11 +338,13 @@ for(i=0;i<4;i++){
      /* IF BONDFLIP ACCEPTED, THEN RETURN SUCCESS! */
 //            fprintf(stderr,"SUCCESS!!!\n");
 
- if(vesicle->tape->constvolswitch == 2){
-	vesicle->volume+=dvol;
-    } else
-    if(vesicle->tape->constvolswitch == 1){
+    if(vesicle->tape->constvolswitch == 2){
+	    vesicle->volume+=dvol;
+    } else if(vesicle->tape->constvolswitch == 1){
         constvolumeaccept(vesicle,constvol_vtx_moved,constvol_vtx_backup);
+    }
+    if(vesicle->tape->constareaswitch==2){
+        vesicle->area+=darea;
     }
 	// delete all backups
 	for(i=0;i<4;i++){
