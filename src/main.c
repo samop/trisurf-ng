@@ -14,6 +14,7 @@
 #include "poly.h"
 #include "sh.h"
 #include "shcomplex.h"
+#include "dumpstate.h"
 
 /** Entrance function to the program
   * @param argv is a number of parameters used in program call (including the program name
@@ -28,7 +29,15 @@ int main(int argv, char *argc[]){
 	force_from_tape=0;
 	parse_args(argv,argc); // sets global variable command_line_args (defined in io.h)
 	ts_fprintf(stdout,"Starting program...\n\n");
-	if(command_line_args.force_from_tape){
+
+    if(command_line_args.dump_from_vtk[0]!=0){
+		ts_fprintf(stdout,"************************************************\n");
+		ts_fprintf(stdout,"***** Dumping vesicle from VTK points list *****\n");
+		ts_fprintf(stdout,"************************************************\n\n");
+        tape=parsetape(command_line_args.tape_fullfilename);
+        vesicle=vtk2vesicle(command_line_args.dump_from_vtk,tape);
+    }
+	else if(command_line_args.force_from_tape){
 		ts_fprintf(stdout,"************************************************\n");
 		ts_fprintf(stdout,"**** Generating initial geometry from tape *****\n");
 		ts_fprintf(stdout,"************************************************\n\n");

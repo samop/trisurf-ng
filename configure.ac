@@ -17,6 +17,8 @@ AC_CHECK_LIB([m], [pow])
 
 AC_CHECK_LIB([gslcblas],[cblas_dgemm])
 AC_CHECK_LIB([gsl],[gsl_blas_dgemm])
+#AC_CHECK_LIB([xml2],[xmlNodeListGetString])
+PKG_CHECK_MODULES([libxml2], [libxml-2.0])
 
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h string.h])
