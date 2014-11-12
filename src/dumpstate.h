@@ -25,7 +25,10 @@ typedef struct {
 ts_vesicle *vtk2vesicle(char *filename, ts_tape *tape);
 ts_bool parse_vtk(char *filename, ts_vesicle *vesicle);
 ts_bool vtk_index2vesicle(xmlNode *node, ts_vesicle *vesicle);
+ts_bool vtk_coordinates(xmlNode *node, ts_vesicle *vesicle);
+ts_bool vtk_neighbours(xmlNode *node, ts_vesicle *vesicle);
 
+ts_vertex_list *vtk_sort_neighbours(ts_bond_list *blist,ts_vertex_list *vlist);
 
 
 #endif
