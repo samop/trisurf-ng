@@ -199,6 +199,19 @@ ts_bool vtx_set_global_values(ts_vesicle *vesicle){
     return TS_SUCCESS;
 }
 
+/** Calculates the triple product of vectors defined by vertices vtx1, vtx2 and vtx3, ($\mathrm{vtx}_1\cdot(\mathrm{vtx}_2\cross\mathrm{vtx}_3$):
+ *  \begin{vmatrix}
+ *  x_1 & y_1 & z_1 \\
+ *  x_2-x_1 & y_2-y_1 & z_2-z_1\\
+ *  x_3-x_1 & y_3-y_1 & z_3-z_1\\
+ *  \end{vmatrix}
+ *  where the vertices coordinates are denoted by corresponding vertex index number. Function is used to determine the orientation of area formed by triangle formed by the three given vertices.
+ *
+ *      @param vtx1 is first vertex, according to which the orientation is calculated
+ *      @param vtx2 is the second vertex
+ *      @param vtx3 is the third vertex
+ *      @returns directionality of the area of the triangle formed by vertices vtx1, vtx2 and vtx3. It is positive if vtx1, vtx2 and vtx3 are oriented counter-clockwise.
+*/
 inline ts_double vtx_direct(ts_vertex *vtx1, ts_vertex *vtx2, ts_vertex *vtx3){
     ts_double dX2=vtx2->x-vtx1->x;
     ts_double dY2=vtx2->y-vtx1->y;
