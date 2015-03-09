@@ -4,6 +4,15 @@
 #include "vertex.h"
 #include<math.h>
 #include<stdio.h>
+
+
+/** @brief Wrapper that calculates energy of every vertex in vesicle
+ *  
+ *  Function calculated energy of every vertex in vesicle. It can be used in
+ *  initialization procedure or in recalculation of the energy after non-MCsweep *  operations. However, when random move of vertex or flip of random bond occur *  call to this function is not necessary nor recommended. 
+ *  @param *vesicle is a pointer to vesicle.
+ *  @returns TS_SUCCESS on success.
+*/
 ts_bool mean_curvature_and_energy(ts_vesicle *vesicle){
 
     ts_uint i;
@@ -19,7 +28,14 @@ ts_bool mean_curvature_and_energy(ts_vesicle *vesicle){
     return TS_SUCCESS;
 }
 
-
+/** @brief Calculate energy of a bond (in models where energy is bond related)
+ *
+ *  This function is experimental and currently only used in polymeres calculation (PEGs or polymeres inside the vesicle).
+ *
+ *  @param *bond is a pointer to a bond between two vertices in polymere
+ *  @param *poly is a pointer to polymere in which we calculate te energy of the bond
+ *  @returns TS_SUCCESS on successful calculation
+*/
 inline ts_bool bond_energy(ts_bond *bond,ts_poly *poly){
 //TODO: This value to be changed and implemented in data structure:
 	ts_double d_relaxed=1.0;
@@ -27,11 +43,46 @@ inline ts_bool bond_energy(ts_bond *bond,ts_poly *poly){
 	return TS_SUCCESS;
 };
 
+/** @brief Calculation of energy of the vertex
+ *  
+ *  Main function that calculates energy of the vertex \f$i\f$. Nearest neighbors (NN) must be ordered in counterclockwise direction for this function to work.
+ *  Firstly NNs that form two neighboring triangles are found (\f$j_m\f$, \f$j_p\f$ and common \f$j\f$). Later, the scalar product of vectors \f$x_1=(\mathbf{i}-\mathbf{j_p})\cdot (\mathbf{i}-\mathbf{j_p})(\mathbf{i}-\mathbf{j_p})\f$, \f$x_2=(\mathbf{j}-\mathbf{j_p})\cdot  (\mathbf{j}-\mathbf{j_p})\f$  and \f$x_3=(\mathbf{j}-\mathbf{j_p})\cdot (\mathbf{i}-\mathbf{j_p})\f$  are calculated. From these three vectors the \f$c_{tp}=\frac{1}{\tan(\varphi_p)}\f$ is calculated, where \f$\varphi_p\f$ is the inner angle at vertex \f$j_p\f$. The procedure is repeated for \f$j_m\f$ instead of \f$j_p\f$ resulting in \f$c_{tn}\f$.
+ *  
+ \f{tikzpicture}{
+\coordinate[label=below:$i$] (i) at (2,0);
+\coordinate[label=left:$j_m$] (jm) at (0,3.7);
+\coordinate[label=above:$j$] (j) at (2.5,6.4);
+\coordinate[label=right:$j_p$] (jp) at (4,2.7);
 
+\draw (i) -- (jm) -- (j) -- (jp) -- (i) -- (j);
+
+\begin{scope}
+\path[clip] (jm)--(i)--(j);
+\draw (jm) circle (0.8);
+\node[right] at (jm) {$\varphi_m$};
+\end{scope}
+
+\begin{scope}
+\path[clip] (jp)--(i)--(j);
+\draw (jp) circle (0.8);
+\node[left] at (jp) {$\varphi_p$};
+\end{scope}
+
+%%vertices
+\draw [fill=gray] (i) circle (0.1);
+\draw [fill=white] (j) circle (0.1);
+\draw [fill=white] (jp) circle (0.1);
+\draw [fill=white] (jm) circle (0.1);
+%\node[draw,circle,fill=white] at (i) {};
+\f}
+
+ * The curvature is then calculated as \f$\mathbf{h}=\frac{1}{2}\Sigma_{k=0}^{\mathrm{neigh\_no}} c_{tp}^{(k)}+c_{tm}^{(k)} (\mathbf{j_k}-\mathbf{i})\f$, where \f$c_{tp}^{(k)}+c_{tm}^k=2\sigma^{(k)}\f$ (length in dual lattice?) and the previous equation can be written as \f$\mathbf{h}=\Sigma_{k=0}^{\mathrm{neigh\_no}}\sigma^{(k)}\cdot(\mathbf{j}-\mathbf{i})\f$ (See Kroll, p. 384, eq 70).
+ *
+ * From the curvature the enery is calculated by equation \f$E=\frac{1}{2}\mathbf{h}\cdot\mathbf{h}\f$.
+ * @param *vtx is a pointer to vertex at which we want to calculate the energy
+ * @returns TS_SUCCESS on successful calculation.
+*/
 inline ts_bool energy_vertex(ts_vertex *vtx){
-//    ts_vertex *vtx=&vlist->vertex[n]-1; // Caution! 0 Indexed value!
-//    ts_triangle *tristar=vtx->tristar-1;
-    //ts_vertex_data *data=vtx->data;
     ts_uint jj;
     ts_uint jjp,jjm;
     ts_vertex *j,*jp, *jm;
@@ -47,7 +98,6 @@ inline ts_bool energy_vertex(ts_vertex *vtx){
         j=vtx->neigh[jj-1];
         jp=vtx->neigh[jjp-1];
         jm=vtx->neigh[jjm-1];
-//        printf("tristar_no=%u, neigh_no=%u, jj=%u\n",data->tristar_no,data->neigh_no,jj);
         jt=vtx->tristar[jj-1];
         x1=vtx_distance_sq(vtx,jp); //shouldn't be zero!
         x2=vtx_distance_sq(j,jp); // shouldn't be zero!
@@ -128,7 +178,6 @@ inline ts_bool energy_vertex(ts_vertex *vtx){
         vtx->curvature=-sqrtl(h);
     }
 #endif
-// What is vtx->c?????????????? Here it is 0!
 // c is forced curvature energy for each vertex. Should be set to zero for
 // normal circumstances.
     vtx->energy=0.5*s*(vtx->curvature/s-vtx->c)*(vtx->curvature/s-vtx->c);
