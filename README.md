@@ -5,7 +5,7 @@ TRISURF NG
 1. Instalation
 --------------
 
-To compile the program, user must have ``automake'', and ``gcc'' tools installed on the computer.
+To compile the program, user must have ``automake``, and ``gcc`` tools installed on the computer.
 
 Required libraries are:
 * libconfuse
@@ -18,26 +18,34 @@ On Debian based systems, install prerequisities by typing the following command 
 
 Move to the project root directory and compile with:
 
-``./configure''
-``make''
-``make install''
+``./configure``
+
+``make``
+
+``make install``
 
 If you are experiencing difficulties due to different automake versions, proceed with the longer procedure:
 
-``aclocal''
-``autoheader''
-``automake -ac''
-``autoconf''
-``./configure''
-``make''
-``make install''
+``aclocal``
+
+``autoheader``
+
+``automake -ac``
+
+``autoconf``
+
+``./configure``
+
+``make``
+
+``make install``
 
 
 2. Use
 ------
 
-Prepare tape file, storing the definition for the simulation. You can use the sample tape file in the ``src/'' directory as a template for your simulation.
+Prepare tape file, storing the definition for the simulation. You can use the sample tape file in the ``src/`` directory as a template for your simulation.
 
-Run simulations with ``trisurf-ng --force-from-tape'' for initial run, or ``trisurf-ng'' for continuing aborted simulations.
+Run simulations with ``trisurf-ng --force-from-tape`` for initial run, or ``trisurf-ng`` for continuing aborted simulations.
 
 
