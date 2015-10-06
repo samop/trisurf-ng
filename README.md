@@ -19,17 +19,25 @@ On Debian based systems, install prerequisities by typing the following command 
 Move to the project root directory and compile with:
 
 ``./configure``
+
 ``make``
+
 ``make install``
 
 If you are experiencing difficulties due to different automake versions, proceed with the longer procedure:
 
 ``aclocal``
+
 ``autoheader``
+
 ``automake -ac``
+
 ``autoconf``
+
 ``./configure``
+
 ``make``
+
 ``make install``
 
 
