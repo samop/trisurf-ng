@@ -18,7 +18,7 @@
 
 ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, ts_uint iterations, ts_uint start_iteration){
 	ts_uint i, j,k,l,m;
-	ts_double r0,kc1,kc2,kc3,kc4;
+	ts_double r0,kc1=0,kc2=0,kc3=0,kc4=0;
 	ts_double l1,l2,l3,vmsr,bfsr, vmsrt, bfsrt;
 	ts_ulong epochtime;
 	FILE *fd1,*fd2=NULL;
