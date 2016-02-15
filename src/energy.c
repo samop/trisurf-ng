@@ -48,7 +48,7 @@ inline ts_bool bond_energy(ts_bond *bond,ts_poly *poly){
  *  Main function that calculates energy of the vertex \f$i\f$. Nearest neighbors (NN) must be ordered in counterclockwise direction for this function to work.
  *  Firstly NNs that form two neighboring triangles are found (\f$j_m\f$, \f$j_p\f$ and common \f$j\f$). Later, the scalar product of vectors \f$x_1=(\mathbf{i}-\mathbf{j_p})\cdot (\mathbf{i}-\mathbf{j_p})(\mathbf{i}-\mathbf{j_p})\f$, \f$x_2=(\mathbf{j}-\mathbf{j_p})\cdot  (\mathbf{j}-\mathbf{j_p})\f$  and \f$x_3=(\mathbf{j}-\mathbf{j_p})\cdot (\mathbf{i}-\mathbf{j_p})\f$  are calculated. From these three vectors the \f$c_{tp}=\frac{1}{\tan(\varphi_p)}\f$ is calculated, where \f$\varphi_p\f$ is the inner angle at vertex \f$j_p\f$. The procedure is repeated for \f$j_m\f$ instead of \f$j_p\f$ resulting in \f$c_{tn}\f$.
  *  
- \f{tikzpicture}{
+\begin{tikzpicture}{
 \coordinate[label=below:$i$] (i) at (2,0);
 \coordinate[label=left:$j_m$] (jm) at (0,3.7);
 \coordinate[label=above:$j$] (j) at (2.5,6.4);
@@ -74,7 +74,7 @@ inline ts_bool bond_energy(ts_bond *bond,ts_poly *poly){
 \draw [fill=white] (jp) circle (0.1);
 \draw [fill=white] (jm) circle (0.1);
 %\node[draw,circle,fill=white] at (i) {};
-\f}
+\end{tikzpicture}
 
  * The curvature is then calculated as \f$\mathbf{h}=\frac{1}{2}\Sigma_{k=0}^{\mathrm{neigh\_no}} c_{tp}^{(k)}+c_{tm}^{(k)} (\mathbf{j_k}-\mathbf{i})\f$, where \f$c_{tp}^{(k)}+c_{tm}^k=2\sigma^{(k)}\f$ (length in dual lattice?) and the previous equation can be written as \f$\mathbf{h}=\Sigma_{k=0}^{\mathrm{neigh\_no}}\sigma^{(k)}\cdot(\mathbf{j}-\mathbf{i})\f$ (See Kroll, p. 384, eq 70).
  *

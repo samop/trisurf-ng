@@ -1,5 +1,5 @@
 bin_PROGRAMS = trisurf
-trisurf_SOURCES = general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c dumpstate.c frame.c energy.c timestep.c vertexmove.c bondflip.c main.c poly.c stats.c sh.c shcomplex.c constvol.c
+trisurf_SOURCES = general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c dumpstate.c frame.c energy.c timestep.c vertexmove.c bondflip.c main.c poly.c stats.c sh.c shcomplex.c constvol.c snapshot.c
 AM_CFLAGS = -Wall -Werror
 AM_CPPFLAGS = ${libxml2_CFLAGS}
 trisurf_LDADD = ${libcurl_LIBS} ${libxml2_LIBS}

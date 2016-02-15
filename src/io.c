@@ -15,6 +15,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <errno.h>
+#include <snapshot.h>
 /** DUMP STATE TO DISK DRIVE **/
 
 ts_bool dump_state(ts_vesicle *vesicle, ts_uint iteration){
@@ -824,7 +825,9 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 		}
 	}
 
-	fprintf(fh, "<?xml version=\"1.0\"?>\n<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\" compressor=\"vtkZLibDataCompressor\">\n <UnstructuredGrid>\n");
+	fprintf(fh, "<?xml version=\"1.0\"?>\n<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\" compressor=\"vtkZLibDataCompressor\">\n");
+	xml_trisurf_data(fh,vesicle);
+	fprintf(fh, " <UnstructuredGrid>\n");
     fprintf(fh, "<Piece NumberOfPoints=\"%u\" NumberOfCells=\"%u\">\n",vlist->n+monono*polyno+fonono*filno, blist->n+monono*polyno+filno*(fonono-1));
     fprintf(fh,"<PointData Scalars=\"scalars\">\n<DataArray type=\"Int64\" Name=\"scalars\" format=\"ascii\">");
    	for(i=0;i<vlist->n;i++){
