@@ -1,6 +1,6 @@
 ####### Vesicle definitions ###########
 # nshell is a number of divisions of dipyramid
-nshell=17
+nshell=19
 # dmax is the max. bond length (in units l_min)
 dmax=1.7
 # dmin_interspecies in the min. dist. between different vertex species (in units l_min)
