@@ -45,7 +45,7 @@ fi
 #-                   ["Trisurf $VERSION on $host, compiled by $cc_string, `expr $ac_cv_sizeof_void_p \* 8`-bit"],
 #                   ["Trisurf (commit `cd $srcdir && git log -1 --format=format:%h`) on $host, compiled by $cc_string, `expr $ac_cv_sizeof_void_p \* 8`-bit"],
 AC_DEFINE_UNQUOTED(TS_VERSION,
-                    ["Trisurf (commit `git describe  --abbrev=6 --dirty --always --tags`) on `hostname`."],
+                    ["Trisurf (commit `git describe  --abbrev=6 --dirty --always --tags`) build on `date` @`hostname`."],
                     [A string containing the version number])
 
 # Checks for library functions.

@@ -5,6 +5,7 @@
 #include<stdarg.h>
 #include <zlib.h>
 #include<inttypes.h>
+#include<config.h>
 
 ts_uint ts_sprintf(ts_string *str, char *fmt, ...){
 	va_list ap;
@@ -42,7 +43,7 @@ ts_bool xml_trisurf_data(FILE *fh, ts_vesicle *vesicle){
 }
 
 ts_bool xml_trisurf_header(FILE *fh, ts_vesicle *vesicle){
-	fprintf(fh, "<trisurfversion></trisurfversion>\n");
+	fprintf(fh, "<trisurfversion>%s</trisurfversion>\n",TS_VERSION);
 	fprintf(fh, "<trisurfdate></trisurfdate>\n");
 	fprintf(fh, "<dumpdate></dumpdate>\n");
 	fprintf(fh, "<tape>\n");
