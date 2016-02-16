@@ -29,7 +29,7 @@ ts_bool xml_trisurf_data(FILE *fh, ts_vesicle *vesicle){
 	xml_trisurf_vtx_tristar(data,vesicle->vlist);
 #ifdef COMPRESSION
 	char *compressed;
-	ts_uint nbytes=ts_compress_string64(data->string, data->beg, &compressed);
+	ts_uint nbytes=ts_compress_string64(data->string, data->beg-1, &compressed); //suppress null character at the end with by substracting 1
 	fwrite(compressed, sizeof(unsigned char), nbytes, fh);
 	free (compressed);
 #else
@@ -59,11 +59,11 @@ ts_bool xml_trisurf_footer(FILE *fh){
 
 ts_bool xml_trisurf_tria(ts_string *data, ts_triangle_list *tlist){
 	ts_uint i;
-	ts_sprintf(data,"<tria>\n");
+	ts_sprintf(data,"<tria>");
 	for(i=0; i<tlist->n;i++){
-		ts_sprintf(data,"%u %u %u\n",tlist->tria[i]->vertex[0]->idx, tlist->tria[i]->vertex[1]->idx, tlist->tria[i]->vertex[2]->idx);
+		ts_sprintf(data,"%u %u %u",tlist->tria[i]->vertex[0]->idx, tlist->tria[i]->vertex[1]->idx, tlist->tria[i]->vertex[2]->idx);
 	}
-	ts_sprintf(data,"</tria>\n");
+	ts_sprintf(data,"</tria>");
 	return TS_SUCCESS;
 }
 
@@ -71,7 +71,7 @@ ts_bool xml_trisurf_tria_neigh(ts_string *data, ts_triangle_list *tlist){
 	ts_uint i;
 	ts_sprintf(data,"<trianeigh>\n");
 	for(i=0; i<tlist->n;i++){
-		ts_sprintf(data,"%u %u %u\n",tlist->tria[i]->neigh[0]->idx, tlist->tria[i]->neigh[1]->idx, tlist->tria[i]->neigh[2]->idx);
+		ts_sprintf(data,"%u %u %u",tlist->tria[i]->neigh[0]->idx, tlist->tria[i]->neigh[1]->idx, tlist->tria[i]->neigh[2]->idx);
 	}
 	ts_sprintf(data,"</trianeigh>\n");
 	return TS_SUCCESS;
@@ -84,7 +84,7 @@ ts_bool xml_trisurf_vtx_neigh(ts_string *data, ts_vertex_list *vlist){
 		for(j=0;j<vlist->vtx[i]->neigh_no;j++){
 			ts_sprintf(data,"%u ",vlist->vtx[i]->neigh[j]->idx);
 		}
-		ts_sprintf(data, "</vtxn>\n");
+		ts_sprintf(data, "</vtxn>");
 	}
 	return TS_SUCCESS;
 }
@@ -96,7 +96,7 @@ ts_bool xml_trisurf_vtx_tristar(ts_string *data, ts_vertex_list *vlist){
 		for(j=0;j<vlist->vtx[i]->tristar_no;j++){
 			ts_sprintf(data,"%u ",vlist->vtx[i]->tristar[j]->idx);
 		}
-		ts_sprintf(data, "</tristar>\n");
+		ts_sprintf(data, "</tristar>");
 	}
 	return TS_SUCCESS;
 }
