@@ -32,7 +32,7 @@ ts_bool parseDump(char *dumpfname) {
 	cur = cur->xmlChildrenNode;
 	while (cur != NULL) {
 		if ((!xmlStrcmp(cur->name, (const xmlChar *)"trisurf"))){
-			*vesicle=parseTrisurfTag(doc, cur);
+			vesicle=parseTrisurfTag(doc, cur);
 		}
 		 
 	cur = cur->next;
@@ -41,6 +41,7 @@ ts_bool parseDump(char *dumpfname) {
 	xmlFreeDoc(doc);
 	fprintf(stderr,"Restoration completed\n");
 	exit(0);
+	vesicle_free(vesicle);
 	return TS_SUCCESS;
 }
 
