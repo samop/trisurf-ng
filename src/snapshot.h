@@ -17,4 +17,11 @@ ts_bool xml_trisurf_tria(ts_string *data, ts_triangle_list *tlist);
 ts_bool xml_trisurf_tria_neigh(ts_string *data, ts_triangle_list *tlist);
 ts_bool xml_trisurf_vtx_neigh(ts_string *data, ts_vertex_list *vlist);
 ts_bool xml_trisurf_vtx_tristar(ts_string *data, ts_vertex_list *vlist);
+
+/* UTILITIES */
+char *base64_encode(const unsigned char *data, size_t input_length, size_t *output_length);
+unsigned char *base64_decode(const char *data, size_t input_length, size_t *output_length);
+void build_decoding_table();
+void base64_cleanup();
+ts_uint ts_compress_string64(char *data, ts_uint data_len, char **compressed);
 #endif
