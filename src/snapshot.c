@@ -49,7 +49,8 @@ ts_bool xml_trisurf_header(FILE *fh, ts_vesicle *vesicle){
     	char *c_time_string;
 	current_time = time(NULL);
 	c_time_string = ctime(&current_time);
-	fprintf(fh, "<trisurfversion>%s</trisurfversion>\n",TS_VERSION);
+	
+	fprintf(fh, "<trisurfversion>Trisurf (commit %s), compiled on %s %s</trisurfversion>\n",TS_VERSION, __DATE__,  __TIME__);
 	fprintf(fh, "<dumpdate>%s</dumpdate>\n", c_time_string);
 	//free (c_time_string);
 
