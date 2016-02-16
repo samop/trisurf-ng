@@ -15,7 +15,7 @@
 #include "sh.h"
 #include "shcomplex.h"
 #include "dumpstate.h"
-
+#include "restore.h"
 /** Entrance function to the program
   * @param argv is a number of parameters used in program call (including the program name
   * @param argc is a pointer to strings (character arrays) which holds the arguments
@@ -29,7 +29,7 @@ int main(int argv, char *argc[]){
 	force_from_tape=0;
 	parse_args(argv,argc); // sets global variable command_line_args (defined in io.h)
 	ts_fprintf(stdout,"Starting program...\n\n");
-
+	parseDump("timestep_000000.vtu");
     if(command_line_args.dump_from_vtk[0]!=0){
 		ts_fprintf(stdout,"************************************************\n");
 		ts_fprintf(stdout,"***** Dumping vesicle from VTK points list *****\n");

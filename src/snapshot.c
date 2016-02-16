@@ -117,6 +117,7 @@ ts_bool xml_trisurf_vtx_tristar(ts_string *data, ts_vertex_list *vlist){
 
 /* zlib compression base64 encoded */
 /* compressed must not be pre-malloced */
+/* taken from https://gist.github.com/arq5x/5315739 */
 ts_uint ts_compress_string64(char *data, ts_uint data_len, char **compressed){
 	z_stream defstream;
 	defstream.zalloc = Z_NULL;
@@ -138,6 +139,10 @@ ts_uint ts_compress_string64(char *data, ts_uint data_len, char **compressed){
 	return nbase;
 }
 
+ts_uint ts_decompress_string64(char *b64, ts_uint data_len, char **decompressed){
+return TS_SUCCESS;
+
+}
 
 /* base64 encoding, taken from http://stackoverflow.com/questions/342409/how-do-i-base64-encode-decode-in-c */
 static char encoding_table[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
@@ -214,7 +219,7 @@ unsigned char *base64_decode(const char *data,
         	if (j < *output_length) decoded_data[j++] = (triple >> 1 * 8) & 0xFF;
         	if (j < *output_length) decoded_data[j++] = (triple >> 0 * 8) & 0xFF;
     }
-
+	if(decoding_table !=NULL) free(decoding_table);
     return decoded_data;
 }
 
