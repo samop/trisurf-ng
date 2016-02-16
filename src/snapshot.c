@@ -6,6 +6,7 @@
 #include <zlib.h>
 #include<inttypes.h>
 #include<config.h>
+#include <time.h>
 
 ts_uint ts_sprintf(ts_string *str, char *fmt, ...){
 	va_list ap;
@@ -43,9 +44,15 @@ ts_bool xml_trisurf_data(FILE *fh, ts_vesicle *vesicle){
 }
 
 ts_bool xml_trisurf_header(FILE *fh, ts_vesicle *vesicle){
+/* format current time */
+	time_t current_time;
+    	char *c_time_string;
+	current_time = time(NULL);
+	c_time_string = ctime(&current_time);
 	fprintf(fh, "<trisurfversion>%s</trisurfversion>\n",TS_VERSION);
-	fprintf(fh, "<trisurfdate></trisurfdate>\n");
-	fprintf(fh, "<dumpdate></dumpdate>\n");
+	fprintf(fh, "<dumpdate>%s</dumpdate>\n", c_time_string);
+	//free (c_time_string);
+
 	fprintf(fh, "<tape>\n");
 	
 	fprintf(fh, "</tape>\n");
