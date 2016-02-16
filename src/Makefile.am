@@ -15,3 +15,6 @@ trisurf_LDADD = ${libcurl_LIBS} ${libxml2_LIBS}
 #spherical_trisurf_ffdir=../
 #spherical_trisurf_ff_PROGRAMS = spherical_trisurf_ff
 #spherical_trisurf_ff_SOURCES = general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c frame.c energy.c timestep.c vertexmove.c spherical_trisurf_ff.c sh.c bondflip.c poly.c stats.c shcomplex.c
+
+#gitversion.c: .git/HEAD .git/index
+#    echo "const char *gitversion = \"$(shell git rev-parse HEAD)\";" > $@

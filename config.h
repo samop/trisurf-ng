@@ -84,6 +84,9 @@
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
+/* A string containing the version number */
+#define TS_VERSION "Trisurf (commit 588bbb-dirty) on natalie."
+
 /* Version number of package */
 #define VERSION "VERSION"
 

@@ -41,6 +41,13 @@ CFLAGS="-O3 -ffast-math"
 AC_MSG_RESULT(no)
 fi
 
+#detect commit version and date
+#-                   ["Trisurf $VERSION on $host, compiled by $cc_string, `expr $ac_cv_sizeof_void_p \* 8`-bit"],
+#                   ["Trisurf (commit `cd $srcdir && git log -1 --format=format:%h`) on $host, compiled by $cc_string, `expr $ac_cv_sizeof_void_p \* 8`-bit"],
+AC_DEFINE_UNQUOTED(TS_VERSION,
+                    ["Trisurf (commit `git describe  --abbrev=6 --dirty --always --tags`) on `hostname`."],
+                    [A string containing the version number])
+
 # Checks for library functions.
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
