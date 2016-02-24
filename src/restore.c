@@ -9,6 +9,8 @@
 #include <zlib.h>
 #include "vesicle.h"
 #include "vertex.h"
+#include "triangle.h"
+
 ts_bool parseDump(char *dumpfname) {
 	xmlDocPtr doc;
 	xmlNodePtr cur;
@@ -100,7 +102,13 @@ ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
 		if ((!xmlStrcmp(child->name, (const xmlChar *)"vtxn"))){
 			parseTrisurfVtxn(vesicle->vlist, doc, child);
 		}
-		 
+		if ((!xmlStrcmp(child->name, (const xmlChar *)"tria"))){
+			parseTrisurfTria(vesicle, doc, child);
+		}
+		 if ((!xmlStrcmp(child->name, (const xmlChar *)"tristar"))){
+			parseTrisurfTristar(vesicle, doc, child);
+		}
+
 	child = child->next;
 	}
 
@@ -109,7 +117,11 @@ ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
 	return vesicle;
 }
 
-ts_bool *parseTrisurfVtxn(ts_vertex_list *vlist, xmlDocPtr doc, xmlNodePtr cur){
+
+
+/* Low level tags parsers */
+
+ts_bool parseTrisurfVtxn(ts_vertex_list *vlist, xmlDocPtr doc, xmlNodePtr cur){
 
 	xmlChar *chari;
 	xmlChar *neighs;
@@ -133,6 +145,52 @@ ts_bool *parseTrisurfVtxn(ts_vertex_list *vlist, xmlDocPtr doc, xmlNodePtr cur){
 		token=strtok(NULL," ");
 	}	
 	xmlFree(neighs);
+	return TS_SUCCESS;
+}
+
+ts_bool parseTrisurfTria(ts_vesicle *vesicle, xmlDocPtr doc, xmlNodePtr cur){
+	xmlChar *triangles;
+	char *tria;
+	char *vtx[3];
+	
+	ts_uint i;
+	triangles = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
+	tria=(char *)triangles;
+	for(i=0;i<3;i++)	vtx[i]=strtok(tria," ");
+	while(vtx[2]!=NULL){
+		triangle_add(vesicle->tlist, vesicle->vlist->vtx[atoi(vtx[0])],vesicle->vlist->vtx[atoi(vtx[1])],vesicle->vlist->vtx[atoi(vtx[2])]);
+		for(i=0;i<3;i++)	vtx[i]=strtok(NULL," ");
+	}	
+
+	xmlFree(triangles);
+	return TS_SUCCESS;
+}
+
+
+ts_bool parseTrisurfTristar(ts_vesicle *vesicle, xmlDocPtr doc, xmlNodePtr cur){
+
+	xmlChar *chari;
+	xmlChar *tristar;
+	char *t;
+	char *token;
+	ts_uint neighi;
+	ts_uint i;
+	chari = xmlGetProp(cur, (xmlChar *)"idx");
+	i=atoi((char *)chari);
+	xmlFree(chari);
+	ts_vertex *vtx=vesicle->vlist->vtx[i];
+	tristar = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
+//	fprintf(stderr,"Found tristar for vtx %u that seems to have index %u with tristar=%s\n",i,vtx->idx,tristar);
+
+	t=(char *)tristar;
+	token=strtok(t," ");
+	while(token!=NULL){
+		neighi=atoi(token);
+		//fprintf(stderr,"%u", neighi);
+		vertex_add_tristar(vtx,vesicle->tlist->tria[neighi]);
+		token=strtok(NULL," ");
+	}	
+	xmlFree(tristar);
 	return TS_SUCCESS;
 }
 
