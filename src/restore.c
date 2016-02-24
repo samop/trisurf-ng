@@ -13,8 +13,8 @@
 
 ts_bool parseDump(char *dumpfname) {
 	xmlDocPtr doc;
-	xmlNodePtr cur;
-	ts_vesicle *vesicle;
+	xmlNodePtr cur, cur1,cur2;
+	ts_vesicle *vesicle=NULL;
 
 	doc = xmlParseFile(dumpfname);
 	
@@ -37,7 +37,28 @@ ts_bool parseDump(char *dumpfname) {
 		if ((!xmlStrcmp(cur->name, (const xmlChar *)"trisurf"))){
 			vesicle=parseTrisurfTag(doc, cur);
 		}
-		 
+		// START Point Position data &  Bonds
+		if ((!xmlStrcmp(cur->name, (const xmlChar *)"UnstructuredGrid"))){
+			cur1 = cur->xmlChildrenNode;
+			while(cur1!=NULL){
+				if ((!xmlStrcmp(cur1->name, (const xmlChar *)"Piece"))){
+					cur2=cur1->xmlChildrenNode;
+					while(cur2!=NULL){
+						if ((!xmlStrcmp(cur2->name, (const xmlChar *)"Points"))){
+							fprintf(stderr,"Found point data\n");
+							if(vesicle!=NULL)
+								parseXMLVertexPosition(vesicle, doc, cur);
+						}
+						if ((!xmlStrcmp(cur2->name, (const xmlChar *)"Cells"))){
+						fprintf(stderr,"Found cell(Bonds) data\n");
+						}
+						cur2=cur2->next;
+					}	
+				}
+				cur1 = cur1->next;
+			}
+		}
+		// END Point Position data & Bonds
 	cur = cur->next;
 	}
 	
@@ -48,6 +69,9 @@ ts_bool parseDump(char *dumpfname) {
 	return TS_SUCCESS;
 }
 
+
+
+/* this is a parser of additional data in xml */
 ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
 	fprintf(stderr,"Parsing trisurf tag\n");
 	xmlNodePtr child;
@@ -193,4 +217,33 @@ ts_bool parseTrisurfTristar(ts_vesicle *vesicle, xmlDocPtr doc, xmlNodePtr cur){
 	xmlFree(tristar);
 	return TS_SUCCESS;
 }
+
+
+/* this is a parser of vertex positions and bonds from main xml data */
+ts_bool parseXMLVertexPosition(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur){
+	xmlNodePtr child = cur->xmlChildrenNode;
+	xmlChar *points;
+	char *pts;
+	int i, idx;
+	char *token[3];
+	while (child != NULL) {
+		if ((!xmlStrcmp(child->name, (const xmlChar *)"DataArray"))){
+			points = xmlNodeListGetString(doc, child->xmlChildrenNode, 1);
+			pts=(char *)points;
+			for(i=0;i<3;i++)	token[i]=strtok(pts," ");
+			idx=0;
+			while(token[0]!=NULL){
+				vesicle->vlist->vtx[idx]->x=atof(token[0]);
+				vesicle->vlist->vtx[idx]->y=atof(token[1]);
+				vesicle->vlist->vtx[idx]->z=atof(token[2]);
+				for(i=0;i<3;i++)	token[i]=strtok(NULL," ");	
+				idx++;
+			}
+			xmlFree(points);
+		}
+		child=child->next;
+	}
+	return TS_SUCCESS;
+}
+
 
