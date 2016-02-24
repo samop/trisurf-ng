@@ -8,7 +8,7 @@ typedef struct{
 	ts_uint beg;
 } ts_string;
 
-#define COMPRESSION
+//#define COMPRESSION
 
 ts_bool xml_trisurf_data(FILE *fh, ts_vesicle *vesicle);
 ts_bool xml_trisurf_header(FILE *fh, ts_vesicle *vesicle);

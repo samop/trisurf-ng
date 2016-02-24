@@ -8,6 +8,7 @@
 #include <snapshot.h>
 #include <zlib.h>
 #include "vesicle.h"
+#include "vertex.h"
 ts_bool parseDump(char *dumpfname) {
 	xmlDocPtr doc;
 	xmlNodePtr cur;
@@ -47,6 +48,9 @@ ts_bool parseDump(char *dumpfname) {
 
 ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
 	fprintf(stderr,"Parsing trisurf tag\n");
+	xmlNodePtr child;
+
+#ifdef COMPRESS
 	/* base64decode */
 	size_t cLen;
 	/*size_t tLen;
@@ -78,6 +82,7 @@ ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
 	fprintf(stderr,"%s\n",subtree);
 	
 	free(subtree);
+#endif
 	/*parse xml subtree */
 	xmlChar *nvtx, *npoly, *nfono;
 	nvtx = xmlGetProp(cur, (xmlChar *)"nvtx");
@@ -89,5 +94,45 @@ ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
 	xmlFree(nvtx);
 	xmlFree(npoly);
 	xmlFree(nfono);
+
+	child = cur->xmlChildrenNode;
+	while (child != NULL) {
+		if ((!xmlStrcmp(child->name, (const xmlChar *)"vtxn"))){
+			parseTrisurfVtxn(vesicle->vlist, doc, child);
+		}
+		 
+	child = child->next;
+	}
+
+
+
 	return vesicle;
 }
+
+ts_bool *parseTrisurfVtxn(ts_vertex_list *vlist, xmlDocPtr doc, xmlNodePtr cur){
+
+	xmlChar *chari;
+	xmlChar *neighs;
+	char *n;
+	char *token;
+	ts_uint neighi;
+	ts_uint i;
+	chari = xmlGetProp(cur, (xmlChar *)"idx");
+	i=atoi((char *)chari);
+	xmlFree(chari);
+	ts_vertex *vtx=vlist->vtx[i];
+	neighs = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
+	//fprintf(stderr,"Found neigh for vtx %u that seems to have index %u with neighs=%s\n",i,vtx->idx,neighs);
+
+	n=(char *)neighs;
+	token=strtok(n," ");
+	while(token!=NULL){
+		neighi=atoi(token);
+		//fprintf(stderr,"%u", neighi);
+		vtx_add_neighbour(vtx,vlist->vtx[neighi]);
+		token=strtok(NULL," ");
+	}	
+	xmlFree(neighs);
+	return TS_SUCCESS;
+}
+
