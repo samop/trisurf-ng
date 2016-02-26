@@ -8,6 +8,7 @@
 #include<config.h>
 #include <time.h>
 
+/* a helper function that utilizes ts_string data structure and performs same as sprintf */
 ts_uint ts_sprintf(ts_string *str, char *fmt, ...){
 	va_list ap;
 	va_start(ap,fmt);
@@ -17,7 +18,7 @@ ts_uint ts_sprintf(ts_string *str, char *fmt, ...){
 	return n;
 }
 
-
+/* outputs additional data into paraview xml file */
 ts_bool xml_trisurf_data(FILE *fh, ts_vesicle *vesicle){
 
 	ts_string *data=(ts_string *)malloc(sizeof(ts_sprintf));
@@ -37,7 +38,7 @@ ts_bool xml_trisurf_data(FILE *fh, ts_vesicle *vesicle){
 #else
 	fprintf(fh,"%s", data->string);
 #endif
-	free(data->string);
+	free(data->string);  /* TODO: valgrind is not ok with this! */
 	free(data);
 	xml_trisurf_footer(fh);
 	return TS_SUCCESS;
@@ -49,15 +50,26 @@ ts_bool xml_trisurf_header(FILE *fh, ts_vesicle *vesicle){
     	char *c_time_string;
 	current_time = time(NULL);
 	c_time_string = ctime(&current_time);
-	
+	int npoly, nfono;	
+
 	fprintf(fh, "<trisurfversion>Trisurf (commit %s), compiled on %s %s</trisurfversion>\n",TS_VERSION, __DATE__,  __TIME__);
 	fprintf(fh, "<dumpdate>%s</dumpdate>\n", c_time_string);
-	//free (c_time_string);
 
 	fprintf(fh, "<tape>\n");
 	
 	fprintf(fh, "</tape>\n");
-	fprintf(fh, "<trisurf nvtx=\"%u\" npoly=\"%u\" nfono=\"%u\">\n", vesicle->vlist->n, vesicle->poly_list->n, vesicle->poly_list->poly[0]->vlist->n);
+	if(vesicle->poly_list!=NULL){
+		npoly=vesicle->poly_list->n;
+		if(npoly!=0){
+			nfono=vesicle->poly_list->poly[0]->vlist->n;
+		} else {
+			nfono=0;
+		}
+	} else {
+		npoly=0;
+		nfono=0;
+	}
+	fprintf(fh, "<trisurf nvtx=\"%u\" npoly=\"%u\" nfono=\"%u\">\n", vesicle->vlist->n, npoly, nfono);
 	return TS_SUCCESS;
 }
 

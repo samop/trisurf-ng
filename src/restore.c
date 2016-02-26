@@ -10,6 +10,9 @@
 #include "vesicle.h"
 #include "vertex.h"
 #include "triangle.h"
+#include "bond.h"
+#include "energy.h"
+#include "initial_distribution.h"
 
 ts_bool parseDump(char *dumpfname) {
 	xmlDocPtr doc;
@@ -51,6 +54,8 @@ ts_bool parseDump(char *dumpfname) {
 						}
 						if ((!xmlStrcmp(cur2->name, (const xmlChar *)"Cells"))){
 						fprintf(stderr,"Found cell(Bonds) data\n");
+							if(vesicle!=NULL)
+								parseXMLBonds(vesicle, doc, cur);
 						}
 						cur2=cur2->next;
 					}	
@@ -63,6 +68,11 @@ ts_bool parseDump(char *dumpfname) {
 	}
 	
 	xmlFreeDoc(doc);
+	init_normal_vectors(vesicle->tlist);
+	mean_curvature_and_energy(vesicle);
+
+/* TODO: cells, polymeres, filaments, core, tape */
+
 	fprintf(stderr,"Restoration completed\n");
 	exit(0);
 	vesicle_free(vesicle);
@@ -245,5 +255,29 @@ ts_bool parseXMLVertexPosition(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur
 	}
 	return TS_SUCCESS;
 }
+ts_bool parseXMLBonds(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur){
+	xmlNodePtr child = cur->xmlChildrenNode;
+	xmlChar *bonds;
+	char *b;
+	int i, idx;
+	char *token[2];
+	while (child != NULL) {
+		if ((!xmlStrcmp(child->name, (const xmlChar *)"DataArray"))){
+			bonds = xmlNodeListGetString(doc, child->xmlChildrenNode, 1);
+			b=(char *)bonds;
+			for(i=0;i<2;i++)	token[i]=strtok(b," ");
+			idx=0;
+			while(token[0]!=NULL){
+				bond_add(vesicle->blist, vesicle->vlist->vtx[atoi(token[0])], vesicle->vlist->vtx[atoi(token[1])]);
+				for(i=0;i<2;i++)	token[i]=strtok(NULL," ");	
+				idx++;
+			}
+			xmlFree(bonds);
+		}
+		child=child->next;
+	}
+	return TS_SUCCESS;
+}
+
 
 
