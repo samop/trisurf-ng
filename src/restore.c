@@ -12,6 +12,7 @@
 #include "triangle.h"
 #include "bond.h"
 #include "energy.h"
+#include "poly.h"
 #include "initial_distribution.h"
 
 ts_bool parseDump(char *dumpfname) {
@@ -68,13 +69,16 @@ ts_bool parseDump(char *dumpfname) {
 	}
 	
 	xmlFreeDoc(doc);
+
+	vesicle->poly_list=init_poly_list(0, 0, vesicle->vlist, vesicle);
+
 	init_normal_vectors(vesicle->tlist);
 	mean_curvature_and_energy(vesicle);
 
 /* TODO: cells, polymeres, filaments, core, tape */
 
 	fprintf(stderr,"Restoration completed\n");
-	write_vertex_xml_file(vesicle,999);
+//	write_vertex_xml_file(vesicle,999);
 	vesicle_free(vesicle);
 	exit(0);
 	return TS_SUCCESS;
@@ -294,12 +298,13 @@ ts_bool parseXMLVertexPosition(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur
 }
 ts_bool parseXMLBonds(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur){
 	xmlNodePtr child = cur->xmlChildrenNode;
-	xmlChar *bonds;
+	xmlChar *bonds, *conname;
 	char *b;
 	int idx;
 	char *token[2];
 	while (child != NULL) {
-		if ((!xmlStrcmp(child->name, (const xmlChar *)"DataArray")) && !xmlStrcmp(xmlGetProp(child, (xmlChar *)"Name"), (const xmlChar *)"connectivity") ){
+		conname=xmlGetProp(child, (xmlChar *)"Name");
+		if ((!xmlStrcmp(child->name, (const xmlChar *)"DataArray")) && !xmlStrcmp(conname, (const xmlChar *)"connectivity") ){
 			bonds = xmlNodeListGetString(doc, child->xmlChildrenNode, 1);
 			b=(char *)bonds;
 			token[0]=strtok(b," ");
@@ -313,6 +318,7 @@ ts_bool parseXMLBonds(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur){
 			}
 			xmlFree(bonds);
 		}
+		xmlFree(conname);
 		child=child->next;
 	}
 	fprintf(stderr,"Bond data j=%d\n",idx);	
