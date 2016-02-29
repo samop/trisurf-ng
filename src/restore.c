@@ -139,6 +139,9 @@ ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
 		if ((!xmlStrcmp(child->name, (const xmlChar *)"tria"))){
 			parseTrisurfTria(vesicle, doc, child);
 		}
+		if ((!xmlStrcmp(child->name, (const xmlChar *)"trianeigh"))){
+			parseTrisurfTriaNeigh(vesicle, doc, child);
+		}
 		 if ((!xmlStrcmp(child->name, (const xmlChar *)"tristar"))){
 			parseTrisurfTristar(vesicle, doc, child);
 		}
@@ -195,6 +198,29 @@ ts_bool parseTrisurfTria(ts_vesicle *vesicle, xmlDocPtr doc, xmlNodePtr cur){
 		triangle_add(vesicle->tlist, vesicle->vlist->vtx[atoi(vtx[0])],vesicle->vlist->vtx[atoi(vtx[1])],vesicle->vlist->vtx[atoi(vtx[2])]);
 		for(i=0;i<3;i++)	vtx[i]=strtok(NULL," ");
 	}	
+
+	xmlFree(triangles);
+	return TS_SUCCESS;
+}
+
+
+ts_bool parseTrisurfTriaNeigh(ts_vesicle *vesicle, xmlDocPtr doc, xmlNodePtr cur){
+	xmlChar *triangles;
+	char *tria;
+	char *ntria[3];
+	ts_uint i,j;
+	triangles = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
+	tria=(char *)triangles;
+	for(i=0;i<3;i++)	ntria[i]=strtok(tria," ");
+	j=0;
+	while(ntria[2]!=NULL){
+		triangle_add_neighbour(vesicle->tlist->tria[j],vesicle->tlist->tria[atoi(ntria[0])]);
+		triangle_add_neighbour(vesicle->tlist->tria[j],vesicle->tlist->tria[atoi(ntria[1])]);
+		triangle_add_neighbour(vesicle->tlist->tria[j],vesicle->tlist->tria[atoi(ntria[2])]);
+		j++;
+		for(i=0;i<3;i++)	ntria[i]=strtok(NULL," ");
+	}	
+	fprintf(stderr,"Parsing triangle neighbors j=%d\n",j);	
 
 	xmlFree(triangles);
 	return TS_SUCCESS;
