@@ -1000,6 +1000,20 @@ ts_bool write_pov_file(ts_vesicle *vesicle, char *filename){
 
 
 ts_tape *parsetape(char *filename){
+	FILE *fd = fopen (filename, "r");
+	long length;
+	size_t size;
+	fseek (fd, 0, SEEK_END);
+  	length = ftell (fd);
+	fseek (fd, 0, SEEK_SET);
+	size=fread (tapetxt, 1, length, fd);
+	fclose(fd);
+	if(size);
+	ts_tape *tape=parsetapebuffer(tapetxt);
+	return tape;
+}
+
+ts_tape *parsetapebuffer(char *buffer){
     ts_tape *tape=(ts_tape *)calloc(1,sizeof(ts_tape));
     tape->multiprocessing=calloc(255,sizeof(char));
 
@@ -1038,7 +1052,7 @@ ts_tape *parsetape(char *filename){
     cfg_t *cfg;    
     ts_uint retval;
     cfg = cfg_init(opts, 0);
-    retval=cfg_parse(cfg, filename);
+    retval=cfg_parse_buf(cfg, buffer);
     if(retval==CFG_FILE_ERROR){
 	fatal("No tape file.",100);
 	}

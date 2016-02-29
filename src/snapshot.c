@@ -7,7 +7,7 @@
 #include<inttypes.h>
 #include<config.h>
 #include <time.h>
-
+#include "io.h"
 /* a helper function that utilizes ts_string data structure and performs same as sprintf */
 ts_uint ts_sprintf(ts_string *str, char *fmt, ...){
 	va_list ap;
@@ -56,7 +56,7 @@ ts_bool xml_trisurf_header(FILE *fh, ts_vesicle *vesicle){
 	fprintf(fh, "<dumpdate>%s</dumpdate>\n", c_time_string);
 
 	fprintf(fh, "<tape>\n");
-	
+		fprintf(fh,"%s",tapetxt);	
 	fprintf(fh, "</tape>\n");
 	if(vesicle->poly_list!=NULL){
 		npoly=vesicle->poly_list->n;
@@ -69,7 +69,7 @@ ts_bool xml_trisurf_header(FILE *fh, ts_vesicle *vesicle){
 		npoly=0;
 		nfono=0;
 	}
-	fprintf(fh, "<trisurf nvtx=\"%u\" npoly=\"%u\" nfono=\"%u\">\n", vesicle->vlist->n, npoly, nfono);
+	fprintf(fh, "<trisurf nvtx=\"%u\" npoly=\"%u\" nfono=\"%u\" compressed=\"false\">\n", vesicle->vlist->n, npoly, nfono);
 	return TS_SUCCESS;
 }
 

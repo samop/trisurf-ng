@@ -7,7 +7,7 @@ static char prefixname[1024];
 static ts_bool restore=0;
 static char tape[1024]; */
 int force_from_tape;
-
+char tapetxt[128000]; //stores text file of the tape
 typedef struct{
 	ts_int force_from_tape;
 	ts_int reset_iteration_count;
@@ -76,6 +76,7 @@ ts_bool write_master_xml_file(ts_char *filename);
 ts_bool write_pov_file(ts_vesicle *vesicle, char *filename);
 
 ts_tape *parsetape(char *filename);
+ts_tape *parsetapebuffer(char *buffer);
 ts_bool tape_free(ts_tape *tape);
 ts_bool getcmdline_tape(cfg_t *cfg, char *opts);
 ts_bool cmdline_to_tape(cfg_t *cfg, char *key, char *val);

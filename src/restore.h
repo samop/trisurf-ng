@@ -3,6 +3,7 @@
 
 ts_bool parseDump(char *dumpfname);
 ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur);
+ts_bool setGlobalTapeTXTfromTapeTag(xmlDocPtr doc, xmlNodePtr cur);
 ts_bool parseTrisurfVtxn(ts_vertex_list *vlist, xmlDocPtr doc, xmlNodePtr cur);
 ts_bool parseTrisurfTria(ts_vesicle *vesicle, xmlDocPtr doc, xmlNodePtr cur);
 ts_bool parseTrisurfTriaNeigh(ts_vesicle *vesicle, xmlDocPtr doc, xmlNodePtr cur);

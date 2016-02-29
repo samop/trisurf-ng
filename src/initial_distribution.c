@@ -39,11 +39,17 @@ ts_vesicle *initial_distribution_dipyramid(ts_uint nshell, ts_uint ncmax1, ts_ui
 
 ts_vesicle *create_vesicle_from_tape(ts_tape *tape){
 	ts_vesicle *vesicle;
-	ts_vertex *vtx;
 
 	vesicle=initial_distribution_dipyramid(tape->nshell,tape->ncxmax,tape->ncymax,tape->nczmax,tape->stepsize);
-    vesicle->tape=tape;
+    	vesicle->tape=tape;
+	set_vesicle_values_from_tape(vesicle);
+	return vesicle;
+}
+
+ts_bool set_vesicle_values_from_tape(ts_vesicle *vesicle){
 	// Nucleus:
+	ts_vertex *vtx;
+	ts_tape *tape=vesicle->tape;
 	vesicle->R_nucleus=tape->R_nucleus*tape->R_nucleus;
 
 	vesicle->clist->dmin_interspecies = tape->dmin_interspecies*tape->dmin_interspecies;
@@ -101,7 +107,7 @@ ts_vesicle *create_vesicle_from_tape(ts_tape *tape){
     else {
         vesicle->sphHarmonics=NULL;
     }
-    return vesicle;
+    return TS_SUCCESS;
 
 }
 

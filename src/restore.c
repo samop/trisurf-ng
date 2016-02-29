@@ -14,12 +14,12 @@
 #include "energy.h"
 #include "poly.h"
 #include "initial_distribution.h"
+#include "io.h"
 
 ts_bool parseDump(char *dumpfname) {
 	xmlDocPtr doc;
 	xmlNodePtr cur, cur1,cur2;
 	ts_vesicle *vesicle=NULL;
-
 	doc = xmlParseFile(dumpfname);
 	
 	if (doc == NULL ) {
@@ -38,6 +38,11 @@ ts_bool parseDump(char *dumpfname) {
 	
 	cur = cur->xmlChildrenNode;
 	while (cur != NULL) {
+
+		if ((!xmlStrcmp(cur->name, (const xmlChar *)"tape"))){
+			setGlobalTapeTXTfromTapeTag(doc, cur);
+		}
+
 		if ((!xmlStrcmp(cur->name, (const xmlChar *)"trisurf"))){
 			vesicle=parseTrisurfTag(doc, cur);
 		}
@@ -84,6 +89,12 @@ ts_bool parseDump(char *dumpfname) {
 	return TS_SUCCESS;
 }
 
+ts_bool setGlobalTapeTXTfromTapeTag(xmlDocPtr doc, xmlNodePtr cur){
+	xmlChar *tape = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
+	strcpy(tapetxt,(char *)tape);
+	xmlFree(tape);
+	return TS_SUCCESS;
+}
 
 
 /* this is a parser of additional data in xml */
@@ -129,8 +140,10 @@ ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
 	nvtx = xmlGetProp(cur, (xmlChar *)"nvtx");
 	npoly=xmlGetProp(cur, (xmlChar *)"npoly");
 	nfono=xmlGetProp(cur, (xmlChar *)"nfono");
-	fprintf(stderr,"nvtx=%u\n",atoi((char *)nvtx));
-	ts_vesicle *vesicle=init_vesicle(atoi((char *)nvtx),10,10,10,0.1);
+	ts_tape *tape=parsetapebuffer(tapetxt);
+	//fprintf(stderr,"nvtx=%u\n",atoi((char *)nvtx));
+	//TODO: check if nvtx is in agreement with nshell from tape
+	ts_vesicle *vesicle=init_vesicle(atoi((char *)nvtx),tape->ncxmax,tape->ncymax,tape->nczmax,tape->stepsize);
 	//vesicle->poly_list=init_poly_list(atoi((char *)npoly),atoi((char *)nmono), vesicle->vlist, vesicle);
 	xmlFree(nvtx);
 	xmlFree(npoly);
@@ -155,6 +168,8 @@ ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
 	}
 
 
+	vesicle->tape=tape;
+	set_vesicle_values_from_tape(vesicle);
 
 	return vesicle;
 }
