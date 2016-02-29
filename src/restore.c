@@ -74,8 +74,8 @@ ts_bool parseDump(char *dumpfname) {
 /* TODO: cells, polymeres, filaments, core, tape */
 
 	fprintf(stderr,"Restoration completed\n");
-	exit(0);
 	vesicle_free(vesicle);
+	exit(0);
 	return TS_SUCCESS;
 }
 
@@ -190,14 +190,18 @@ ts_bool parseTrisurfTria(ts_vesicle *vesicle, xmlDocPtr doc, xmlNodePtr cur){
 	char *tria;
 	char *vtx[3];
 	
-	ts_uint i;
+	ts_uint i,j;
 	triangles = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
 	tria=(char *)triangles;
-	for(i=0;i<3;i++)	vtx[i]=strtok(tria," ");
+	vtx[0]=strtok(tria," ");
+	for(i=1;i<3;i++)	vtx[i]=strtok(NULL," ");
+	j=0;
 	while(vtx[2]!=NULL){
 		triangle_add(vesicle->tlist, vesicle->vlist->vtx[atoi(vtx[0])],vesicle->vlist->vtx[atoi(vtx[1])],vesicle->vlist->vtx[atoi(vtx[2])]);
 		for(i=0;i<3;i++)	vtx[i]=strtok(NULL," ");
+		j++;
 	}	
+	fprintf(stderr,"Parsing triangles %s j=%d\n",triangles,j);	
 
 	xmlFree(triangles);
 	return TS_SUCCESS;
@@ -211,7 +215,8 @@ ts_bool parseTrisurfTriaNeigh(ts_vesicle *vesicle, xmlDocPtr doc, xmlNodePtr cur
 	ts_uint i,j;
 	triangles = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
 	tria=(char *)triangles;
-	for(i=0;i<3;i++)	ntria[i]=strtok(tria," ");
+	ntria[0]=strtok(tria," ");
+	for(i=1;i<3;i++)	ntria[i]=strtok(NULL," ");
 	j=0;
 	while(ntria[2]!=NULL){
 		triangle_add_neighbour(vesicle->tlist->tria[j],vesicle->tlist->tria[atoi(ntria[0])]);
@@ -266,7 +271,8 @@ ts_bool parseXMLVertexPosition(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur
 		if ((!xmlStrcmp(child->name, (const xmlChar *)"DataArray"))){
 			points = xmlNodeListGetString(doc, child->xmlChildrenNode, 1);
 			pts=(char *)points;
-			for(i=0;i<3;i++)	token[i]=strtok(pts," ");
+			token[0]=strtok(pts," ");
+			for(i=1;i<3;i++)	token[i]=strtok(NULL," ");
 			idx=0;
 			while(token[0]!=NULL){
 				vesicle->vlist->vtx[idx]->x=atof(token[0]);
@@ -291,7 +297,8 @@ ts_bool parseXMLBonds(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur){
 		if ((!xmlStrcmp(child->name, (const xmlChar *)"DataArray"))){
 			bonds = xmlNodeListGetString(doc, child->xmlChildrenNode, 1);
 			b=(char *)bonds;
-			for(i=0;i<2;i++)	token[i]=strtok(b," ");
+			token[0]=strtok(b," ");
+			token[1]=strtok(NULL," ");
 			idx=0;
 			while(token[0]!=NULL){
 				bond_add(vesicle->blist, vesicle->vlist->vtx[atoi(token[0])], vesicle->vlist->vtx[atoi(token[1])]);

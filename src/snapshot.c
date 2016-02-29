@@ -82,7 +82,7 @@ ts_bool xml_trisurf_tria(ts_string *data, ts_triangle_list *tlist){
 	ts_uint i;
 	ts_sprintf(data,"<tria>");
 	for(i=0; i<tlist->n;i++){
-		ts_sprintf(data,"%u %u %u",tlist->tria[i]->vertex[0]->idx, tlist->tria[i]->vertex[1]->idx, tlist->tria[i]->vertex[2]->idx);
+		ts_sprintf(data,"%u %u %u ",tlist->tria[i]->vertex[0]->idx, tlist->tria[i]->vertex[1]->idx, tlist->tria[i]->vertex[2]->idx);
 	}
 	ts_sprintf(data,"</tria>");
 	return TS_SUCCESS;
@@ -92,7 +92,7 @@ ts_bool xml_trisurf_tria_neigh(ts_string *data, ts_triangle_list *tlist){
 	ts_uint i;
 	ts_sprintf(data,"<trianeigh>\n");
 	for(i=0; i<tlist->n;i++){
-		ts_sprintf(data,"%u %u %u",tlist->tria[i]->neigh[0]->idx, tlist->tria[i]->neigh[1]->idx, tlist->tria[i]->neigh[2]->idx);
+		ts_sprintf(data,"%u %u %u ",tlist->tria[i]->neigh[0]->idx, tlist->tria[i]->neigh[1]->idx, tlist->tria[i]->neigh[2]->idx);
 	}
 	ts_sprintf(data,"</trianeigh>\n");
 	return TS_SUCCESS;
