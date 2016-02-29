@@ -273,13 +273,15 @@ ts_bool parseXMLVertexPosition(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur
 			points = xmlNodeListGetString(doc, child->xmlChildrenNode, 1);
 			pts=(char *)points;
 			token[0]=strtok(pts," ");
-			for(i=1;i<3;i++)	token[i]=strtok(NULL," ");
+			token[1]=strtok(NULL," ");
+			token[2]=strtok(NULL,"\n");
 			idx=0;
 			while(token[0]!=NULL){
 				vesicle->vlist->vtx[idx]->x=atof(token[0]);
 				vesicle->vlist->vtx[idx]->y=atof(token[1]);
 				vesicle->vlist->vtx[idx]->z=atof(token[2]);
-				for(i=0;i<3;i++)	token[i]=strtok(NULL," ");	
+				for(i=0;i<2;i++)	token[i]=strtok(NULL," ");	
+				token[2]=strtok(NULL,"\n");
 				idx++;
 			}
 			xmlFree(points);
@@ -294,18 +296,19 @@ ts_bool parseXMLBonds(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur){
 	xmlNodePtr child = cur->xmlChildrenNode;
 	xmlChar *bonds;
 	char *b;
-	int i, idx;
+	int idx;
 	char *token[2];
 	while (child != NULL) {
 		if ((!xmlStrcmp(child->name, (const xmlChar *)"DataArray")) && !xmlStrcmp(xmlGetProp(child, (xmlChar *)"Name"), (const xmlChar *)"connectivity") ){
 			bonds = xmlNodeListGetString(doc, child->xmlChildrenNode, 1);
 			b=(char *)bonds;
 			token[0]=strtok(b," ");
-			token[1]=strtok(NULL," ");
+			token[1]=strtok(NULL,"\n");
 			idx=0;
 			while(token[0]!=NULL){
 				bond_add(vesicle->blist, vesicle->vlist->vtx[atoi(token[0])], vesicle->vlist->vtx[atoi(token[1])]);
-				for(i=0;i<2;i++)	token[i]=strtok(NULL," ");	
+				token[0]=strtok(NULL," ");	
+				token[1]=strtok(NULL,"\n");	
 				idx++;
 			}
 			xmlFree(bonds);
