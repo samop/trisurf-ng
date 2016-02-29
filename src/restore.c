@@ -50,12 +50,12 @@ ts_bool parseDump(char *dumpfname) {
 						if ((!xmlStrcmp(cur2->name, (const xmlChar *)"Points"))){
 							fprintf(stderr,"Found point data\n");
 							if(vesicle!=NULL)
-								parseXMLVertexPosition(vesicle, doc, cur);
+								parseXMLVertexPosition(vesicle, doc, cur2);
 						}
 						if ((!xmlStrcmp(cur2->name, (const xmlChar *)"Cells"))){
 						fprintf(stderr,"Found cell(Bonds) data\n");
 							if(vesicle!=NULL)
-								parseXMLBonds(vesicle, doc, cur);
+								parseXMLBonds(vesicle, doc, cur2);
 						}
 						cur2=cur2->next;
 					}	
@@ -74,6 +74,7 @@ ts_bool parseDump(char *dumpfname) {
 /* TODO: cells, polymeres, filaments, core, tape */
 
 	fprintf(stderr,"Restoration completed\n");
+	write_vertex_xml_file(vesicle,999);
 	vesicle_free(vesicle);
 	exit(0);
 	return TS_SUCCESS;
@@ -285,6 +286,8 @@ ts_bool parseXMLVertexPosition(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur
 		}
 		child=child->next;
 	}
+	fprintf(stderr,"Vertices position j=%d\n",idx);	
+
 	return TS_SUCCESS;
 }
 ts_bool parseXMLBonds(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur){
@@ -294,7 +297,7 @@ ts_bool parseXMLBonds(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur){
 	int i, idx;
 	char *token[2];
 	while (child != NULL) {
-		if ((!xmlStrcmp(child->name, (const xmlChar *)"DataArray"))){
+		if ((!xmlStrcmp(child->name, (const xmlChar *)"DataArray")) && !xmlStrcmp(xmlGetProp(child, (xmlChar *)"Name"), (const xmlChar *)"connectivity") ){
 			bonds = xmlNodeListGetString(doc, child->xmlChildrenNode, 1);
 			b=(char *)bonds;
 			token[0]=strtok(b," ");
@@ -309,6 +312,7 @@ ts_bool parseXMLBonds(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur){
 		}
 		child=child->next;
 	}
+	fprintf(stderr,"Bond data j=%d\n",idx);	
 	return TS_SUCCESS;
 }
 
