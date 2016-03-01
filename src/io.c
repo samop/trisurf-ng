@@ -455,7 +455,7 @@ while (1)
            {"dump-filename", required_argument,0, 'f'},
            {"tape-options",required_argument,0,'c'},
            {"tape-template", required_argument,0,0},
-            {"dump-from-vtk",required_argument,0,0},
+            {"restore-from-vtk",required_argument,0,0},
            {0, 0, 0, 0}
          };
        /* getopt_long stores the option index here. */
@@ -482,7 +482,7 @@ while (1)
             if(strcmp(long_options[option_index].name,"tape-template")==0){
                 strcpy(command_line_args.tape_templatefull,optarg);
             }
-            if(strcmp(long_options[option_index].name,"dump-from-vtk")==0){
+            if(strcmp(long_options[option_index].name,"restore-from-vtk")==0){
                 strcpy(command_line_args.dump_from_vtk,optarg);
             }
            break;

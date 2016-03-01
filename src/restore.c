@@ -16,7 +16,7 @@
 #include "initial_distribution.h"
 #include "io.h"
 
-ts_bool parseDump(char *dumpfname) {
+ts_vesicle *parseDump(char *dumpfname) {
 	xmlDocPtr doc;
 	xmlNodePtr cur, cur1,cur2;
 	ts_vesicle *vesicle=NULL;
@@ -80,13 +80,13 @@ ts_bool parseDump(char *dumpfname) {
 	init_normal_vectors(vesicle->tlist);
 	mean_curvature_and_energy(vesicle);
 
-/* TODO: cells, polymeres, filaments, core, tape */
+/* TODO: filaments */
 
 	fprintf(stderr,"Restoration completed\n");
-	write_vertex_xml_file(vesicle,999);
-	vesicle_free(vesicle);
-	exit(0);
-	return TS_SUCCESS;
+//	write_vertex_xml_file(vesicle,999);
+//	vesicle_free(vesicle);
+//	exit(0);
+	return vesicle;
 }
 
 ts_bool setGlobalTapeTXTfromTapeTag(xmlDocPtr doc, xmlNodePtr cur){
