@@ -25,7 +25,7 @@ constareaswitch=2
 
 ####### Polymer (brush) definitions ###########
 # npoly is a number of polymers attached to npoly distinct vertices on vesicle
-npoly=0
+npoly=2
 # nmono is a number of monomers in each polymer
 nmono=10
 # Spring constant between monomers of the polymer

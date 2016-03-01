@@ -75,7 +75,7 @@ ts_bool parseDump(char *dumpfname) {
 	
 	xmlFreeDoc(doc);
 
-	vesicle->poly_list=init_poly_list(0, 0, vesicle->vlist, vesicle);
+//	vesicle->poly_list=init_poly_list(0, 0, vesicle->vlist, vesicle);
 
 	init_normal_vectors(vesicle->tlist);
 	mean_curvature_and_energy(vesicle);
@@ -83,7 +83,7 @@ ts_bool parseDump(char *dumpfname) {
 /* TODO: cells, polymeres, filaments, core, tape */
 
 	fprintf(stderr,"Restoration completed\n");
-//	write_vertex_xml_file(vesicle,999);
+	write_vertex_xml_file(vesicle,999);
 	vesicle_free(vesicle);
 	exit(0);
 	return TS_SUCCESS;
@@ -136,10 +136,10 @@ ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
 	free(subtree);
 #endif
 	/*parse xml subtree */
-	xmlChar *nvtx, *npoly, *nfono;
+	xmlChar *nvtx, *npoly, *nmono;
 	nvtx = xmlGetProp(cur, (xmlChar *)"nvtx");
 	npoly=xmlGetProp(cur, (xmlChar *)"npoly");
-	nfono=xmlGetProp(cur, (xmlChar *)"nfono");
+	nmono=xmlGetProp(cur, (xmlChar *)"nmono");
 	ts_tape *tape=parsetapebuffer(tapetxt);
 	//fprintf(stderr,"nvtx=%u\n",atoi((char *)nvtx));
 	//TODO: check if nvtx is in agreement with nshell from tape
@@ -147,7 +147,7 @@ ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
 	//vesicle->poly_list=init_poly_list(atoi((char *)npoly),atoi((char *)nmono), vesicle->vlist, vesicle);
 	xmlFree(nvtx);
 	xmlFree(npoly);
-	xmlFree(nfono);
+	xmlFree(nmono);
 
 	child = cur->xmlChildrenNode;
 	while (child != NULL) {
@@ -285,7 +285,7 @@ ts_bool parseXMLVertexPosition(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur
 	xmlNodePtr child = cur->xmlChildrenNode;
 	xmlChar *points;
 	char *pts;
-	int i, idx;
+	int i, idx, polyidx, monoidx;
 	char *token[3];
 	while (child != NULL) {
 		if ((!xmlStrcmp(child->name, (const xmlChar *)"DataArray"))){
@@ -296,9 +296,17 @@ ts_bool parseXMLVertexPosition(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur
 			token[2]=strtok(NULL,"\n");
 			idx=0;
 			while(token[0]!=NULL){
-				vesicle->vlist->vtx[idx]->x=atof(token[0]);
-				vesicle->vlist->vtx[idx]->y=atof(token[1]);
-				vesicle->vlist->vtx[idx]->z=atof(token[2]);
+				if(idx<vesicle->vlist->n){
+					vesicle->vlist->vtx[idx]->x=atof(token[0]);
+					vesicle->vlist->vtx[idx]->y=atof(token[1]);
+					vesicle->vlist->vtx[idx]->z=atof(token[2]);
+				} else {
+					polyidx=(idx-vesicle->vlist->n)/vesicle->tape->nmono;
+					monoidx=(idx-vesicle->vlist->n)%vesicle->tape->nmono;
+					vesicle->poly_list->poly[polyidx]->vlist->vtx[monoidx]->x=atof(token[0]);
+					vesicle->poly_list->poly[polyidx]->vlist->vtx[monoidx]->y=atof(token[1]);
+					vesicle->poly_list->poly[polyidx]->vlist->vtx[monoidx]->z=atof(token[2]);
+				}
 				for(i=0;i<2;i++)	token[i]=strtok(NULL," ");	
 				token[2]=strtok(NULL,"\n");
 				idx++;
@@ -315,7 +323,7 @@ ts_bool parseXMLBonds(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur){
 	xmlNodePtr child = cur->xmlChildrenNode;
 	xmlChar *bonds, *conname;
 	char *b;
-	int idx;
+	int idx, polyidx;
 	char *token[2];
 	while (child != NULL) {
 		conname=xmlGetProp(child, (xmlChar *)"Name");
@@ -326,7 +334,18 @@ ts_bool parseXMLBonds(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur){
 			token[1]=strtok(NULL,"\n");
 			idx=0;
 			while(token[0]!=NULL){
-				bond_add(vesicle->blist, vesicle->vlist->vtx[atoi(token[0])], vesicle->vlist->vtx[atoi(token[1])]);
+				if(idx<3*(vesicle->vlist->n-2)){
+					bond_add(vesicle->blist, vesicle->vlist->vtx[atoi(token[0])], vesicle->vlist->vtx[atoi(token[1])]);
+				}
+				else {
+				//find grafted vtx
+					if((vesicle->tape->nmono-1)==(idx-3*(vesicle->vlist->n-2))%(vesicle->tape->nmono)){
+						polyidx=(idx-3*(vesicle->vlist->n-2))/(vesicle->tape->nmono);
+						fprintf(stderr,"poly=%d, vertex=%d\n",polyidx,atoi(token[0]));
+						vesicle->poly_list->poly[polyidx]->grafted_vtx=vesicle->vlist->vtx[atoi(token[0])];
+						vesicle->vlist->vtx[atoi(token[0])]->grafted_poly=vesicle->poly_list->poly[polyidx];
+					}
+				}
 				token[0]=strtok(NULL," ");	
 				token[1]=strtok(NULL,"\n");	
 				idx++;
