@@ -1,3 +1,4 @@
+/* vim: set ts=4 sts=4 sw=4 noet : */
 #ifndef _H_CELL
 #define _H_CELL
 ts_cell_list  *init_cell_list(ts_uint ncmax1, ts_uint ncmax2, ts_uint ncmax3, ts_double stepsize);

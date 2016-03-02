@@ -1,3 +1,4 @@
+/* vim: set ts=4 sts=4 sw=4 noet : */
 #ifndef _H_DUMPSTATE
 #define _H_DUMPSTATE
 

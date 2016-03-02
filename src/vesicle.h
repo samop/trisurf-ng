@@ -1,3 +1,4 @@
+/* vim: set ts=4 sts=4 sw=4 noet : */
 #ifndef _VESICLE_H
 #define _VESICLE_H
 

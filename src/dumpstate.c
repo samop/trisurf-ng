@@ -1,3 +1,4 @@
+/* vim: set ts=4 sts=4 sw=4 noet : */
 #include <string.h>
 #include "general.h"
 #include <stdio.h>

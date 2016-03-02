@@ -1,3 +1,4 @@
+/* vim: set ts=4 sts=4 sw=4 noet : */
 #include<math.h>
 #include<stdlib.h>
 #include<gsl/gsl_complex.h>

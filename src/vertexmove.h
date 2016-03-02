@@ -1,3 +1,4 @@
+/* vim: set ts=4 sts=4 sw=4 noet : */
 
 ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *rn);
 

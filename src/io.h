@@ -1,3 +1,4 @@
+/* vim: set ts=4 sts=4 sw=4 noet : */
 #ifndef _IO_H
 #define _IO_H
 #include <confuse.h>

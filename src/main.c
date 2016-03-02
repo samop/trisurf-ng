@@ -1,3 +1,4 @@
+/* vim: set ts=4 sts=4 sw=4 noet : */
 #include<stdio.h>
 #include<math.h>
 #include<stdlib.h>
@@ -28,6 +29,9 @@ int main(int argv, char *argc[]){
 	ts_uint start_iteration=0;
 	force_from_tape=0;
 	parse_args(argv,argc); // sets global variable command_line_args (defined in io.h)
+	ts_fprintf(stdout,"TRISURF-NG v. %s, compiled on: %s %s.\n", TS_VERSION, __DATE__, __TIME__);
+	ts_fprintf(stdout,"Programming done by: Samo Penic and Miha Fosnaric\n");
+	ts_fprintf(stdout,"Released under terms of GPLv3\n");
 	ts_fprintf(stdout,"Starting program...\n\n");
 //	vesicle = parseDump("timestep_000000.vtu");
 //		run_simulation(vesicle, vesicle->tape->mcsweeps, vesicle->tape->inititer, vesicle->tape->iterations, 1);

@@ -1,3 +1,4 @@
+/* vim: set ts=4 sts=4 sw=4 noet : */
 #ifndef _POLY_H
 #define _POLY_H
 #include"io.h"
