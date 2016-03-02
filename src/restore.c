@@ -54,12 +54,12 @@ ts_vesicle *parseDump(char *dumpfname) {
 					cur2=cur1->xmlChildrenNode;
 					while(cur2!=NULL){
 						if ((!xmlStrcmp(cur2->name, (const xmlChar *)"Points"))){
-							fprintf(stderr,"Found point data\n");
+							//fprintf(stderr,"Found point data\n");
 							if(vesicle!=NULL)
 								parseXMLVertexPosition(vesicle, doc, cur2);
 						}
 						if ((!xmlStrcmp(cur2->name, (const xmlChar *)"Cells"))){
-						fprintf(stderr,"Found cell(Bonds) data\n");
+						//fprintf(stderr,"Found cell(Bonds) data\n");
 							if(vesicle!=NULL)
 								parseXMLBonds(vesicle, doc, cur2);
 						}
@@ -99,7 +99,7 @@ ts_bool setGlobalTapeTXTfromTapeTag(xmlDocPtr doc, xmlNodePtr cur){
 
 /* this is a parser of additional data in xml */
 ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
-	fprintf(stderr,"Parsing trisurf tag\n");
+	//fprintf(stderr,"Parsing trisurf tag\n");
 	xmlNodePtr child;
 
 #ifdef COMPRESS
@@ -129,9 +129,9 @@ ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
     	inflateInit(&infstream);
     	inflate(&infstream, Z_NO_FLUSH);
     	inflateEnd(&infstream);	
-	fprintf(stderr,"%lu\n",cLen);
+	//fprintf(stderr,"%lu\n",cLen);
 	subtree[infstream.total_out]='\0'; //zero terminate string	
-	fprintf(stderr,"%s\n",subtree);
+	//fprintf(stderr,"%s\n",subtree);
 	
 	free(subtree);
 #endif
@@ -221,7 +221,7 @@ ts_bool parseTrisurfTria(ts_vesicle *vesicle, xmlDocPtr doc, xmlNodePtr cur){
 		for(i=0;i<3;i++)	vtx[i]=strtok(NULL," ");
 		j++;
 	}	
-	fprintf(stderr,"Parsing triangles %s j=%d\n",triangles,j);	
+	//fprintf(stderr,"Parsing triangles %s j=%d\n",triangles,j);	
 
 	xmlFree(triangles);
 	return TS_SUCCESS;
@@ -245,7 +245,7 @@ ts_bool parseTrisurfTriaNeigh(ts_vesicle *vesicle, xmlDocPtr doc, xmlNodePtr cur
 		j++;
 		for(i=0;i<3;i++)	ntria[i]=strtok(NULL," ");
 	}	
-	fprintf(stderr,"Parsing triangle neighbors j=%d\n",j);	
+	//fprintf(stderr,"Parsing triangle neighbors j=%d\n",j);	
 
 	xmlFree(triangles);
 	return TS_SUCCESS;
@@ -315,7 +315,7 @@ ts_bool parseXMLVertexPosition(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur
 		}
 		child=child->next;
 	}
-	fprintf(stderr,"Vertices position j=%d\n",idx);	
+	//fprintf(stderr,"Vertices position j=%d\n",idx);	
 
 	return TS_SUCCESS;
 }
@@ -341,7 +341,7 @@ ts_bool parseXMLBonds(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur){
 				//find grafted vtx
 					if((vesicle->tape->nmono-1)==(idx-3*(vesicle->vlist->n-2))%(vesicle->tape->nmono)){
 						polyidx=(idx-3*(vesicle->vlist->n-2))/(vesicle->tape->nmono);
-						fprintf(stderr,"poly=%d, vertex=%d\n",polyidx,atoi(token[0]));
+						//fprintf(stderr,"poly=%d, vertex=%d\n",polyidx,atoi(token[0]));
 						vesicle->poly_list->poly[polyidx]->grafted_vtx=vesicle->vlist->vtx[atoi(token[0])];
 						vesicle->vlist->vtx[atoi(token[0])]->grafted_poly=vesicle->poly_list->poly[polyidx];
 					}
@@ -355,7 +355,7 @@ ts_bool parseXMLBonds(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur){
 		xmlFree(conname);
 		child=child->next;
 	}
-	fprintf(stderr,"Bond data j=%d\n",idx);	
+	//fprintf(stderr,"Bond data j=%d\n",idx);	
 	return TS_SUCCESS;
 }
 
