@@ -42,7 +42,7 @@ class Runner:
 	'''
 	Class Runner consists of a single running or terminated instance of the trisurf
 	'''
-	def initFromTape(self, tape='tape'):
+	def initFromTape(self, tape):
 		self.tape=Tape()
 		self.tape.readTape(tape)
 		pass
