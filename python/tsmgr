@@ -4,6 +4,7 @@ from trisurf import trisurf
 
 
 
-run1=trisurf.Runner(tape='tape')
+run1=trisurf.Runner(snapshot='snapshot.vtu')
 print(run1)
+#print(run1.tape.config)
 print(run1.tape.getValue('nshell'))

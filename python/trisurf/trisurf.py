@@ -1,6 +1,11 @@
 #!/usr/bin/python3
 
 import configobj
+import xml.etree.ElementTree as ET
+import base64
+import zlib
+import io
+
 
 '''
 This is a trisurf instance manager written in python
@@ -30,7 +35,7 @@ class Tape:
 	
 
 	def setTape(self, string):
-		self.tape=string
+		self.config=configobj.ConfigObj(io.StringIO(string))
 		return
 
 	def getValue(self,key):
@@ -45,10 +50,21 @@ class Runner:
 	def initFromTape(self, tape):
 		self.tape=Tape()
 		self.tape.readTape(tape)
-		pass
 
-	def initFromSnapshot(self, tape='snapshot.vtu'):
-		pass
+	def initFromSnapshot(self, snapshotfile):
+		try:
+			tree = ET.parse(snapshotfile)
+		except:
+			print("Error reading snapshot file")
+			exit(1)
+
+		root = tree.getroot()
+		tapetxt=root.find('tape')
+		version=root.find('trisurfversion')
+		#print("Reading snapshot made from: "+version.text)
+		self.tape=Tape()
+		#print(tapetxt.text)
+		self.tape.setTape(tapetxt.text)
 
 	def __init__(self, subdir='run0', tape='', snapshot=''):
 		self.subdir=subdir
