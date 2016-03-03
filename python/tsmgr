@@ -1,0 +1,9 @@
+#!/usr/bin/python3
+
+from trisurf import trisurf
+
+
+
+run1=trisurf.Runner(tape='tape')
+print(run1)
+print(run1.tape.getValue('nshell'))
