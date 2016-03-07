@@ -5,6 +5,11 @@ from trisurf import trisurf
 
 
 run1=trisurf.Runner(snapshot='snapshot.vtu')
+run1.setMaindir(("N","k","V","Np","Nm"),("nshell","xk0","constvolswitch","npoly","nmono"))
+run1.start()
+#run
 print(run1)
-#print(run1.tape.config)
-print(run1.tape.getValue('nshell'))
+run1.getStatistics()
+print(run1.statistics)
+#print(run1.tape)
+#print(run1.tape.getValue('nshell'))
