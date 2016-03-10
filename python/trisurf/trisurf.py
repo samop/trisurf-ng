@@ -8,6 +8,7 @@ import io
 import os
 from itertools import islice
 import mmap
+import shlex
 '''
 This is a trisurf instance manager written in python
 
@@ -129,16 +130,25 @@ class Statistics:
 					i=0;
 					for line in fin:
 						if(i==1):
-							print (line)
+							#print (line)
+							fields=shlex.split(line)
+							epoch1=fields[0]
+							n1=fields[1]
 						if(i==nlines-1):
-							print (line)
+							fields=shlex.split(line)
+							epoch2=fields[0]
+							n2=fields[1]
 						i=i+1
 			except:
 				print("Cannot read statistics file in "+self.fullname+"\n")
-				exit(1)
+				return(False)
 		else:
 			print("File "+self.fullname+" does not exists.\n")
-			exit(1)
+			return(False)
+
+		self.dT=(int(epoch2)-int(epoch1))/(int(n2)-int(n1))
+		return(True)
+
 
 class Runner:
 	'''

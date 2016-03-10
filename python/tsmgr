@@ -6,6 +6,7 @@ from trisurf import trisurf
 
 run1=trisurf.Runner(snapshot='snapshot.vtu')
 run1.setMaindir(("N","k","V","Np","Nm"),("nshell","xk0","constvolswitch","npoly","nmono"))
+run1.setSubdir("run0")
 run1.start()
 #run
 print(run1)
