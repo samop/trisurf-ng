@@ -339,4 +339,11 @@ ts_uint ts_fprintf(FILE *fd, char *fmt, ...);
 #define VTX(n) &(vlist->vtx[n])
 #define VTX_DATA(n) vlist->vtx[n].data
 
+
+/* FOR PID GENERATION ROUTINE */
+#define CPF_CLOEXEC 1
+
+int createPidFile(const char *progName, const char *pidFile, int flags);
+
+int lockRegion(int fd, int type, int whence, int start, int len);
 #endif
