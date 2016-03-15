@@ -17,6 +17,8 @@
 #include "shcomplex.h"
 #include "dumpstate.h"
 #include "restore.h"
+
+#include <fcntl.h>
 /** Entrance function to the program
   * @param argv is a number of parameters used in program call (including the program name
   * @param argc is a pointer to strings (character arrays) which holds the arguments
@@ -28,6 +30,8 @@ int main(int argv, char *argc[]){
 	ts_tape *tape;
 	ts_uint start_iteration=0;
 	force_from_tape=0;
+	/* create lock file */
+	createPidFile("ts_trisurf",".lock",0);
 	parse_args(argv,argc); // sets global variable command_line_args (defined in io.h)
 	ts_fprintf(stdout,"TRISURF-NG v. %s, compiled on: %s %s.\n", TS_VERSION, __DATE__, __TIME__);
 	ts_fprintf(stdout,"Programming done by: Samo Penic and Miha Fosnaric\n");

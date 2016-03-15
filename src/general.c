@@ -61,7 +61,7 @@ int createPidFile(const char *progName, const char *pidFile, int flags)
     fd = open(pidFile, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
     if (fd == -1){
         ts_fprintf(stderr,"Could not open PID file %s", pidFile);
-	fatal("Cannot continue",1);
+	fatal("Cannot continue (1)",1);
 }
     if (flags & CPF_CLOEXEC) {
 
@@ -75,13 +75,13 @@ int createPidFile(const char *progName, const char *pidFile, int flags)
         flags = fcntl(fd, F_GETFD);                     /* Fetch flags */
         if (flags == -1){
             ts_fprintf(stderr,"Could not get flags for PID file %s", pidFile);
-	fatal("Cannot continue",1);
+	fatal("Cannot continue (2)",1);
 }
         flags |= FD_CLOEXEC;                            /* Turn on FD_CLOEXEC */
 
         if (fcntl(fd, F_SETFD, flags) == -1)            /* Update flags */
             ts_fprintf(stderr,"Could not set flags for PID file %s", pidFile);
-		fatal("Cannot continue",1);
+		fatal("Cannot continue (3)",1);
 	    
     }
 
@@ -89,24 +89,24 @@ int createPidFile(const char *progName, const char *pidFile, int flags)
         if (errno  == EAGAIN || errno == EACCES){
             ts_fprintf(stderr,"PID file '%s' is locked; probably "
                      "'%s' is already running", pidFile, progName);
-		fatal("Cannot continue",1);
+		fatal("Cannot continue (4)",1);
 }
         else{
             ts_fprintf(stderr,"Unable to lock PID file '%s'", pidFile);
-	fatal("Cannot continue",1);
+	fatal("Cannot continue (5)",1);
 }
     }
 
     if (ftruncate(fd, 0) == -1){
         ts_fprintf(stderr,"Could not truncate PID file '%s'", pidFile);
-	fatal("Cannot continue",1);
+	fatal("Cannot continue (6)",1);
 }
 
     snprintf(buf, BUF_SIZE, "%ld\n", (long) getpid());
     if (write(fd, buf, strlen(buf)) != strlen(buf)){
 
         ts_fprintf(stderr,"Writing to PID file '%s'", pidFile);
-	fatal("Cannot continue",1);
+	fatal("Cannot continue (7)",1);
 }
     return fd;
 }
