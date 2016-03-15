@@ -9,6 +9,7 @@ import os
 from itertools import islice
 import mmap
 import shlex
+import psutil
 '''
 This is a trisurf instance manager written in python
 
@@ -181,13 +182,25 @@ class Runner:
 		self.tape.setTape(tapetxt.text)
 
 	def getStatus(self):
-		return 0
+		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
+		self.Dir.makeifnotexist()
+#		self.Dir.goto()
+		try:
+			fp = open(os.path.join(self.Dir.fullpath(),'.lock'))
+		except IOError as e:
+			return 0 #file probably does not exist. e==2??
+		pid=fp.readline();
+		fp.close();
+		if(psutil.pid_exists(int(pid))):
+			return 1
+		else:
+			return 0
 
 	def start(self):
 		if(self.getStatus()==0):
 			self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
 			self.Dir.makeifnotexist()
-			self.Dir.goto()
+#			self.Dir.goto()
 			print("Starting trisurf-ng executable at "+self.Dir.fullpath()+"\n")
 		else:
 			print("Process already running. Not starting\n")
@@ -212,7 +225,7 @@ class Runner:
 		return
 
 	def getStatistics(self, statfile="statistics.csv"):
-		self.statistics=Statistics("", statfile) # we are already in the running directory, so local path is needed!
+		self.statistics=Statistics(self.Dir.fullpath(), statfile)
 		return
 
 	def __str__(self):
