@@ -32,9 +32,10 @@ for opt, arg in opts:
 			run.start()
 	elif opt == '-s':
 		for run in Runs:
-			run.getStatistics()
-			print(run)
-			print(run.statistics)
+			reportstr=run.getStatistics()
+			print(reportstr)
+			#print(run)
+			#print(run.statistics)
 	else:
 		print('tsmgr [-h] [-r] [-s]')
 		sys.exit(2)

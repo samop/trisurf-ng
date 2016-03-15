@@ -10,6 +10,9 @@ from itertools import islice
 import mmap
 import shlex
 import psutil
+import time
+import datetime
+
 '''
 This is a trisurf instance manager written in python
 
@@ -102,11 +105,8 @@ class Statistics:
 		self.path=path
 		self.filename=filename
 		self.fullname=os.path.join(path,filename)
-		self.read()
+		self.fileOK=self.read()
 		return
-
-	def __str__(self):
-		return(str(self.fullname))
 
 	def exists(self):
 		if(os.path.isfile(self.fullname)):
@@ -141,14 +141,20 @@ class Statistics:
 							n2=fields[1]
 						i=i+1
 			except:
-				print("Cannot read statistics file in "+self.fullname+"\n")
+				#print("Cannot read statistics file in "+self.fullname+"\n")
 				return(False)
 		else:
-			print("File "+self.fullname+" does not exists.\n")
+			#print("File "+self.fullname+" does not exists.\n")
 			return(False)
 
 		self.dT=(int(epoch2)-int(epoch1))/(int(n2)-int(n1))
+		self.last=n2
+		self.startDate=epoch1
 		return(True)
+
+	def __str__(self):
+		return(str(self.fullname))
+
 
 
 class Runner:
@@ -227,7 +233,11 @@ class Runner:
 	def getStatistics(self, statfile="statistics.csv"):
 		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
 		self.statistics=Statistics(self.Dir.fullpath(), statfile)
-		return
+		if(self.statistics.fileOK):
+			report=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(self.statistics.startDate)))+"\t"+str(datetime.timedelta(microseconds=(int(self.tape.config['iterations'])-int(self.statistics.last))*self.statistics.dT)*1000)+" ETA\t"+"STATUS"
+		else:
+			report="N/A\tN/A\t"+"STATUS"
+		return report
 
 	def __str__(self):
 		if(self.getStatus()==0):
