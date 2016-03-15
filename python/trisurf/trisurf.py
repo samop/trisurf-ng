@@ -225,6 +225,7 @@ class Runner:
 		return
 
 	def getStatistics(self, statfile="statistics.csv"):
+		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
 		self.statistics=Statistics(self.Dir.fullpath(), statfile)
 		return
 

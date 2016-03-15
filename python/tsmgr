@@ -1,16 +1,71 @@
 #!/usr/bin/python3
-
+import sys, getopt
 from trisurf import trisurf
 
-
+# -- configuration of the multiple/single run --
 
 run1=trisurf.Runner(snapshot='snapshot.vtu')
 run1.setMaindir(("N","k","V","Np","Nm"),("nshell","xk0","constvolswitch","npoly","nmono"))
 run1.setSubdir("run0")
-run1.start()
+
+run2=trisurf.Runner(snapshot='snapshot.vtu')
+run2.setMaindir(("N","k","V","Np","Nm"),("nshell","xk0","constvolswitch","npoly","nmono"))
+run2.setSubdir("run1")
+
+
+#obligatory: combine all runs
+Runs=[run1,run2];
+
+# -- reading command line switches and acting accordingly --
+argv=sys.argv[1:];
+try:
+	opts, args = getopt.getopt(argv,"hrs")
+except getopt.GetoptError:
+	print('tsmgr [-h] [-r] [-s]')
+	sys.exit(2)
+for opt, arg in opts:
+	if opt == '-h':
+		print ('tsmgr [-h] [-r] [-s]')
+		sys.exit()
+	elif opt == '-r':
+		for run in Runs:
+			run.start()
+	elif opt == '-s':
+		for run in Runs:
+			run.getStatistics()
+			print(run)
+			print(run.statistics)
+	else:
+		print('tsmgr [-h] [-r] [-s]')
+		sys.exit(2)
+
+
+
+
+
+
+
+
+
+# -- OBSOLETE and TESTING --
+
+
+
+
+
+#	elif opt in ("-i", "--ifile"):
+#		inputfile = arg
+#	elif opt in ("-o", "--ofile"):
+#		outputfile = arg
+#	print ('Input file is "', inputfile)
+#	print ('Output file is "', outputfile)
+
+
+
+#run1.start()
 #run
-print(run1)
-run1.getStatistics()
-print(run1.statistics)
+#print(run1)
+#run1.getStatistics()
+#print(run1.statistics)
 #print(run1.tape)
 #print(run1.tape.getValue('nshell'))
