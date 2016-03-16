@@ -27,11 +27,11 @@ processno=0
 try:
 	opts, args = getopt.getopt(argv,"a:n:hrsc:")
 except getopt.GetoptError:
-	print('tsmgr [-n process number] [-h] [-r] [-s] [-c comment text]')
+	print('tsmgr [-n process number] [-h] [-r] [-s] [-c comment text] [-a comment text]')
 	sys.exit(2)
 for opt, arg in opts:
 	if opt == '-h':
-		print ('tsmgr [-n process number] [-h] [-r] [-s] [-c comment text]')
+		print ('tsmgr [-n process number] [-h] [-r] [-s] [-c comment text] [-a comment text]')
 		sys.exit()
 	elif opt == '-r':
 		if processno:
@@ -70,7 +70,7 @@ for opt, arg in opts:
 
 		
 	else:
-		print('tsmgr [-n process number] [-h] [-r] [-s] [-c comment text]')
+		print('tsmgr [-n process number] [-h] [-r] [-s] [-c comment text] [-a comment text]')
 		sys.exit(2)
 
 
