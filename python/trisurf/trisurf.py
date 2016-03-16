@@ -24,7 +24,29 @@ If tape is specified, the trisurf wilt start from tape with initial distribution
 
 '''
 
+class FileContent:
+	def __init__(self,filename):
+		self.filename=filename
+		self.data=""
+		self.readfile()
 
+	def readfile(self):
+		try:
+			with open (self.filename, "r") as myfile:
+				self.data=myfile.read().replace('\n', '')
+		except:
+			pass
+
+
+	def writefile(self, data, mode='w'):
+		with open (self.filename, mode) as myfile:
+			myfile.write(data)
+
+	def getText(self):
+		return self.data
+
+	def __str__(self):
+		return self.getText()
 
 class Tape:
 	'''Has all the info on the tape'''
@@ -187,18 +209,26 @@ class Runner:
 		self.tape=Tape()
 		self.tape.setTape(tapetxt.text)
 
-	def getStatus(self):
+	def getPID(self):
 		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
 		self.Dir.makeifnotexist()
-#		self.Dir.goto()
 		try:
 			fp = open(os.path.join(self.Dir.fullpath(),'.lock'))
 		except IOError as e:
 			return 0 #file probably does not exist. e==2??
-		pid=fp.readline();
-		fp.close();
+		pid=fp.readline()
+		fp.close()
+		return pid
+
+	def getStatus(self):
+		pid=self.getPID()
+		if(pid==0):
+			return 0
 		if(psutil.pid_exists(int(pid))):
-			return 1
+			if psutil.Process(int(pid)).name=="trisurf":
+				return 1
+			else:
+				return 0
 		else:
 			return 0
 
@@ -233,11 +263,25 @@ class Runner:
 	def getStatistics(self, statfile="statistics.csv"):
 		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
 		self.statistics=Statistics(self.Dir.fullpath(), statfile)
-		if(self.statistics.fileOK):
-			report=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(self.statistics.startDate)))+"\t"+str(datetime.timedelta(microseconds=(int(self.tape.config['iterations'])-int(self.statistics.last))*self.statistics.dT)*1000)+" ETA\t"+"STATUS"
+		self.Comment=FileContent(os.path.join(self.Dir.fullpath(),".comment"))
+		pid=self.getPID();
+		if(self.getStatus()):
+			statustxt="Running"
 		else:
-			report="N/A\tN/A\t"+"STATUS"
+			statustxt="Stopped"
+			pid=""
+
+		if(self.statistics.fileOK):
+#			report=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(self.statistics.startDate)))+"\t"+str(datetime.timedelta(microseconds=(int(self.tape.config['iterations'])-int(self.statistics.last))*self.statistics.dT)*1000)+" ETA\t"+"STATUS"
+			report=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(self.statistics.startDate))),str(datetime.timedelta(microseconds=(int(self.tape.config['iterations'])-int(self.statistics.last))*self.statistics.dT)*1000), statustxt, pid, str(self.Dir.fullpath()), self.Comment.getText()]
+		else:
+			report=["N/A","N/A\t",statustxt, pid, str(self.Dir.fullpath()), self.Comment.getText()]
 		return report
+
+	def writeComment(self, data):
+		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
+		self.Comment=FileContent(os.path.join(self.Dir.fullpath(),".comment"))
+		self.Comment.writefile(data,mode='w')
 
 	def __str__(self):
 		if(self.getStatus()==0):
