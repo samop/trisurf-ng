@@ -13,48 +13,73 @@ import psutil
 import time
 import datetime
 
-'''
-This is a trisurf instance manager written in python
 
-
-Invoke with:
-tsmgr [-t tape | -r snapshot.vtu] [-s subdirectory]
-
-If tape is specified, the trisurf wilt start from tape with initial distribution, if snapshot is specified the trisurf will be restored from given snapshot file and simulation will continue.
-
-'''
+# Process status
+TS_NOLOCK=0 # lock file does not exist
+TS_NONEXISTANT=0 # process is not in the list of processes
+TS_STOPPED=1 # the process is listed, but is in stopped state
+TS_RUNNING=2 # process is running
 
 class FileContent:
+	'''
+	Class is helpful for reading and writting the specific files.
+	'''
 	def __init__(self,filename):
+		''' The instance is done by calling constructor FileContent(filename)
+
+		The object then reads filename if it exists, otherwise the data is empty string.
+		User may force to reread file by calling the readline() method of the class.
+
+		Filename is stored in local variable for future file operations.
+		'''
+
 		self.filename=filename
-		self.data=""
 		self.readfile()
 
 	def readfile(self):
+		'''Force reread of the file and setting the data'''
+		self.data=""
 		try:
 			with open (self.filename, "r") as myfile:
-				self.data=myfile.read().replace('\n', '')
+				self.data=myfile.read().replace('\n', '') #read the file and remove newline from the text
 		except:
-			pass
+			pass # does nothing if error occurs
 
 
 	def writefile(self, data, mode='w'):
+		'''File may be updated by completely rewritting the file contents or appending the data to the end of the file.
+		this is achieved by calling writefile(data, mode) method, where data is the string data to be written and
+		mode can be 'a' for append and 'w' for writting the file anew.
+		'''
 		with open (self.filename, mode) as myfile:
 			myfile.write(data)
 
 	def getText(self):
+		'''
+		Method getText() or calling the object itself returns string of data
+		'''
 		return self.data
 
 	def __str__(self):
+		'''
+		Method getText() or calling the object itself returns string of data
+		'''
 		return self.getText()
 
 class Tape:
-	'''Has all the info on the tape'''
+	'''
+	Special class that manages configuration of trisurf (commonly named tape). It can read and parse configuration from disk or parse it from string.
+	'''
 
 	def __init__(self):
+		'''The object is instatiated by calling Tape() constructor without parameters'''
 		return
 
 	def readTape(self, tape='tape'):
+		'''
+		Tape is read and parsed by calling the readTape() method with optional tape parameter, which is full path to filename where the configuration is stored.
+		If the tape cannot be read, it prints error and exits.
+		'''
 		try:
 			self.config=configobj.ConfigObj(tape)
 		except:
@@ -62,13 +87,17 @@ class Tape:
 			exit(1)
 
 	def setTape(self, string):
+		'''Method setTape(string) parses the string in memory that hold the tape contents.'''
 		self.config=configobj.ConfigObj(io.StringIO(string))
 		return
 
 	def getValue(self,key):
+		'''Method getValue(key) returns value of a single parsed setting named "key".'''
+
 		return self.config[key]
 
 	def __str__(self):
+		'''Calling the object itself, it recreates the tape contents from parsed values in form of key=value.'''
 		retval=""
 		for key,val in self.config.iteritems():
 			retval=retval+str(key)+" = "+str(val)+"\n"
@@ -77,22 +106,31 @@ class Tape:
 
 
 class Directory:
+	'''
+	Class deals with the paths where the simulation is run and data is stored.
+	'''
 	def __init__(self, maindir=".", simdir=""):
+		'''Initialization Directory() takes two optional parameters, namely maindir and simdir. Defaults to current directory. It sets local variables maindir and simdir accordingly.'''
 		self.maindir=maindir
 		self.simdir=simdir
 		return
 
 	def fullpath(self):
+		'''
+		Method returns string of path where the data is stored. It combines values of maindir and simdir as maindir/simdir on Unix.
+		'''
 		return os.path.join(self.maindir,self.simdir)
 
 	def exists(self):
+		''' Method checks whether the directory  specified by fullpath() exists. It return True/False on completion.'''
 		path=self.fullpath()
 		if(os.path.exists(path)):
-			return 1
+			return True
 		else:
-			return 0
+			return False
 
 	def make(self):
+		''' Method make() creates directory. If it fails it exits the program with error message.'''
 		try:
 			os.makedirs(self.fullpath())
 		except:
@@ -101,11 +139,13 @@ class Directory:
 		return
 
 	def makeifnotexist(self):
+		'''Method makeifnotexist() creates directory if it does not exist.'''
 		if(self.exists()==0):
 			self.make()
 		return
 
 	def remove(self):
+		'''Method remove() removes directory recursively. WARNING! No questions asked.'''
 		if(self.exists()):
 			try:
 				os.rmdir(self.fullpath())
@@ -115,6 +155,9 @@ class Directory:
 		return
 
 	def goto(self):
+		'''
+		Method goto() moves current directory to the one specified by fullpath(). WARNING: when using the relative paths, do not call this function multiple times.
+		'''
 		try:
 			os.chdir(self.fullpath())
 		except:
@@ -123,7 +166,17 @@ class Directory:
 
 
 class Statistics:
+	'''
+	Class that deals with the statistics file from the simulations.
+	File is generally large and not all data is needed, so it is dealt with in a specific way.
+	'''
+
 	def __init__(self,path,filename="statistics.csv"):
+		'''
+		At the initialization call it receives optional filename parameter specifying the path and filename of the statistics file.
+
+		The local variables path, filename, fullname (joined path and filename) and private check if the file exists are stored.
+		'''
 		self.path=path
 		self.filename=filename
 		self.fullname=os.path.join(path,filename)
@@ -131,12 +184,16 @@ class Statistics:
 		return
 
 	def exists(self):
+		'''Method check if the statistics file exists.'''
 		if(os.path.isfile(self.fullname)):
 			return True
 		else:
 			return False
 
 	def mapcount(self):
+		'''
+		Internal method for determining the number of the lines in the most efficient way. Is it really the most efficient?
+		'''
 		f = open(self.fullname, "r+")
 		buf = mmap.mmap(f.fileno(), 0)
 		lines = 0
@@ -146,6 +203,9 @@ class Statistics:
 		return lines
 
 	def read(self):
+		'''
+		Method read() reads the statistics if it exists. It sets local variable dT storing the time differential between two intervals of simulation (outer loops). It also stores last simulation loop and the start of the run.
+		'''
 		if(self.exists()):
 			nlines=self.mapcount()
 			try:
@@ -175,13 +235,16 @@ class Statistics:
 		return(True)
 
 	def __str__(self):
+		'''
+		Prints the full path with filename of the statistics.csv file
+		'''
 		return(str(self.fullname))
 
 
 
 class Runner:
 	'''
-	Class Runner consists of a single running or terminated instance of the trisurf
+	Class Runner consists of a single running or terminated instance of the trisurf. It manages starting, stopping, verifying the running process and printing the reports of the configured instances.
 	'''
 	def __init__(self, subdir='run0', tape='', snapshot=''):
 		self.subdir=subdir
@@ -218,19 +281,23 @@ class Runner:
 			return 0 #file probably does not exist. e==2??
 		pid=fp.readline()
 		fp.close()
-		return pid
+		return int(pid)
 
 	def getStatus(self):
 		pid=self.getPID()
 		if(pid==0):
-			return 0
+			return TS_NOLOCK
 		if(psutil.pid_exists(int(pid))):
-			if psutil.Process(int(pid)).name=="trisurf":
-				return 1
+			proc= psutil.Process(int(pid))
+			if proc.name=="trisurf":
+				if proc.status=="stopped":
+					return TS_STOPPED
+				else:
+					return TS_RUNNING
 			else:
-				return 0
+				return TS_NONEXISTANT
 		else:
-			return 0
+			return TS_NONEXISTANT
 
 	def start(self):
 		if(self.getStatus()==0):
@@ -246,7 +313,7 @@ class Runner:
 		pass
 
 	def setMaindir(self,prefix,variables):
-		maindir="./"
+		maindir=""
 		for p,v in zip(prefix,variables):
 			if(v=="xk0"):
 				tv=str(round(float(self.tape.config[v])))
@@ -265,23 +332,25 @@ class Runner:
 		self.statistics=Statistics(self.Dir.fullpath(), statfile)
 		self.Comment=FileContent(os.path.join(self.Dir.fullpath(),".comment"))
 		pid=self.getPID();
-		if(self.getStatus()):
-			statustxt="Running"
-		else:
-			statustxt="Stopped"
+		status=self.getStatus()
+		if(status==TS_NONEXISTANT or status==TS_NOLOCK):
+			statustxt="Not running"
 			pid=""
+		elif status==TS_STOPPED:
+			statustxt="Stopped"
+		else:
+			statustxt="Running"
 
 		if(self.statistics.fileOK):
-#			report=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(self.statistics.startDate)))+"\t"+str(datetime.timedelta(microseconds=(int(self.tape.config['iterations'])-int(self.statistics.last))*self.statistics.dT)*1000)+" ETA\t"+"STATUS"
 			report=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(self.statistics.startDate))),str(datetime.timedelta(microseconds=(int(self.tape.config['iterations'])-int(self.statistics.last))*self.statistics.dT)*1000), statustxt, pid, str(self.Dir.fullpath()), self.Comment.getText()]
 		else:
 			report=["N/A","N/A\t",statustxt, pid, str(self.Dir.fullpath()), self.Comment.getText()]
 		return report
 
-	def writeComment(self, data):
+	def writeComment(self, data, mode='w'):
 		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
 		self.Comment=FileContent(os.path.join(self.Dir.fullpath(),".comment"))
-		self.Comment.writefile(data,mode='w')
+		self.Comment.writefile(data,mode=mode)
 
 	def __str__(self):
 		if(self.getStatus()==0):

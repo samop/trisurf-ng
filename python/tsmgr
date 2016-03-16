@@ -9,7 +9,7 @@ run1=trisurf.Runner(snapshot='snapshot.vtu')
 run1.setMaindir(("N","k","V","Np","Nm"),("nshell","xk0","constvolswitch","npoly","nmono"))
 run1.setSubdir("run0")
 
-run2=trisurf.Runner(snapshot='snapshot.vtu')
+run2=trisurf.Runner(tape='tape')
 run2.setMaindir(("N","k","V","Np","Nm"),("nshell","xk0","constvolswitch","npoly","nmono"))
 run2.setSubdir("run1")
 
@@ -25,7 +25,7 @@ Runs=[run1,run2]
 argv=sys.argv[1:]
 processno=0
 try:
-	opts, args = getopt.getopt(argv,"n:hrsc:")
+	opts, args = getopt.getopt(argv,"a:n:hrsc:")
 except getopt.GetoptError:
 	print('tsmgr [-n process number] [-h] [-r] [-s] [-c comment text]')
 	sys.exit(2)
@@ -63,6 +63,10 @@ for opt, arg in opts:
 		comment = arg
 		if processno:
 			Runs[processno-1].writeComment(arg)
+	elif opt == '-a':
+		comment = arg
+		if processno:
+			Runs[processno-1].writeComment("\n"+arg, 'a')
 
 		
 	else:
