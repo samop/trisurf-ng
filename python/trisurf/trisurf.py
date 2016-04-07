@@ -246,8 +246,9 @@ class Runner:
 	'''
 	Class Runner consists of a single running or terminated instance of the trisurf. It manages starting, stopping, verifying the running process and printing the reports of the configured instances.
 	'''
-	def __init__(self, subdir='run0', tape='', snapshot=''):
+	def __init__(self, subdir='run0', tape='', snapshot='', runArgs=[]):
 		self.subdir=subdir
+		self.runArgs=runArgs
 		self.fromSnapshot=False
 		if(tape!=''):
 			self.initFromTape(tape)
@@ -309,9 +310,9 @@ class Runner:
 			self.Dir.goto()
 			print("Starting trisurf-ng executable at "+self.Dir.fullpath()+"\n")
 			if(self.fromSnapshot==True):
-				params=["trisurf", "--restore-from-vtk",self.snapshotFile]
+				params=["trisurf", "--restore-from-vtk",self.snapshotFile]+self.runArgs
 			else:
-				params="trisurf"
+				params=["trisurf"]+self.runArgs
 			Popen (params, stdout=False)
 			cwd.goto()
 		else:
