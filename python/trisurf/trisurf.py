@@ -12,7 +12,7 @@ import shlex
 import psutil
 import time
 import datetime
-from subprocess import call, Popen
+import subprocess
 
 # Process status
 TS_NOLOCK=0 # lock file does not exist
@@ -313,7 +313,7 @@ class Runner:
 				params=["trisurf", "--restore-from-vtk",self.snapshotFile]+self.runArgs
 			else:
 				params=["trisurf"]+self.runArgs
-			Popen (params, stdout=False)
+			subprocess.Popen (params, stdout=subprocess.DEVNULL)
 			cwd.goto()
 		else:
 			print("Process already running. Not starting\n")
@@ -352,7 +352,7 @@ class Runner:
 			statustxt="Running"
 
 		if(self.statistics.fileOK):
-			report=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(self.statistics.startDate))),str(datetime.timedelta(microseconds=(int(self.tape.config['iterations'])-int(self.statistics.last))*self.statistics.dT)*1000), statustxt, pid, str(self.Dir.fullpath()), self.Comment.getText()]
+			report=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(self.statistics.startDate))),str(datetime.timedelta(microseconds=(int(self.tape.config['iterations'])-int(self.statistics.last))*self.statistics.dT)*1000000), statustxt, pid, str(self.Dir.fullpath()), self.Comment.getText()]
 		else:
 			report=["N/A","N/A\t",statustxt, pid, str(self.Dir.fullpath()), self.Comment.getText()]
 		return report
