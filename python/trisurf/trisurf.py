@@ -12,7 +12,7 @@ import shlex
 import psutil
 import time
 import datetime
-
+from subprocess import call, Popen
 
 # Process status
 TS_NOLOCK=0 # lock file does not exist
@@ -248,6 +248,7 @@ class Runner:
 	'''
 	def __init__(self, subdir='run0', tape='', snapshot=''):
 		self.subdir=subdir
+		self.fromSnapshot=False
 		if(tape!=''):
 			self.initFromTape(tape)
 		if(snapshot!=''):
@@ -265,7 +266,8 @@ class Runner:
 		except:
 			print("Error reading snapshot file")
 			exit(1)
-
+		self.fromSnapshot=True
+		self.snapshotFile=snapshotfile
 		root = tree.getroot()
 		tapetxt=root.find('tape')
 		version=root.find('trisurfversion')
@@ -303,8 +305,15 @@ class Runner:
 		if(self.getStatus()==0):
 			self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
 			self.Dir.makeifnotexist()
-#			self.Dir.goto()
+			cwd=Directory(maindir=os.getcwd())
+			self.Dir.goto()
 			print("Starting trisurf-ng executable at "+self.Dir.fullpath()+"\n")
+			if(self.fromSnapshot==True):
+				params=["trisurf", "--restore-from-vtk",self.snapshotFile]
+			else:
+				params="trisurf"
+			Popen (params, stdout=False)
+			cwd.goto()
 		else:
 			print("Process already running. Not starting\n")
 		return
