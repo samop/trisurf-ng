@@ -42,10 +42,11 @@ int main(int argv, char *argc[]){
 
     if(command_line_args.dump_from_vtk[0]!=0){
 		ts_fprintf(stdout,"************************************************\n");
-		ts_fprintf(stdout,"***** Dumping vesicle from VTK points list *****\n");
+		ts_fprintf(stdout,"**** Restoring vesicle from VTK points list ****\n");
 		ts_fprintf(stdout,"************************************************\n\n");
 		vesicle = parseDump(command_line_args.dump_from_vtk);
 		tape = vesicle->tape;
+/* Here you should read new tape file, reassign some values in vertex from the tape and assign read tape to vesicle->tape */
 //        tape=parsetape(command_line_args.tape_fullfilename);
   //      vesicle=vtk2vesicle(command_line_args.dump_from_vtk,tape);
     }
