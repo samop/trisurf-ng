@@ -1,8 +1,8 @@
 bin_PROGRAMS = trisurf
 trisurf_SOURCES = general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c dumpstate.c frame.c energy.c timestep.c vertexmove.c bondflip.c main.c poly.c stats.c sh.c shcomplex.c constvol.c snapshot.c restore.c
 GITVERSION:=$(shell git --no-pager describe --tags --always --dirty)
-AM_CFLAGS = -Wall -Werror -DTS_VERSION=\"$(GITVERSION)\"
-AM_CPPFLAGS = ${libxml2_CFLAGS}
+AM_CFLAGS = -Wall -Werror -DTS_VERSION=\"$(GITVERSION)\" -fgnu89-inline
+AM_CPPFLAGS = ${libxml2_CFLAGS} -fgnu89-inline
 trisurf_LDADD = ${libcurl_LIBS} ${libxml2_LIBS}
 #shdiscoverdir=../
 #shdiscover_PROGRAMS= shdiscover
