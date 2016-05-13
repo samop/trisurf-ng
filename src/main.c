@@ -46,6 +46,12 @@ int main(int argv, char *argc[]){
 		ts_fprintf(stdout,"************************************************\n\n");
 		vesicle = parseDump(command_line_args.dump_from_vtk);
 		tape = vesicle->tape;
+		FILE *fd=fopen(".status","r");
+		if(fd!=NULL){
+			fscanf(fd,"%u", &start_iteration);
+			fclose(fd);
+			start_iteration++;
+		}
 /* Here you should read new tape file, reassign some values in vertex from the tape and assign read tape to vesicle->tape */
 //        tape=parsetape(command_line_args.tape_fullfilename);
   //      vesicle=vtk2vesicle(command_line_args.dump_from_vtk,tape);

@@ -22,7 +22,7 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 	ts_double r0,kc1=0,kc2=0,kc3=0,kc4=0;
 	ts_double l1,l2,l3,vmsr,bfsr, vmsrt, bfsrt;
 	ts_ulong epochtime;
-	FILE *fd1,*fd2=NULL;
+	FILE *fd1,*fd2=NULL,*fd3=NULL;
  	char filename[10000];
     strcpy(filename,command_line_args.path);
     strcat(filename,"statistics.csv");
@@ -76,6 +76,12 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 		cell_occupation(vesicle);
 		ts_fprintf(stdout,"Done %d out of %d iterations (x %d MC sweeps).\n",i+1,inititer+iterations,mcsweeps);
             dump_state(vesicle,i);
+		fd3=fopen(".status","w");
+		if(fd3==NULL){
+			fatal("Cannot open .status file for writing",1);
+		}
+		fprintf(fd3,"%d",i);
+		fclose(fd3);
 		if(i>=inititer){
 			write_vertex_xml_file(vesicle,i-inititer);
 			write_master_xml_file(command_line_args.output_fullfilename);

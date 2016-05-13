@@ -19,6 +19,7 @@ TS_NOLOCK=0 # lock file does not exist
 TS_NONEXISTANT=0 # process is not in the list of processes
 TS_STOPPED=1 # the process is listed, but is in stopped state
 TS_RUNNING=2 # process is running
+TS_COMPLETED=3 #simulation is completed
 
 class FileContent:
 	'''
@@ -209,7 +210,13 @@ class Statistics:
 		Method read() reads the statistics if it exists. It sets local variable dT storing the time differential between two intervals of simulation (outer loops). It also stores last simulation loop and the start of the run.
 		'''
 		if(self.exists()):
+		#	epoch1=0
+		#	epoch2=0
+		#	n1=0
+		#	n2=0
 			nlines=self.mapcount()
+			if nlines<2:
+				return(False)
 			try:
 				with open(self.fullname, "r+") as fin:
 					i=0;
@@ -230,8 +237,10 @@ class Statistics:
 		else:
 			#print("File "+self.fullname+" does not exists.\n")
 			return(False)
-
-		self.dT=(int(epoch2)-int(epoch1))/(int(n2)-int(n1))
+		try:
+			self.dT=(int(epoch2)-int(epoch1))/(int(n2)-int(n1))
+		except:
+			self.dT=0
 		self.last=n2
 		self.startDate=epoch1
 		return(True)
@@ -289,8 +298,27 @@ class Runner:
 		fp.close()
 		return int(pid)
 
+	def getLastIteration(self):
+		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
+		#self.Dir.makeifnotexist()
+		try:
+			fp = open(os.path.join(self.Dir.fullpath(),'.status'))
+		except IOError as e:
+			return -1 #file probably does not exist. e==2??
+		status=fp.readline()
+		fp.close()
+		return int(status)
+
+	def isCompleted(self):
+		if (int(self.tape.getValue("iterations"))==self.getLastIteration()+1):
+			return True
+		else:
+			return False
+
 	def getStatus(self):
 		pid=self.getPID()
+		if(self.isCompleted()):
+			return TS_COMPLETED
 		if(pid==0):
 			return TS_NOLOCK
 		if(psutil.pid_exists(int(pid))):
@@ -306,7 +334,7 @@ class Runner:
 			return TS_NONEXISTANT
 
 	def start(self):
-		if(self.getStatus()==0):
+		if(self.getStatus()==0 or self.getStatus()==TS_COMPLETED):
 			self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
 #Symlinks tape file to the directory or create tape file from snapshot in the direcory...
 			if(self.Dir.makeifnotexist()):
@@ -328,13 +356,21 @@ class Runner:
 						os.symlink(os.path.abspath(self.snapshotFile), os.path.join(self.Dir.fullpath(),self.snapshotFile))
 					except:
 						print("Error while symlinking "+os.path.abspath(self.snapshotFile)+" to "+os.path.join(self.Dir.fullpath(),self.snapshotFile))
-	
+		
+			#check if the simulation has been completed. in this case notify user and stop executing.
+			if(self.isCompleted() and ("--force-from-tape" not in self.runArgs) and ("--reset-iteration-count" not in self.runArgs)):
+				print("The simulation was completed. Not starting executable at localhost in "+self.Dir.fullpath()+"\n")
+				return
+
 			cwd=Directory(maindir=os.getcwd())
 			self.Dir.goto()
-			print("Starting trisurf-ng executable at "+self.Dir.fullpath()+"\n")
+			print("Starting trisurf-ng executable at localhost in "+self.Dir.fullpath()+"\n")
 			if(self.fromSnapshot==True):
 				params=["trisurf", "--restore-from-vtk",self.snapshotFile]+self.runArgs
 			else:
+				#veify if dump exists. If not it is a first run and shoud be run with --force-from-tape
+				if(os.path.isfile("dump.bin")==False):
+					self.runArgs.append("--force-from-tape")
 				params=["trisurf"]+self.runArgs
 			subprocess.Popen (params, stdout=subprocess.DEVNULL)
 			cwd.goto()
@@ -371,6 +407,8 @@ class Runner:
 			pid=""
 		elif status==TS_STOPPED:
 			statustxt="Stopped"
+		elif status==TS_COMPLETED:
+			statustxt="Completed"
 		else:
 			statustxt="Running"
 
