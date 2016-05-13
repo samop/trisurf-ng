@@ -142,7 +142,9 @@ class Directory:
 		'''Method makeifnotexist() creates directory if it does not exist.'''
 		if(self.exists()==0):
 			self.make()
-		return
+			return True
+		else:
+			return False
 
 	def remove(self):
 		'''Method remove() removes directory recursively. WARNING! No questions asked.'''
@@ -246,13 +248,13 @@ class Runner:
 	'''
 	Class Runner consists of a single running or terminated instance of the trisurf. It manages starting, stopping, verifying the running process and printing the reports of the configured instances.
 	'''
-	def __init__(self, subdir='run0', tape='', snapshot='', runArgs=[]):
+	def __init__(self, subdir='run0', tape=None, snapshot=None, runArgs=[]):
 		self.subdir=subdir
 		self.runArgs=runArgs
 		self.fromSnapshot=False
-		if(tape!=''):
+		if(tape!=None):
 			self.initFromTape(tape)
-		if(snapshot!=''):
+		if(snapshot!=None):
 			self.initFromSnapshot(snapshot)
 		return
 
@@ -260,6 +262,7 @@ class Runner:
 	def initFromTape(self, tape):
 		self.tape=Tape()
 		self.tape.readTape(tape)
+		self.tapeFile=tape
 
 	def initFromSnapshot(self, snapshotfile):
 		try:
@@ -274,10 +277,10 @@ class Runner:
 		version=root.find('trisurfversion')
 		self.tape=Tape()
 		self.tape.setTape(tapetxt.text)
-
+		
 	def getPID(self):
 		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
-		self.Dir.makeifnotexist()
+		#self.Dir.makeifnotexist()
 		try:
 			fp = open(os.path.join(self.Dir.fullpath(),'.lock'))
 		except IOError as e:
@@ -292,8 +295,8 @@ class Runner:
 			return TS_NOLOCK
 		if(psutil.pid_exists(int(pid))):
 			proc= psutil.Process(int(pid))
-			if proc.name=="trisurf":
-				if proc.status=="stopped":
+			if proc.name()=="trisurf":
+				if proc.status()=="stopped":
 					return TS_STOPPED
 				else:
 					return TS_RUNNING
@@ -305,7 +308,27 @@ class Runner:
 	def start(self):
 		if(self.getStatus()==0):
 			self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
-			self.Dir.makeifnotexist()
+#Symlinks tape file to the directory or create tape file from snapshot in the direcory...
+			if(self.Dir.makeifnotexist()):
+				if(self.fromSnapshot==False):
+					try:
+						os.symlink(os.path.abspath(self.tapeFile), self.Dir.fullpath()+"/tape")
+					except:
+						print("Error while symlinking "+os.path.abspath(self.tapeFile)+" to "+self.Dir.fullpath()+"/tape")
+						exit(1)
+				else:
+					try:
+						with open (os.path.join(self.Dir.fullpath(),"tape"), "w") as myfile:
+							myfile.write("#This is automatically generated tape file from snapshot\n")
+							myfile.write(str(self.tape))
+					except:
+						print("Error -- cannot make tapefile  "+ os.path.join(self.Dir.fullpath(),"tape")+" from the snapshot in the running directory")
+						exit(1)
+					try:
+						os.symlink(os.path.abspath(self.snapshotFile), os.path.join(self.Dir.fullpath(),self.snapshotFile))
+					except:
+						print("Error while symlinking "+os.path.abspath(self.snapshotFile)+" to "+os.path.join(self.Dir.fullpath(),self.snapshotFile))
+	
 			cwd=Directory(maindir=os.getcwd())
 			self.Dir.goto()
 			print("Starting trisurf-ng executable at "+self.Dir.fullpath()+"\n")
