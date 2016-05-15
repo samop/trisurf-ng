@@ -451,6 +451,7 @@ while (1)
            {"force-from-tape", no_argument,       &(command_line_args.force_from_tape), 1},
 	   {"reset-iteration-count", no_argument, &(command_line_args.reset_iteration_count), 1},
            {"tape",     no_argument,       0, 't'},
+	   {"version", no_argument, 0, 'v'},
            {"output-file",  required_argument, 0, 'o'},
            {"directory",  required_argument, 0, 'd'},
            {"dump-filename", required_argument,0, 'f'},
@@ -462,7 +463,7 @@ while (1)
        /* getopt_long stores the option index here. */
        int option_index = 0;
 
-       c = getopt_long (argc, argv, "d:f:o:t:c:",
+       c = getopt_long (argc, argv, "d:f:o:t:c:v",
                         long_options, &option_index);
 
        /* Detect the end of the options. */
@@ -487,6 +488,11 @@ while (1)
                 strcpy(command_line_args.dump_from_vtk,optarg);
             }
            break;
+	 case 'v':
+		fprintf(stdout,"TRISURF-NG v. %s, compiled on: %s %s.\n", TS_VERSION, __DATE__, __TIME__);
+        	fprintf(stdout,"Programming done by: Samo Penic and Miha Fosnaric\n");
+        	fprintf(stdout,"Released under terms of GPLv3\n");
+		exit(0);
 
          case 'c':
               strcpy(command_line_args.tape_opts,optarg);
