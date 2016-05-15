@@ -407,7 +407,8 @@ class Runner:
 		self.Comment=FileContent(os.path.join(self.Dir.fullpath(),".comment"))
 		pid=self.getPID()
 		status=self.getStatus()
-		ETA=str(datetime.timedelta(microseconds=(int(self.tape.config['iterations'])-int(self.statistics.last))*self.statistics.dT)*1000000)
+		if(self.statistics.fileOK):
+			ETA=str(datetime.timedelta(microseconds=(int(self.tape.config['iterations'])-int(self.statistics.last))*self.statistics.dT)*1000000)
 		if(status==TS_NONEXISTANT or status==TS_NOLOCK):
 			statustxt="Not running"
 			pid=""
@@ -425,7 +426,7 @@ class Runner:
 		if(self.statistics.fileOK):
 			report=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(self.statistics.startDate))),ETA, statustxt, pid, str(self.Dir.fullpath()), self.Comment.getText()]
 		else:
-			report=["N/A","N/A\t",statustxt, pid, str(self.Dir.fullpath()), self.Comment.getText()]
+			report=["N/A","N/A",statustxt, pid, str(self.Dir.fullpath()), self.Comment.getText()]
 		return report
 
 	def writeComment(self, data, mode='w'):
