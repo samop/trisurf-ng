@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from trisurf import tsmgr
 from trisurf import trisurf
 

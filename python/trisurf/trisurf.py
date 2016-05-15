@@ -13,6 +13,7 @@ import psutil
 import time
 import datetime
 import subprocess
+import shutil
 
 # Process status
 TS_NOLOCK=0 # lock file does not exist
@@ -323,8 +324,8 @@ class Runner:
 			return TS_NOLOCK
 		if(psutil.pid_exists(int(pid))):
 			proc= psutil.Process(int(pid))
-			if proc.name()=="trisurf":
-				if proc.status()=="stopped":
+			if proc.name=="trisurf":
+				if proc.status=="stopped":
 					return TS_STOPPED
 				else:
 					return TS_RUNNING
@@ -335,6 +336,10 @@ class Runner:
 
 	def start(self):
 		if(self.getStatus()==0 or self.getStatus()==TS_COMPLETED):
+			#check if executable exists
+			if(shutil.which('trisurf')==None):
+				print("Error. Trisurf executable not found in PATH. Please install trisurf prior to running trisurf manager.")
+				exit(1)
 			self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
 #Symlinks tape file to the directory or create tape file from snapshot in the direcory...
 			if(self.Dir.makeifnotexist()):
@@ -400,20 +405,25 @@ class Runner:
 		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
 		self.statistics=Statistics(self.Dir.fullpath(), statfile)
 		self.Comment=FileContent(os.path.join(self.Dir.fullpath(),".comment"))
-		pid=self.getPID();
+		pid=self.getPID()
 		status=self.getStatus()
+		ETA=str(datetime.timedelta(microseconds=(int(self.tape.config['iterations'])-int(self.statistics.last))*self.statistics.dT)*1000000)
 		if(status==TS_NONEXISTANT or status==TS_NOLOCK):
 			statustxt="Not running"
 			pid=""
+			ETA=""
 		elif status==TS_STOPPED:
 			statustxt="Stopped"
+			ETA="N/A"
 		elif status==TS_COMPLETED:
 			statustxt="Completed"
+			pid=""
+			ETA=""
 		else:
 			statustxt="Running"
 
 		if(self.statistics.fileOK):
-			report=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(self.statistics.startDate))),str(datetime.timedelta(microseconds=(int(self.tape.config['iterations'])-int(self.statistics.last))*self.statistics.dT)*1000000), statustxt, pid, str(self.Dir.fullpath()), self.Comment.getText()]
+			report=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(self.statistics.startDate))),ETA, statustxt, pid, str(self.Dir.fullpath()), self.Comment.getText()]
 		else:
 			report=["N/A","N/A\t",statustxt, pid, str(self.Dir.fullpath()), self.Comment.getText()]
 		return report
