@@ -1,7 +1,6 @@
 import sys, getopt
 import tabulate
 
-
 def printHelp():
 	print('Python module tsmgr accept following switches:\n')
 	print('tsmgr [-n process number] [-R] [-h] [-r] [-s] [-c comment text] [-a comment text]\n')

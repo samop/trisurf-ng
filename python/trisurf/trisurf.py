@@ -352,7 +352,7 @@ class Runner:
 				else:
 					try:
 						with open (os.path.join(self.Dir.fullpath(),"tape"), "w") as myfile:
-							myfile.write("#This is automatically generated tape file from snapshot\n")
+							myfile.write("#This is automatically generated tape file from snapshot")
 							myfile.write(str(self.tape))
 					except:
 						print("Error -- cannot make tapefile  "+ os.path.join(self.Dir.fullpath(),"tape")+" from the snapshot in the running directory")
@@ -364,12 +364,12 @@ class Runner:
 		
 			#check if the simulation has been completed. in this case notify user and stop executing.
 			if(self.isCompleted() and ("--force-from-tape" not in self.runArgs) and ("--reset-iteration-count" not in self.runArgs)):
-				print("The simulation was completed. Not starting executable at localhost in "+self.Dir.fullpath()+"\n")
+				print("The simulation was completed. Not starting executable in "+self.Dir.fullpath())
 				return
 
 			cwd=Directory(maindir=os.getcwd())
 			self.Dir.goto()
-			print("Starting trisurf-ng executable at localhost in "+self.Dir.fullpath()+"\n")
+			print("Starting trisurf-ng executable in "+self.Dir.fullpath())
 			if(self.fromSnapshot==True):
 				params=["trisurf", "--restore-from-vtk",self.snapshotFile]+self.runArgs
 			else:
@@ -380,7 +380,7 @@ class Runner:
 			subprocess.Popen (params, stdout=subprocess.DEVNULL)
 			cwd.goto()
 		else:
-			print("Process already running. Not starting\n")
+			print("Process in "+self.Dir.fullpath()+" already running. Not starting.")
 		return
 
 	def stop(self):
