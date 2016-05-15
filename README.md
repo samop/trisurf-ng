@@ -7,15 +7,21 @@ TRISURF NG
 
 To compile the program, user must have ``automake``, and ``gcc`` tools installed on the computer.
 
-Required libraries are:
+Required C libraries are:
 * libconfuse
 * libgsl
 * libxml2
 * zlib
 
+and python libraries for running tsmgr:
+* tabulate
+* psutil
+* configobj
+
 On Debian based systems, install prerequisities by typing the following command in the command line:
 
-``sudo apt-get install libconfuse-dev libgsl0-dev libxml2-dev zlib1g-dev automake gcc``
+``sudo apt-get install libconfuse-dev libgsl0-dev libxml2-dev zlib1g-dev automake gcc python3-psutil python3 python3-pip``
+``sudo pip3 install tabulate configobj``
 
 Move to the project root directory and compile with:
 
