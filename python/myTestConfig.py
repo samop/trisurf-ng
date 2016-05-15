@@ -3,6 +3,9 @@ from trisurf import tsmgr
 from trisurf import trisurf
 
 
+
+print("Running trisurf version "+ tsmgr.getTrisurfVersion())
+
 #Simple example how to start simulation from a previos snapshot
 run1=trisurf.Runner(snapshot='snapshot.vtu')
 run1.setMaindir(("N","k","V","Np","Nm"),("nshell","xk0","constvolswitch","npoly","nmono"))

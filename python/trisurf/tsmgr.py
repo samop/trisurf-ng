@@ -1,5 +1,6 @@
 import sys, getopt
 import tabulate
+import subprocess,re
 
 def printHelp():
 	print('Python module tsmgr accept following switches:\n')
@@ -12,6 +13,16 @@ def printHelp():
 	print('[-a comment text]  : append additional comment for process');
 	print('[-h]               : print help');
 
+
+def getTrisurfVersion():
+	p = subprocess.Popen('trisurf --version', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+	lines=p.stdout.readlines()
+	version=re.findall(r'[0-9a-f]{7}(?:-dirty)?', lines[0].decode('ascii'))
+	p.wait()
+	if(len(version)):
+		return version[0]
+	else:
+		return "unknown version"
 
 def start(Runs):
 	argv=sys.argv[1:]
