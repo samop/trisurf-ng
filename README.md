@@ -48,6 +48,8 @@ If you are experiencing difficulties due to different automake versions, proceed
 ``make install``
 
 
+This procedure can be done automatically by calling the build.sh script.
+
 2. Use
 ------
 
