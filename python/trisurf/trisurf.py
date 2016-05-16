@@ -287,7 +287,7 @@ class Runner:
 		version=root.find('trisurfversion')
 		self.tape=Tape()
 		self.tape.setTape(tapetxt.text)
-		
+
 	def getPID(self):
 		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
 		#self.Dir.makeifnotexist()
@@ -324,8 +324,8 @@ class Runner:
 			return TS_NOLOCK
 		if(psutil.pid_exists(int(pid))):
 			proc= psutil.Process(int(pid))
-			if proc.name=="trisurf":
-				if proc.status=="stopped":
+			if proc.name()=="trisurf":
+				if proc.status()=="stopped":
 					return TS_STOPPED
 				else:
 					return TS_RUNNING
