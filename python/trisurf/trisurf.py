@@ -325,8 +325,14 @@ class Runner:
 		if(psutil.pid_exists(int(pid))):
 			proc= psutil.Process(int(pid))
 			#psutil.__version__ == '3.4.2' requires name() and status(), some older versions reguire name, status
-			if proc.name()=="trisurf":
-				if proc.status()=="stopped":
+			if(psutil.__version__>='2.0.0'):
+				procname=proc.name()
+				procstat=proc.status()
+			else:
+				procname=proc.name
+				procstat=proc.status
+			if procname=="trisurf":
+				if procstat=="stopped":
 					return TS_STOPPED
 				else:
 					return TS_RUNNING
