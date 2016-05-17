@@ -199,13 +199,18 @@ class Statistics:
 		Internal method for determining the number of the lines in the most efficient way. Is it really the most efficient?
 		'''
 		f = open(self.fullname, "r+")
-		buf = mmap.mmap(f.fileno(), 0)
-		lines = 0
-		readline = buf.readline
-		while readline():
-			lines += 1
+		try:
+			buf = mmap.mmap(f.fileno(), 0)
+			lines = 0
+			readline = buf.readline
+			while readline():
+				lines += 1
+			f.close()
+		except:
+			lines=0
+			f.close()
 		return lines
-
+		
 	def read(self):
 		'''
 		Method read() reads the statistics if it exists. It sets local variable dT storing the time differential between two intervals of simulation (outer loops). It also stores last simulation loop and the start of the run.
