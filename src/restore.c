@@ -83,7 +83,7 @@ ts_vesicle *parseDump(char *dumpfname) {
 
 /* TODO: filaments */
 
-	ts_fprintf(stdout,"Restoration completed\n");
+//	ts_fprintf(stdout,"Restoration completed\n");
 //	write_vertex_xml_file(vesicle,999);
 //	vesicle_free(vesicle);
 //	exit(0);

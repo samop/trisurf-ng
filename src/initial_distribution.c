@@ -93,7 +93,7 @@ ts_bool set_vesicle_values_from_tape(ts_vesicle *vesicle){
 	vesicle->dmax=tape->dmax*tape->dmax; /* dmax^2 in the vesicle dmax variable */
 	vesicle->bending_rigidity=tape->xk0;
 	vtx_set_global_values(vesicle); /* make xk0 default value for every vertex */ 
-	ts_fprintf(stdout, "Tape setting: xk0=%e\n",tape->xk0);
+//	ts_fprintf(stdout, "Tape setting: xk0=%e\n",tape->xk0);
 	vesicle->stepsize=tape->stepsize;
 	vesicle->clist->ncmax[0]=tape->ncxmax;
 	vesicle->clist->ncmax[1]=tape->ncymax;
