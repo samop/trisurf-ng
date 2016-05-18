@@ -862,13 +862,13 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 
     fprintf(fh,"</DataArray>\n</PointData>\n<CellData>\n</CellData>\n<Points>\n<DataArray type=\"Float64\" Name=\"Koordinate tock\" NumberOfComponents=\"3\" format=\"ascii\">\n");
 	for(i=0;i<vlist->n;i++){
-		fprintf(fh,"%e %e %e\n",vtx[i]->x,vtx[i]->y, vtx[i]->z);
+		fprintf(fh,"%.17e %.17e %.17e\n",vtx[i]->x,vtx[i]->y, vtx[i]->z);
 	}
 	//polymeres
 	if(poly){
 		for(i=0;i<vesicle->poly_list->n;i++){
 			for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++){
-				fprintf(fh,"%e %e %e\n", vesicle->poly_list->poly[i]->vlist->vtx[j]->x,vesicle->poly_list->poly[i]->vlist->vtx[j]->y, vesicle->poly_list->poly[i]->vlist->vtx[j]->z );
+				fprintf(fh,"%.17e %.17e %.17e\n", vesicle->poly_list->poly[i]->vlist->vtx[j]->x,vesicle->poly_list->poly[i]->vlist->vtx[j]->y, vesicle->poly_list->poly[i]->vlist->vtx[j]->z );
 			}
 		}
 	}
@@ -876,7 +876,7 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 	if(fil){
 		for(i=0;i<vesicle->filament_list->n;i++){
 			for(j=0;j<vesicle->filament_list->poly[i]->vlist->n;j++){
-				fprintf(fh,"%e %e %e\n", vesicle->filament_list->poly[i]->vlist->vtx[j]->x,vesicle->filament_list->poly[i]->vlist->vtx[j]->y, vesicle->filament_list->poly[i]->vlist->vtx[j]->z );
+				fprintf(fh,"%.17e %.17e %.17e\n", vesicle->filament_list->poly[i]->vlist->vtx[j]->x,vesicle->filament_list->poly[i]->vlist->vtx[j]->y, vesicle->filament_list->poly[i]->vlist->vtx[j]->z );
 			}
 		}
 	}

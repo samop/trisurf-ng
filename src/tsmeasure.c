@@ -40,7 +40,7 @@ void vesicle_calculate_ulm2(ts_vesicle *vesicle){
 	calculateUlmComplex(vesicle);
 	ts_int i,j;
 	for(i=0;i<vesicle->sphHarmonics->l;i++){
-    		for(j=0;j<2*i+1;j++){
+    		for(j=i;j<2*i+1;j++){
 			printf("%e ", gsl_complex_abs2(vesicle->sphHarmonics->ulmComplex[i][j]));
     		}
 	}
@@ -51,18 +51,19 @@ void vesicle_calculate_ulm2(ts_vesicle *vesicle){
 int main(){
 	ts_vesicle *vesicle;
 	ts_char *i,*j;
-	ts_uint tstep;
+	ts_uint tstep,n;
     	ts_char *number;
+	struct dirent **list;
+	int count;
 	ts_fprintf(stdout,"TRISURF-NG v. %s, compiled on: %s %s.\n", TS_VERSION, __DATE__, __TIME__);
-	ts_fprintf(stdout,"Programming done by: Samo Penic and Miha Fosnaric\n");
-	ts_fprintf(stdout,"Released under terms of GPLv3\n");
-	ts_fprintf(stdout,"Starting program...\n\n");
-	DIR *dir = opendir(".");
-	if(dir){
+	count=scandir(".",&list,0,alphasort);
+	if(count<0){
+		fatal("Error, cannot open directory.",1);
+	}
+        tstep=0;
+	for(n=0;n<count;n++){
 		struct dirent *ent;
-        	tstep=0;
-		while((ent = readdir(dir)) != NULL)
-		{
+		ent=list[n];	
             	i=rindex(ent->d_name,'.');
             	if(i==NULL) continue;
             	if(strcmp(i+1,"vtu")==0){
@@ -71,19 +72,16 @@ int main(){
                     number=strndup(j+1,j-i); 
 			quiet=1;
                     ts_fprintf(stdout,"timestep: %u filename: %s\n",atoi(number),ent->d_name);
+			printf("%u ",atoi(number));
 			vesicle=restoreVesicle(ent->d_name);
 			vesicle_calculate_ulm2(vesicle);
                     	tstep++;
 			//vesicle_free(vesicle);
                     free(number);
-            	}  
+            	}
+		free(ent);  
 		}
-	}
-	free(dir);
-
-
-
-
-return 0;
+	free(list);
+	return 0;
 }
 
