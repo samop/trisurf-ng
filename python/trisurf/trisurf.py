@@ -370,7 +370,7 @@ class Runner:
 						print("Error -- cannot make tapefile  "+ os.path.join(self.Dir.fullpath(),"tape")+" from the snapshot in the running directory")
 						exit(1)
 					try:
-						os.symlink(os.path.abspath(self.snapshotFile), os.path.join(self.Dir.fullpath(),self.snapshotFile))
+						os.symlink(os.path.abspath(self.snapshotFile), os.path.join(self.Dir.fullpath(),"initial_snapshot.vtu"))
 					except:
 						print("Error while symlinking "+os.path.abspath(self.snapshotFile)+" to "+os.path.join(self.Dir.fullpath(),self.snapshotFile))
 		
@@ -383,7 +383,7 @@ class Runner:
 			self.Dir.goto()
 			print("Starting trisurf-ng executable in "+self.Dir.fullpath())
 			if(self.fromSnapshot==True):
-				params=["trisurf", "--restore-from-vtk",self.snapshotFile]+self.runArgs
+				params=["trisurf", "--restore-from-vtk","initial_snapshot.vtu"]+self.runArgs
 			else:
 				#veify if dump exists. If not it is a first run and shoud be run with --force-from-tape
 				if(os.path.isfile("dump.bin")==False):
