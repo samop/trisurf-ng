@@ -68,7 +68,6 @@ int main(){
 		ent=list[n];	
             	i=rindex(ent->d_name,'.');
             	if(i==NULL) {
-			free(ent);  
 			continue;
 		}
             	if(strcmp(i+1,"vtu")==0){
