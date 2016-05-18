@@ -38,6 +38,7 @@ ts_bool vesicle_free(ts_vesicle *vesicle){
     triangle_list_free(vesicle->tlist);
     cell_list_free(vesicle->clist);
     poly_list_free(vesicle->poly_list);
+    poly_list_free(vesicle->filament_list);
     complex_sph_free(vesicle->sphHarmonics);
     free(vesicle);
     return TS_SUCCESS;

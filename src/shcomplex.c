@@ -69,7 +69,7 @@ ts_bool complex_sph_free(ts_spharm *sph){
     if(sph->co != NULL) free(sph->co);
     if(sph->ulm !=NULL) free(sph->ulm);
     if(sph->ulmComplex !=NULL) free(sph->ulmComplex);
-
+    if(sph->sumUlm2 !=NULL) free(sph->sumUlm2);
         if(sph->Ylmi!=NULL) {
             for(i=0;i<sph->l;i++){
                 if(sph->Ylmi[i]!=NULL){

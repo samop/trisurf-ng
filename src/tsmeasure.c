@@ -34,9 +34,9 @@ ts_vesicle *restoreVesicle(char *filename){
 }
 
 void vesicle_calculate_ulm2(ts_vesicle *vesicle){
-	complex_sph_free(vesicle->sphHarmonics);
+	//complex_sph_free(vesicle->sphHarmonics);
 
-	vesicle->sphHarmonics=complex_sph_init(vesicle->vlist,21);
+	//vesicle->sphHarmonics=complex_sph_init(vesicle->vlist,21);
 	vesicle_volume(vesicle);
 	preparationSh(vesicle,getR0(vesicle));
 	calculateUlmComplex(vesicle);
@@ -68,7 +68,7 @@ int main(){
 		ent=list[n];	
             	i=rindex(ent->d_name,'.');
             	if(i==NULL) {
-			continue;
+				continue;
 		}
             	if(strcmp(i+1,"vtu")==0){
                     j=rindex(ent->d_name,'_');
@@ -78,14 +78,20 @@ int main(){
                     ts_fprintf(stdout,"timestep: %u filename: %s\n",atoi(number),ent->d_name);
 			printf("%u ",atoi(number));
 			vesicle=restoreVesicle(ent->d_name);
-			vesicle_calculate_ulm2(vesicle);
+//			vesicle_calculate_ulm2(vesicle);
                     	tstep++;
 			//vesicle_free(vesicle);
                     free(number);
+			tape_free(vesicle->tape);
 			vesicle_free(vesicle);
             	}
 		free(ent);  
 		}
+	for (n = 0; n < count; n++)
+  	{
+  		free(list[n]);
+  	}
+	
 	free(list);
 	return 0;
 }
