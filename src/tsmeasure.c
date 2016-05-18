@@ -34,6 +34,8 @@ ts_vesicle *restoreVesicle(char *filename){
 }
 
 void vesicle_calculate_ulm2(ts_vesicle *vesicle){
+	complex_sph_free(vesicle->sphHarmonics);
+
 	vesicle->sphHarmonics=complex_sph_init(vesicle->vlist,21);
 	vesicle_volume(vesicle);
 	preparationSh(vesicle,getR0(vesicle));
@@ -65,7 +67,10 @@ int main(){
 		struct dirent *ent;
 		ent=list[n];	
             	i=rindex(ent->d_name,'.');
-            	if(i==NULL) continue;
+            	if(i==NULL) {
+			free(ent);  
+			continue;
+		}
             	if(strcmp(i+1,"vtu")==0){
                     j=rindex(ent->d_name,'_');
                     if(j==NULL) continue;
@@ -78,6 +83,7 @@ int main(){
                     	tstep++;
 			//vesicle_free(vesicle);
                     free(number);
+			vesicle_free(vesicle);
             	}
 		free(ent);  
 		}
