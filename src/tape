@@ -1,6 +1,6 @@
 ####### Vesicle definitions ###########
 # nshell is a number of divisions of dipyramid
-nshell=5
+nshell=10
 # dmax is the max. bond length (in units l_min)
 dmax=1.7
 # dmin_interspecies in the min. dist. between different vertex species (in units l_min)
@@ -12,12 +12,12 @@ stepsize=0.15
 
 # Pressure calculations
 # (pswitch=1: calc. p*dV energy contribution)
-pswitch = 0
+pswitch = 1
 # pressure difference: p_inside - p_outside (in units kT/l_min^3):
-pressure=0.0
+pressure=-10.0
 
 #Constant volume constraint (0 disable constant volume, 1 enable wiht additional vertex move, 2 enable with epsvol)
-constvolswitch=2
+constvolswitch=0
 constvolprecision=1e-14
 
 #Constant area constraint (0 disable constant area, 2 enable constant area with epsarea)
@@ -25,7 +25,7 @@ constareaswitch=2
 
 ####### Polymer (brush) definitions ###########
 # npoly is a number of polymers attached to npoly distinct vertices on vesicle
-npoly=2
+npoly=0
 # nmono is a number of monomers in each polymer
 nmono=10
 # Spring constant between monomers of the polymer
@@ -42,7 +42,9 @@ xi=0
 ####### Nucleus (inside the vesicle) ###########
 # Radius of an impenetrable hard sphere inside the vesicle
 R_nucleus=0
-
+R_nucleusX=2.0
+R_nucleusY=6.0
+R_nucleusZ=2.0
 #######  Cell definitions ############
 nxmax=60
 nymax=60
@@ -52,7 +54,7 @@ nzmax=60
 ####### Program Control ############
 #how many MC sweeps between subsequent records of states to disk
 #200000
-mcsweeps=20
+mcsweeps=2000
 #how many initial mcsweeps*inititer MC sweeps before recording to disk?
 #2
 inititer=0
