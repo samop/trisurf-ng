@@ -57,7 +57,7 @@ ts_vesicle *parseDump(char *dumpfname) {
 						if ((!xmlStrcmp(cur2->name, (const xmlChar *)"Points"))){
 							//fprintf(stderr,"Found point data\n");
 							if(vesicle!=NULL)
-								fprintf(stderr,"Fils: %ld, Nfono: %ld\n", vesicle->tape->nfil, vesicle->tape->nfono);
+								//fprintf(stderr,"Fils: %ld, Nfono: %ld\n", vesicle->tape->nfil, vesicle->tape->nfono);
 								parseXMLVertexPosition(vesicle, doc, cur2);
 						}
 						if ((!xmlStrcmp(cur2->name, (const xmlChar *)"Cells"))){
@@ -311,7 +311,7 @@ ts_bool parseXMLVertexPosition(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur
 				} else {
 					filidx=(idx-vesicle->vlist->n-vesicle->tape->nmono*vesicle->tape->npoly)/vesicle->tape->nfono;
 					fonoidx=(idx-vesicle->vlist->n-vesicle->tape->nmono*vesicle->tape->npoly)%vesicle->tape->nfono;
-					fprintf(stderr,"filidx=%d, fonoidx=%d, coord=%s,%s,%s\n",filidx,fonoidx,token[0],token[1],token[2]);
+					//fprintf(stderr,"filidx=%d, fonoidx=%d, coord=%s,%s,%s\n",filidx,fonoidx,token[0],token[1],token[2]);
 					vesicle->filament_list->poly[filidx]->vlist->vtx[fonoidx]->x=atof(token[0]);
 					vesicle->filament_list->poly[filidx]->vlist->vtx[fonoidx]->y=atof(token[1]);
 					vesicle->filament_list->poly[filidx]->vlist->vtx[fonoidx]->z=atof(token[2]);
@@ -324,7 +324,7 @@ ts_bool parseXMLVertexPosition(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur
 		}
 		child=child->next;
 	}
-	fprintf(stderr,"Came here\n");
+	//fprintf(stderr,"Came here\n");
 	//fprintf(stderr,"Vertices position j=%d\n",idx);	
 
 	return TS_SUCCESS;
