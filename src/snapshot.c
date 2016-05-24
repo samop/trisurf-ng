@@ -57,7 +57,7 @@ ts_bool xml_trisurf_header(FILE *fh, ts_vesicle *vesicle){
 	fprintf(fh, "<trisurfversion>Trisurf (commit %s), compiled on %s %s</trisurfversion>\n",TS_VERSION, __DATE__,  __TIME__);
 	fprintf(fh, "<dumpdate>%s</dumpdate>\n", c_time_string);
 
-	fprintf(fh, "<tape>\n");
+	fprintf(fh, "<tape>");
 		fprintf(fh,"%s",tapetxt);	
 	fprintf(fh, "</tape>\n");
 	if(vesicle->poly_list!=NULL){
