@@ -1,6 +1,6 @@
 ####### Vesicle definitions ###########
 # nshell is a number of divisions of dipyramid
-nshell=10
+nshell=17
 # dmax is the max. bond length (in units l_min)
 dmax=1.7
 # dmin_interspecies in the min. dist. between different vertex species (in units l_min)
@@ -25,7 +25,7 @@ constareaswitch=2
 
 ####### Polymer (brush) definitions ###########
 # npoly is a number of polymers attached to npoly distinct vertices on vesicle
-npoly=0
+npoly=3
 # nmono is a number of monomers in each polymer
 nmono=10
 # Spring constant between monomers of the polymer
@@ -33,7 +33,7 @@ k_spring=800
 
 ####### Filament (inside the vesicle) definitions ###########
 # nfil is a number of filaments inside the vesicle
-nfil=0
+nfil=2
 # nfono is a number of monomers in each filament
 nfono=300
 # Persistence lenght of the filaments (in units l_min)
@@ -54,7 +54,7 @@ nzmax=60
 ####### Program Control ############
 #how many MC sweeps between subsequent records of states to disk
 #200000
-mcsweeps=2000
+mcsweeps=20
 #how many initial mcsweeps*inititer MC sweeps before recording to disk?
 #2
 inititer=0
