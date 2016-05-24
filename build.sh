@@ -8,4 +8,6 @@ autoconf
 make clean
 make
 sudo make install
-
+cd python
+sudo python3 setup.py install
+cd ..
