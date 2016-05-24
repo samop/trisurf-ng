@@ -286,7 +286,7 @@ ts_bool parseXMLVertexPosition(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur
 	xmlNodePtr child = cur->xmlChildrenNode;
 	xmlChar *points;
 	char *pts;
-	int i, idx, polyidx, monoidx;
+	int i, idx, polyidx, monoidx, filidx, fonoidx;
 	char *token[3];
 	while (child != NULL) {
 		if ((!xmlStrcmp(child->name, (const xmlChar *)"DataArray"))){
@@ -301,12 +301,19 @@ ts_bool parseXMLVertexPosition(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur
 					vesicle->vlist->vtx[idx]->x=atof(token[0]);
 					vesicle->vlist->vtx[idx]->y=atof(token[1]);
 					vesicle->vlist->vtx[idx]->z=atof(token[2]);
-				} else {
+				} else if(vesicle->tape->nmono && vesicle->tape->npoly && idx<vesicle->vlist->n+vesicle->tape->nmono*vesicle->tape->npoly) {
 					polyidx=(idx-vesicle->vlist->n)/vesicle->tape->nmono;
 					monoidx=(idx-vesicle->vlist->n)%vesicle->tape->nmono;
 					vesicle->poly_list->poly[polyidx]->vlist->vtx[monoidx]->x=atof(token[0]);
 					vesicle->poly_list->poly[polyidx]->vlist->vtx[monoidx]->y=atof(token[1]);
 					vesicle->poly_list->poly[polyidx]->vlist->vtx[monoidx]->z=atof(token[2]);
+				} else {
+					filidx=(idx-vesicle->vlist->n-vesicle->tape->nmono*vesicle->tape->npoly)/vesicle->tape->nfono;
+					fonoidx=(idx-vesicle->vlist->n-vesicle->tape->nmono*vesicle->tape->npoly)%vesicle->tape->nfono;
+					fprintf(stderr,"filidx=%d, fonoidx=%d, coord=%s,%s,%s\n",filidx,fonoidx,token[0],token[1],token[2]);
+					vesicle->filament_list->poly[filidx]->vlist->vtx[fonoidx]->x=atof(token[0]);
+					vesicle->filament_list->poly[filidx]->vlist->vtx[fonoidx]->y=atof(token[1]);
+					vesicle->filament_list->poly[filidx]->vlist->vtx[fonoidx]->z=atof(token[2]);
 				}
 				for(i=0;i<2;i++)	token[i]=strtok(NULL," ");	
 				token[2]=strtok(NULL,"\n");
@@ -316,6 +323,7 @@ ts_bool parseXMLVertexPosition(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur
 		}
 		child=child->next;
 	}
+	fprintf(stderr,"Came here\n");
 	//fprintf(stderr,"Vertices position j=%d\n",idx);	
 
 	return TS_SUCCESS;
@@ -340,7 +348,8 @@ ts_bool parseXMLBonds(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur){
 				}
 				else {
 				//find grafted vtx
-					if((vesicle->tape->nmono-1)==(idx-3*(vesicle->vlist->n-2))%(vesicle->tape->nmono)){
+					if(vesicle->tape->npoly && vesicle->tape->nmono && (vesicle->tape->nmono-1)==(idx-3*(vesicle->vlist->n-2))%(vesicle->tape->nmono)
+						&& idx<(3*vesicle->vlist->n-2+vesicle->tape->nmono*vesicle->tape->npoly+vesicle->tape->npoly)){
 						polyidx=(idx-3*(vesicle->vlist->n-2))/(vesicle->tape->nmono);
 						//fprintf(stderr,"poly=%d, vertex=%d\n",polyidx,atoi(token[0]));
 						vesicle->poly_list->poly[polyidx]->grafted_vtx=vesicle->vlist->vtx[atoi(token[0])];
