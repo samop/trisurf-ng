@@ -51,6 +51,5 @@ AC_FUNC_REALLOC
 AC_CHECK_FUNCS([pow sqrt strndup])
 
 AC_CONFIG_FILES([Makefile
-                 src/Makefile
-                 test/Makefile])
+                 src/Makefile])
 AC_OUTPUT
