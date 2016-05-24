@@ -397,8 +397,6 @@ class Runner:
 			print("Process in "+self.Dir.fullpath()+" already running. Not starting.")
 		return
 
-	def stop(self):
-		pass
 
 	def setMaindir(self,prefix,variables):
 		maindir=""
@@ -442,6 +440,11 @@ class Runner:
 		else:
 			report=["N/A","N/A",statustxt, pid, str(self.Dir.fullpath()), self.Comment.getText()]
 		return report
+
+
+	def stop(self):
+		p=psutil.Process(self.getPID())
+		p.kill()
 
 	def writeComment(self, data, mode='w'):
 		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)

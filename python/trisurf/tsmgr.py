@@ -80,8 +80,7 @@ def start(Runs):
 
 		elif opt == '-k':
 			if processno:
-				p=psutil.Process(Runs[processno-1].getPID())
-				p.kill()
+				Runs[processno-1].stop()
 		else:
 			printHelp()
 			sys.exit(2)

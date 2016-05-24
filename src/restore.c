@@ -57,6 +57,7 @@ ts_vesicle *parseDump(char *dumpfname) {
 						if ((!xmlStrcmp(cur2->name, (const xmlChar *)"Points"))){
 							//fprintf(stderr,"Found point data\n");
 							if(vesicle!=NULL)
+								fprintf(stderr,"Fils: %ld, Nfono: %ld\n", vesicle->tape->nfil, vesicle->tape->nfono);
 								parseXMLVertexPosition(vesicle, doc, cur2);
 						}
 						if ((!xmlStrcmp(cur2->name, (const xmlChar *)"Cells"))){
