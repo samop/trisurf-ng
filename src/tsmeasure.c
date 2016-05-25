@@ -78,9 +78,8 @@ int main(){
                     ts_fprintf(stdout,"timestep: %u filename: %s\n",atoi(number),ent->d_name);
 			printf("%u ",atoi(number));
 			vesicle=restoreVesicle(ent->d_name);
-//			vesicle_calculate_ulm2(vesicle);
+			vesicle_calculate_ulm2(vesicle);
                     	tstep++;
-			//vesicle_free(vesicle);
                     free(number);
 			tape_free(vesicle->tape);
 			vesicle_free(vesicle);
