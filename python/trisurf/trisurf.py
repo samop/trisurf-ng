@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 import configobj
 import xml.etree.ElementTree as ET
 import base64
@@ -84,6 +82,9 @@ class Tape:
 		'''
 		try:
 			self.config=configobj.ConfigObj(tape)
+			with open (tape, "r") as myfile:
+				self.rawText=myfile.read() #read the file
+
 		except:
 			print("Error reading or parsing tape file!\n")
 			exit(1)
@@ -91,6 +92,7 @@ class Tape:
 	def setTape(self, string):
 		'''Method setTape(string) parses the string in memory that hold the tape contents.'''
 		self.config=configobj.ConfigObj(io.StringIO(string))
+		self.rawText=string
 		return
 
 	def getValue(self,key):
@@ -364,8 +366,8 @@ class Runner:
 				else:
 					try:
 						with open (os.path.join(self.Dir.fullpath(),"tape"), "w") as myfile:
-							myfile.write("#This is automatically generated tape file from snapshot")
-							myfile.write(str(self.tape))
+							#myfile.write("#This is automatically generated tape file from snapshot")
+							myfile.write(str(self.tape.rawText))
 					except:
 						print("Error -- cannot make tapefile  "+ os.path.join(self.Dir.fullpath(),"tape")+" from the snapshot in the running directory")
 						exit(1)
@@ -395,8 +397,6 @@ class Runner:
 			print("Process in "+self.Dir.fullpath()+" already running. Not starting.")
 		return
 
-	def stop(self):
-		pass
 
 	def setMaindir(self,prefix,variables):
 		maindir=""
@@ -440,6 +440,11 @@ class Runner:
 		else:
 			report=["N/A","N/A",statustxt, pid, str(self.Dir.fullpath()), self.Comment.getText()]
 		return report
+
+
+	def stop(self):
+		p=psutil.Process(self.getPID())
+		p.kill()
 
 	def writeComment(self, data, mode='w'):
 		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)

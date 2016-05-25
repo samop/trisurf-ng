@@ -72,10 +72,19 @@ ts_bool single_verticle_timestep(ts_vesicle *vesicle,ts_vertex *vtx,ts_double *r
 
 // TODO: Maybe faster if checks only nucleus-neighboring cells
 // Nucleus penetration check:
+if(vesicle->R_nucleus>0.0){
 	if (vtx->x*vtx->x + vtx->y*vtx->y + vtx->z*vtx->z < vesicle->R_nucleus){
 		vtx=memcpy((void *)vtx,(void *)&backupvtx[0],sizeof(ts_vertex));
 		return TS_FAIL;
 	}
+} else if(vesicle->R_nucleusX>0.0){
+//	fprintf(stderr,"DEBUG, (Rx, Ry,Rz)^2=(%f,%f,%f)\n",vesicle->R_nucleusX, vesicle->R_nucleusY, vesicle->R_nucleusZ);
+	if ((vtx->x*vtx->x)/vesicle->R_nucleusX + vtx->y*vtx->y/vesicle->R_nucleusY + (vtx->z*vtx->z)/vesicle->R_nucleusZ < 1.0){
+		vtx=memcpy((void *)vtx,(void *)&backupvtx[0],sizeof(ts_vertex));
+		return TS_FAIL;
+	}
+
+}
 
 //self avoidance check with distant vertices
 	cellidx=vertex_self_avoidance(vesicle, vtx);

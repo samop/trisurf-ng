@@ -1,6 +1,7 @@
 import sys, getopt
 import tabulate
 import subprocess,re
+import psutil
 
 def printHelp():
 	print('Python module tsmgr accept following switches:\n')
@@ -9,6 +10,7 @@ def printHelp():
 	print('[-R]               : raw output for -s switch');
 	print('[-r]               : run process');
 	print('[-s]               : process status');
+	print('[-k]               : kill process');
 	print('[-c comment text]  : write new comment for process');
 	print('[-a comment text]  : append additional comment for process');
 	print('[-h]               : print help');
@@ -29,7 +31,7 @@ def start(Runs):
 	processno=0
 	raw=False
 	try:
-		opts, args = getopt.getopt(argv,"Ra:n:hrsc:")
+		opts, args = getopt.getopt(argv,"Ra:n:hrskc:")
 	except getopt.GetoptError:
 		printHelp()
 		sys.exit(2)
@@ -76,7 +78,9 @@ def start(Runs):
 			if processno:
 				Runs[processno-1].writeComment("\n"+arg, 'a')
 
-			
+		elif opt == '-k':
+			if processno:
+				Runs[processno-1].stop()
 		else:
 			printHelp()
 			sys.exit(2)

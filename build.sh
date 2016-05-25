@@ -5,6 +5,9 @@ autoheader
 automake -ac
 autoconf
 ./configure
+make clean
 make
-make install
-
+sudo make install
+cd python
+sudo python3 setup.py install
+cd ..

@@ -260,6 +260,9 @@ typedef struct {
 	long int nfil;
 	long int nfono;
 	long int R_nucleus;
+	ts_double R_nucleusX;
+	ts_double R_nucleusY;
+	ts_double R_nucleusZ;
 	long int pswitch;
     long int constvolswitch;
     long int constareaswitch;
@@ -307,6 +310,9 @@ typedef struct {
 	ts_int pswitch;
     ts_tape *tape;
 	ts_double R_nucleus;
+	ts_double R_nucleusX;
+	ts_double R_nucleusY;
+	ts_double R_nucleusZ;
     ts_double area;
 } ts_vesicle;
 

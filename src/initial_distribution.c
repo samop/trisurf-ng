@@ -52,7 +52,9 @@ ts_bool set_vesicle_values_from_tape(ts_vesicle *vesicle){
 	ts_vertex *vtx;
 	ts_tape *tape=vesicle->tape;
 	vesicle->R_nucleus=tape->R_nucleus*tape->R_nucleus;
-
+	vesicle->R_nucleusX=tape->R_nucleusX*tape->R_nucleusX;
+	vesicle->R_nucleusY=tape->R_nucleusY*tape->R_nucleusY;
+	vesicle->R_nucleusZ=tape->R_nucleusZ*tape->R_nucleusZ;
 	vesicle->clist->dmin_interspecies = tape->dmin_interspecies*tape->dmin_interspecies;
 
 	//Initialize grafted polymers (brush):
