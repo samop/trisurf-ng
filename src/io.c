@@ -612,11 +612,17 @@ ts_bool print_help(FILE *fd){
 	fprintf(fd,"Flags:\n\n");
 	fprintf(fd,"--force-from-tape\t\t makes initial shape of the vesicle from tape. Ignores already existing binary dump and possible simulation results.\n");
 	fprintf(fd,"--restore-from-vtk\t\t VTK's file ending with '.vtu' are preferred way to make state snapshots for restoration. With this flag the restoration of the vesicle from vtk is possible. The simulation will continue if hidden '.status' file with last iteration done is present. Otherwise it will start simulation from timestep 0.\n");
-	fprintf(fd,"--reset-iteration-count\t\t starts simulation from the beginning (using binary dump or tape).\n");
+	fprintf(fd,"--reset-iteration-count\t\t starts simulation from the beginning (using binary dump).\n");
 	fprintf(fd,"--tape (or -t)\t\t specifies tape filename. For --force-from-tape and restoring from binary dump. Defaults to 'tape'.\n");
 	fprintf(fd,"--version (or -v)\t\t Prints version information.\n");
 	fprintf(fd,"--output-file (or -o)\t\t Specifies filename of .PVD file. Defaults to 'output.pvd'\n");
-	fprintf(fd,"--dump-filename (or -f)\t\t specifies filename for binary dump&restore. Defaults to 'dump.bin'\n\n");
+	fprintf(fd,"--dump-filename (or -f)\t\t specifies filename for binary dump&restore. Defaults to 'dump.bin'\n\n\n");
+	fprintf(fd,"Examples:\n\n");
+	fprintf(fd,"trisurf --force-from-tape\n");
+	fprintf(fd,"trisurf --reset-iteration-count\n");
+	fprintf(fd,"trisurf --restore-from-vtk filename.vtu\n");
+	fprintf(fd,"\n\n");
+
 	return TS_SUCCESS;
 }
 
