@@ -81,7 +81,7 @@ ts_tape *parsetapebuffer(char *buffer);
 ts_bool tape_free(ts_tape *tape);
 ts_bool getcmdline_tape(cfg_t *cfg, char *opts);
 ts_bool cmdline_to_tape(cfg_t *cfg, char *key, char *val);
-
+ts_bool print_help(FILE *fd);
 ts_bool dump_state(ts_vesicle *vesicle, ts_uint iteration);
 ts_vesicle *restore_state(ts_uint *iteration);
 #endif

@@ -531,8 +531,8 @@ while (1)
 
          case '?':
            /* getopt_long already printed an error message. */
-
-            ts_fprintf(stderr,"\n\nhere comes the help.\n\n");
+            print_help(stdout);
+//ts_fprintf(stderr,"\n\nhere comes the help.\n\n");
             fatal("Ooops, read help first",1);
            break;
 
@@ -598,6 +598,26 @@ while (1)
     free(buffer);
     return TS_SUCCESS;
 
+}
+
+
+ts_bool print_help(FILE *fd){
+	fprintf(fd,"TRISURF-NG v. %s, compiled on: %s %s.\n", TS_VERSION, __DATE__, __TIME__);
+	fprintf(fd,"Programming done by: Samo Penic and Miha Fosnaric\n");
+	fprintf(fd,"Released under terms of GPLv3\n\n");
+
+	fprintf(fd, "Invoking trisurf-ng without any flags results in default operation. Program reads 'tape' file and 'dump.bin' binary representation of the vesicle from disk and continues the simulation where it was aborted (as specified in 'dump.bin').\n\n");
+	fprintf(fd,"If 'tape' has different values than binary dump, those are used (if possible -- some values in tape, such as nshell cannot be modified).\n\n\n");
+	fprintf(fd,"However, if dump.bin is not present, user is notified to specify --force-from-tape flag. The vesicle will be created from specifications in tape.\n\n\n");
+	fprintf(fd,"Flags:\n\n");
+	fprintf(fd,"--force-from-tape\t\t makes initial shape of the vesicle from tape. Ignores already existing binary dump and possible simulation results.\n");
+	fprintf(fd,"--restore-from-vtk\t\t VTK's file ending with '.vtu' are preferred way to make state snapshots for restoration. With this flag the restoration of the vesicle from vtk is possible. The simulation will continue if hidden '.status' file with last iteration done is present. Otherwise it will start simulation from timestep 0.\n");
+	fprintf(fd,"--reset-iteration-count\t\t starts simulation from the beginning (using binary dump or tape).\n");
+	fprintf(fd,"--tape (or -t)\t\t specifies tape filename. For --force-from-tape and restoring from binary dump. Defaults to 'tape'.\n");
+	fprintf(fd,"--version (or -v)\t\t Prints version information.\n");
+	fprintf(fd,"--output-file (or -o)\t\t Specifies filename of .PVD file. Defaults to 'output.pvd'\n");
+	fprintf(fd,"--dump-filename (or -f)\t\t specifies filename for binary dump&restore. Defaults to 'dump.bin'\n\n");
+	return TS_SUCCESS;
 }
 
 
