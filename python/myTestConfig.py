@@ -11,6 +11,8 @@ run1=trisurf.Runner(snapshot='snapshot.vtu')
 run1.setMaindir(("N","k","V","Np","Nm"),("nshell","xk0","constvolswitch","npoly","nmono"))
 run1.setSubdir("run0")
 
+print(run1.getLastVTU())
+
 #Example how to start simulation from tape. Extra argument in runArgs will be passed to trisurf executable (meaning that simulation will always start from the beginning (bipyramid) ignoring the fact that some states may have been calculated already)
 run2=trisurf.Runner(tape='tape', runArgs=['--force-from-tape'])
 run2.setMaindir(("N","k","V","Np","Nm"),("nshell","xk0","constvolswitch","npoly","nmono"))

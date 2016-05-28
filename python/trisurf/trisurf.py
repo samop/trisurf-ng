@@ -382,10 +382,18 @@ class Runner:
 				return
 
 			cwd=Directory(maindir=os.getcwd())
+			lastVTU=self.getLastVTU() #we get last VTU file in case we need to continue the simulation from last snapshot. Need to be done before the Dir.goto() call.
 			self.Dir.goto()
 			print("Starting trisurf-ng executable in "+self.Dir.fullpath())
 			if(self.fromSnapshot==True):
-				params=["trisurf", "--restore-from-vtk","initial_snapshot.vtu"]+self.runArgs
+				#here we try to determine whether we should continue the simulation or start from last known VTU snapshot.
+				if(lastVTU==None):
+					initSnap="initial_snapshot.vtu"
+				else:
+					initSnap=lastVTU
+					print("WARNING: Not using initial snapshot as starting point, but selecting "+initSnap+" as a starting vesicle")
+				params=["trisurf", "--restore-from-vtk",initSnap]+self.runArgs
+				print("InitSnap is: "+initSnap)
 			else:
 				#veify if dump exists. If not it is a first run and shoud be run with --force-from-tape
 				if(os.path.isfile("dump.bin")==False):
@@ -450,6 +458,14 @@ class Runner:
 		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
 		self.Comment=FileContent(os.path.join(self.Dir.fullpath(),".comment"))
 		self.Comment.writefile(data,mode=mode)
+
+
+	def getLastVTU(self):
+		vtuidx=self.getLastIteration()
+		if vtuidx<0:
+			return None
+		else:
+			return  'timestep_{:06d}.vtu'.format(vtuidx)
 
 	def __str__(self):
 		if(self.getStatus()==0):
