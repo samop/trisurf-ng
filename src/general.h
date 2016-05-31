@@ -313,6 +313,7 @@ typedef struct {
 	ts_double R_nucleusX;
 	ts_double R_nucleusY;
 	ts_double R_nucleusZ;
+	ts_double nucleus_center[3];
     ts_double area;
 } ts_vesicle;
 

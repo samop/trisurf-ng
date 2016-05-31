@@ -55,6 +55,7 @@ int main(int argv, char *argc[]){
 				}
 			fclose(fd);
 			start_iteration++;
+			printf("nucleus coords: %.17e %.17e %.17e\n",vesicle->nucleus_center[0], vesicle->nucleus_center[1], vesicle->nucleus_center[2]);
 		}
 		else
 			ts_fprintf(stdout,"No .status file. The iteration count will start from 0");

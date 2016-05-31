@@ -165,6 +165,9 @@ ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
 		 if ((!xmlStrcmp(child->name, (const xmlChar *)"tristar"))){
 			parseTrisurfTristar(vesicle, doc, child);
 		}
+		 if ((!xmlStrcmp(child->name, (const xmlChar *)"nucleus"))){
+			parseTrisurfNucleus(vesicle, doc, child);
+		}
 
 	child = child->next;
 	}
@@ -179,6 +182,18 @@ ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
 
 
 /* Low level tags parsers */
+ts_bool parseTrisurfNucleus(ts_vesicle *vesicle, xmlDocPtr doc, xmlNodePtr cur){
+	xmlChar *coords = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
+	char *n=(char *)coords;
+	char *token=strtok(n," ");
+	ts_uint i;
+	for(i=0;i<3;i++){
+		vesicle->nucleus_center[i]=atof(token);
+		token=strtok(NULL," ");
+	}
+	xmlFree(coords);
+	return TS_SUCCESS;
+}
 
 ts_bool parseTrisurfVtxn(ts_vertex_list *vlist, xmlDocPtr doc, xmlNodePtr cur){
 

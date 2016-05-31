@@ -32,6 +32,7 @@ ts_bool xml_trisurf_data(FILE *fh, ts_vesicle *vesicle){
 	xml_trisurf_tria_neigh(data,vesicle->tlist);
 	xml_trisurf_vtx_neigh(data,vesicle->vlist);	
 	xml_trisurf_vtx_tristar(data,vesicle->vlist);
+	xml_trisurf_nucleus(data,vesicle);
 #ifdef COMPRESSION
 	char *compressed;
 	ts_uint nbytes=ts_compress_string64(data->string, data->beg-1, &compressed); //suppress null character at the end with by substracting 1
@@ -124,7 +125,12 @@ ts_bool xml_trisurf_vtx_tristar(ts_string *data, ts_vertex_list *vlist){
 	return TS_SUCCESS;
 }
 
-
+ts_bool xml_trisurf_nucleus(ts_string *data, ts_vesicle* vesicle){
+	if(vesicle->R_nucleus>0.0 || (vesicle->R_nucleusX>0.0 && vesicle->R_nucleusY>0.0 && vesicle->R_nucleusZ>0.0)){
+		ts_sprintf(data,"<nucleus>%.17e %.17e %.7e</nucleus>",vesicle->nucleus_center[0], vesicle->nucleus_center[1], vesicle->nucleus_center[2]);
+	}
+	return TS_SUCCESS;
+}
 
 
 /* UTILITIES */

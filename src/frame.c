@@ -42,6 +42,10 @@ ts_bool centermass(ts_vesicle *vesicle){
 			vesicle->filament_list->poly[i]->vlist->vtx[j]->z-=vesicle->cm[2];
 		}
     }
+//move nucleus for the same vector as we moved vesicle
+	vesicle->nucleus_center[0]-=vesicle->cm[0];
+	vesicle->nucleus_center[1]-=vesicle->cm[1];
+	vesicle->nucleus_center[2]-=vesicle->cm[2];
 
     vesicle->cm[0]=0.0;
     vesicle->cm[1]=0.0;
