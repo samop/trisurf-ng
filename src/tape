@@ -42,9 +42,9 @@ xi=0
 ####### Nucleus (inside the vesicle) ###########
 # Radius of an impenetrable hard sphere inside the vesicle
 R_nucleus=0
-R_nucleusX=2.0
-R_nucleusY=6.0
-R_nucleusZ=2.0
+R_nucleusX=6.0
+R_nucleusY=12.0
+R_nucleusZ=6.0
 #######  Cell definitions ############
 nxmax=60
 nymax=60
@@ -54,7 +54,7 @@ nzmax=60
 ####### Program Control ############
 #how many MC sweeps between subsequent records of states to disk
 #200000
-mcsweeps=20
+mcsweeps=200
 #how many initial mcsweeps*inititer MC sweeps before recording to disk?
 #2
 inititer=0
