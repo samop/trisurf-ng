@@ -10,10 +10,11 @@ def combine(Runs):
 		with open (statfile,"r") as myfile:
 			#lines = [line.rstrip('\n') for line in myfile]
 			data=data+myfile.readlines()[1:]
-	
-	print("Header line placer... Not yet implemented")
-	for line in data:
-		print(line.replace('\n',''))
+
+	with open ("combinedStatistics.csv","w") as output:
+		output.write("Header line placer... Not yet implemented\n")
+		for line in data:
+			output.write(line)
 
 	
 
