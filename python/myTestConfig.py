@@ -29,5 +29,5 @@ for i in range(0,4): #0,1,2,3
 #obligatory final configuration step: combine all runs
 Runs=[run1,run2]+pRun
 #start manager with configured runs
-#tsmgr.start(Runs)
-statistics.combine([run1,run2])
+tsmgr.start(Runs)
+#statistics.combine([run1,run2])
