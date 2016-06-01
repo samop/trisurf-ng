@@ -16,6 +16,8 @@
 #include<gsl/gsl_complex.h>
 #include<gsl/gsl_complex_math.h>
 #include<string.h>
+#include <sys/stat.h>
+
 
 ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, ts_uint iterations, ts_uint start_iteration){
 	ts_uint i, j,k,l,m;
@@ -24,22 +26,34 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 	ts_ulong epochtime;
 	FILE *fd1,*fd2=NULL,*fd3=NULL;
  	char filename[10000];
-    strcpy(filename,command_line_args.path);
-    strcat(filename,"statistics.csv");
-	FILE *fd=fopen(filename,"w");
+	//struct stat st;
+	strcpy(filename,command_line_args.path);
+	strcat(filename,"statistics.csv");
+	//int result = stat(filename, &st);
+	FILE *fd;
+	if(start_iteration==0)
+		fd=fopen(filename,"w");
+	else
+		fd=fopen(filename,"a");
 	if(fd==NULL){
 		fatal("Cannot open statistics.csv file for writing",1);
 	}
-	fprintf(fd, "Epoch OuterLoop VertexMoveSucessRate BondFlipSuccessRate Volume Area lamdba1 lambda2 lambda3 Kc(2-9) Kc(6-9) Kc(2-end) Kc(3-6)\n");
+	if(start_iteration==0)
+		fprintf(fd, "Epoch OuterLoop VertexMoveSucessRate BondFlipSuccessRate Volume Area lamdba1 lambda2 lambda3 Kc(2-9) Kc(6-9) Kc(2-end) Kc(3-6)\n");
 
 	 if(vesicle->sphHarmonics!=NULL){
         strcpy(filename,command_line_args.path);
         strcat(filename,"ulm2.csv"); 
+//	int result = stat(filename, &st);
+	if(start_iteration==0)
 		fd2=fopen(filename,"w");
+	else
+		fd2=fopen(filename,"a");
 		if(fd2==NULL){
 			fatal("Cannot open ulm2.csv file for writing",1);
 		}
-		fprintf(fd2, "Timestep u_00^2 u_10^2 u_11^2 u_20^2 ...\n");	
+		if(start_iteration==0) //file does not exist
+			fprintf(fd2, "Timestep u_00^2 u_10^2 u_11^2 u_20^2 ...\n");	
 
 	}
 
