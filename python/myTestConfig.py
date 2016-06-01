@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 from trisurf import tsmgr
 from trisurf import trisurf
-
+from trisurf import statistics
 
 
 print("Running trisurf version "+ tsmgr.getTrisurfVersion())
@@ -29,5 +29,5 @@ for i in range(0,4): #0,1,2,3
 #obligatory final configuration step: combine all runs
 Runs=[run1,run2]+pRun
 #start manager with configured runs
-tsmgr.start(Runs)
-
+#tsmgr.start(Runs)
+statistics.combine([run1,run2])
