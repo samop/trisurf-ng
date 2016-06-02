@@ -3,7 +3,7 @@
 
 
 /** @brief initial bond length */
-#define A0 1.2 
+#define DEF_A0 1.2 
 
 /** @brief Creates initial distribution of vertices
   *

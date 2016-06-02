@@ -30,6 +30,9 @@ int main(int argv, char *argc[]){
 	ts_tape *tape;
 	ts_uint start_iteration=0;
 	force_from_tape=0;
+	/* Area and volume for constant area and constant volume are initialized to be zero */
+	A0=0;
+	V0=0;
 	/* create lock file */
 	createPidFile("ts_trisurf",".lock",0);
 	parse_args(argv,argc); // sets global variable command_line_args (defined in io.h)

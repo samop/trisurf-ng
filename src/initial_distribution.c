@@ -126,15 +126,15 @@ ts_bool pentagonal_dipyramid_vertex_distribution(ts_vertex_list *vlist){
 	const ts_double c2= cos(4.0*M_PI/5.0);
 
 	/* Calculates projection lenght of an edge bond to pentagram plane */
-	const ts_double xl0=A0/(2.0*sin(M_PI/5.0));
+	const ts_double xl0=DEF_A0/(2.0*sin(M_PI/5.0));
 #ifdef TS_DOUBLE_DOUBLE
-	const ts_double z0=sqrt(pow(A0,2)-pow(xl0,2));
+	const ts_double z0=sqrt(pow(DEF_A0,2)-pow(xl0,2));
 #endif
 #ifdef TS_DOUBLE_FLOAT
-	const ts_double z0=sqrtf(powf(A0,2)-powf(xl0,2));
+	const ts_double z0=sqrtf(powf(DEF_A0,2)-powf(xl0,2));
 #endif
 #ifdef TS_DOUBLE_LONGDOUBLE
-	const ts_double z0=sqrtl(powl(A0,2)-powl(xl0,2));
+	const ts_double z0=sqrtl(powl(DEF_A0,2)-powl(xl0,2));
 #endif
 //	const z0=sqrt(A0*A0 -xl0*xl0); /* I could use pow function but if pow is used make a check on the float type. If float then powf, if long double use powl */
 
@@ -226,7 +226,7 @@ ts_bool init_vertex_neighbours(ts_vertex_list *vlist){
 	for(i=1;i<=vlist->n;i++){
 		for(j=1;j<=vlist->n;j++){
 			dist2=vtx_distance_sq(vtx[i],vtx[j]);
-			if( (dist2>eps) && (dist2<(A0*A0+eps))){ 
+			if( (dist2>eps) && (dist2<(DEF_A0*DEF_A0+eps))){ 
 	//if it is close enough, but not too much close (solves problem of comparing when i==j)
 				vtx_add_neighbour(vtx[i],vtx[j]);
 			}
@@ -259,7 +259,7 @@ ts_vertex_list *init_sort_neighbours(ts_bond_list *blist,ts_vertex_list *vlist){
                	dist2=vtx_distance_sq(vtx[i]->neigh[j-1],vtx[i]->neigh[jj-1]);
                	direct=vtx_direct(vtx[i],vtx[i]->neigh[j-1],vtx[i]->neigh[jj-1]);
 // TODO: check if fabs can be used with all floating point types!!
-               	if( (fabs(dist2-A0*A0)<=eps) && (direct>0.0) && (j!=jjj) ){
+               	if( (fabs(dist2-DEF_A0*DEF_A0)<=eps) && (direct>0.0) && (j!=jjj) ){
            			vtx_add_cneighbour(blist,tvtx[k],tvtx[vtx[i]->neigh[j-1]->idx+1]);
            			jjj=jj;
            			jj=j;
@@ -325,7 +325,7 @@ ts_bool init_triangles(ts_vesicle *vesicle){
 				dist=vtx_distance_sq(vtx[i]->neigh[j-1],vtx[i]->neigh[jj-1]);
 				direct=vtx_direct(vtx[i],vtx[i]->neigh[j-1],vtx[i]->neigh[jj-1]);				
 // TODO: same as above				
-				if(fabs(dist-A0*A0)<=eps && direct < 0.0 && vtx[i]->neigh[j-1]->idx+1 > i && vtx[i]->neigh[jj-1]->idx+1 >i){
+				if(fabs(dist-DEF_A0*DEF_A0)<=eps && direct < 0.0 && vtx[i]->neigh[j-1]->idx+1 > i && vtx[i]->neigh[jj-1]->idx+1 >i){
 					triangle_add(tlist,vtx[i],vtx[i]->neigh[j-1],vtx[i]->neigh[jj-1]);
 				}	
 			}	
