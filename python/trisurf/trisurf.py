@@ -236,10 +236,10 @@ class Statistics:
 		try:
 			self.dT=int(epoch2)-int(epoch1)
 			self.last=n2
-			print(epoch1)
-			print(epoch2)
-			print(self.dT)
-			print(self.last)
+			#print(epoch1)
+			#print(epoch2)
+			#print(self.dT)
+			#print(self.last)
 			self.startDate=os.path.getmtime(os.path.join(self.path,'.lock'))
 		except:
 			return(False)
