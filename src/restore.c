@@ -168,6 +168,13 @@ ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
 		 if ((!xmlStrcmp(child->name, (const xmlChar *)"nucleus"))){
 			parseTrisurfNucleus(vesicle, doc, child);
 		}
+	 	 if ((!xmlStrcmp(child->name, (const xmlChar *)"constant_volume"))){
+			parseTrisurfConstantVolume(doc, child);
+		}
+	 	 if ((!xmlStrcmp(child->name, (const xmlChar *)"constant_area"))){
+			parseTrisurfConstantArea(doc, child);
+		}
+
 
 	child = child->next;
 	}
@@ -182,6 +189,21 @@ ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
 
 
 /* Low level tags parsers */
+ts_bool parseTrisurfConstantVolume(xmlDocPtr doc, xmlNodePtr cur){
+	xmlChar *cvol = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
+	char *n=(char *)cvol;
+	V0=atof(n);
+	xmlFree(cvol);
+	return TS_SUCCESS;
+}
+ts_bool parseTrisurfConstantArea(xmlDocPtr doc, xmlNodePtr cur){
+	xmlChar *carea = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
+	char *n=(char *)carea;
+	A0=atof(n);
+	xmlFree(carea);
+	return TS_SUCCESS;
+}
+
 ts_bool parseTrisurfNucleus(ts_vesicle *vesicle, xmlDocPtr doc, xmlNodePtr cur){
 	xmlChar *coords = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
 	char *n=(char *)coords;

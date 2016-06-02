@@ -19,6 +19,7 @@ ts_bool xml_trisurf_tria_neigh(ts_string *data, ts_triangle_list *tlist);
 ts_bool xml_trisurf_vtx_neigh(ts_string *data, ts_vertex_list *vlist);
 ts_bool xml_trisurf_vtx_tristar(ts_string *data, ts_vertex_list *vlist);
 ts_bool xml_trisurf_nucleus(ts_string *data, ts_vesicle* vesicle);
+ts_bool xml_trisurf_constvolarea(ts_string *data, ts_double volume, ts_double area);
 /* UTILITIES */
 char *base64_encode(const unsigned char *data, size_t input_length, size_t *output_length);
 unsigned char *base64_decode(const char *data, size_t input_length, size_t *output_length);

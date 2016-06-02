@@ -12,4 +12,6 @@ ts_bool parseTrisurfTristar(ts_vesicle *vesicle, xmlDocPtr doc, xmlNodePtr cur);
 ts_bool parseXMLVertexPosition(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur);
 ts_bool parseXMLBonds(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur);
 ts_bool parseTrisurfNucleus(ts_vesicle *vesicle, xmlDocPtr doc, xmlNodePtr cur);
+ts_bool parseTrisurfConstantVolume(xmlDocPtr doc, xmlNodePtr cur);
+ts_bool parseTrisurfConstantArea(xmlDocPtr doc, xmlNodePtr cur);
 #endif

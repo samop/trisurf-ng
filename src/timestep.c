@@ -65,8 +65,12 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 	cell_occupation(vesicle);
 	vesicle_volume(vesicle); //needed for constant volume at this moment
     vesicle_area(vesicle); //needed for constant area at this moment
-	V0=vesicle->volume; 
-    A0=vesicle->area;
+	if(V0<0.000001) 
+		V0=vesicle->volume; 
+	ts_fprintf(stdout,"Setting volume V0=%.17f\n",V0);
+	if(A0<0.000001)
+		A0=vesicle->area;
+		ts_fprintf(stdout,"Setting area A0=%.17f\n",A0);
 	epsvol=4.0*sqrt(2.0*M_PI)/pow(3.0,3.0/4.0)*V0/pow(vesicle->tlist->n,3.0/2.0);
     epsarea=A0/(ts_double)vesicle->tlist->n;
   //  fprintf(stderr, "DVol=%1.16f (%1.16f), V0=%1.16f\n", epsvol,0.003e-2*V0,V0);
@@ -88,14 +92,7 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 		bfsr/=(ts_double)mcsweeps;
 		centermass(vesicle);
 		cell_occupation(vesicle);
-		ts_fprintf(stdout,"Done %d out of %d iterations (x %d MC sweeps).\n",i+1,inititer+iterations,mcsweeps);
             dump_state(vesicle,i);
-		fd3=fopen(".status","w");
-		if(fd3==NULL){
-			fatal("Cannot open .status file for writing",1);
-		}
-		fprintf(fd3,"%d",i);
-		fclose(fd3);
 		if(i>=inititer){
 			write_vertex_xml_file(vesicle,i-inititer);
 			write_master_xml_file(command_line_args.output_fullfilename);
@@ -146,7 +143,14 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 		    fflush(fd);	
 		//	sprintf(filename,"timestep-%05d.pov",i-inititer);
 		//	write_pov_file(vesicle,filename);
+		} //end if(inititer....)
+		fd3=fopen(".status","w"); //write status file when everything is written to disk.
+		if(fd3==NULL){
+			fatal("Cannot open .status file for writing",1);
 		}
+		fprintf(fd3,"%d",i);
+		fclose(fd3);
+		ts_fprintf(stdout,"Done %d out of %d iterations (x %d MC sweeps).\n",i+1,inititer+iterations,mcsweeps);
 	}
 	fclose(fd);
 	if(fd2!=NULL) fclose(fd2);
