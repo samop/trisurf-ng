@@ -212,8 +212,40 @@ class Statistics:
 			lines=0
 			f.close()
 		return lines
-		
+
+	def tail(self,filename,n=2):
+		with open(filename,'r') as myfile:
+			lines=myfile.readlines()
+		return [lines[len(lines)-2].replace('\n',''),lines[len(lines)-1].replace('\n','')]
+
 	def read(self):
+		try:
+			lines=self.tail(self.fullname)
+		except:
+			return(False)
+		if len(lines)<2:
+			return(False)
+		#print (line)
+		fields=shlex.split(lines[0])
+		epoch1=fields[0]
+		n1=fields[1]
+		
+		fields=shlex.split(lines[1])
+		epoch2=fields[0]
+		n2=fields[1]
+		try:
+			self.dT=int(epoch2)-int(epoch1)
+			self.last=n2
+			print(epoch1)
+			print(epoch2)
+			print(self.dT)
+			print(self.last)
+			self.startDate=os.path.getmtime(os.path.join(self.path,'.lock'))
+		except:
+			return(False)
+		return(True)
+
+	def read_old(self):
 		'''
 		Method read() reads the statistics if it exists. It sets local variable dT storing the time differential between two intervals of simulation (outer loops). It also stores last simulation loop and the start of the run.
 		'''
