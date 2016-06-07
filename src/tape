@@ -12,7 +12,7 @@ stepsize=0.15
 
 # Pressure calculations
 # (pswitch=1: calc. p*dV energy contribution)
-pswitch = 1
+pswitch = 0
 # pressure difference: p_inside - p_outside (in units kT/l_min^3):
 pressure=-10.0
 
