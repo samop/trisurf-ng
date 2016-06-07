@@ -862,7 +862,7 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 	xml_trisurf_data(fh,vesicle);
 	fprintf(fh, " <UnstructuredGrid>\n");
     fprintf(fh, "<Piece NumberOfPoints=\"%u\" NumberOfCells=\"%u\">\n",vlist->n+monono*polyno+fonono*filno, blist->n+monono*polyno+filno*(fonono-1));
-    fprintf(fh,"<PointData Scalars=\"scalars\">\n<DataArray type=\"Int64\" Name=\"scalars\" format=\"ascii\">");
+    fprintf(fh,"<PointData Scalars=\"vertices_idx\">\n<DataArray type=\"Int64\" Name=\"vertices_idx\" format=\"ascii\">");
    	for(i=0;i<vlist->n;i++){
 		fprintf(fh,"%u ",vtx[i]->idx);
     }
@@ -913,6 +913,33 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 			}
 		}
     fprintf(fh,"</DataArray>\n");
+
+	//here comes additional data. Energy!
+	fprintf(fh,"<DataArray type=\"Float64\" Name=\"bending_energy\" format=\"ascii\">");
+	for(i=0;i<vlist->n;i++){
+		fprintf(fh,"%.17e ",vtx[i]->energy*vtx[i]->xk);
+	}
+		//polymeres
+		if(poly){
+			poly_idx=vlist->n;
+			for(i=0;i<vesicle->poly_list->n;i++){
+				for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++,poly_idx++){
+					fprintf(fh,"%.17e ", vesicle->poly_list->poly[i]->vlist->vtx[j]->energy* vesicle->poly_list->poly[i]->k);
+				}
+			}
+		}
+		//filaments
+		if(fil){
+			poly_idx=vlist->n+monono*polyno;
+			for(i=0;i<vesicle->filament_list->n;i++){
+				for(j=0;j<vesicle->filament_list->poly[i]->vlist->n;j++,poly_idx++){
+		//	fprintf(stderr,"was here\n");
+					fprintf(fh,"%.17e ",  vesicle->filament_list->poly[i]->vlist->vtx[j]->energy*  vesicle->filament_list->poly[i]->k);
+				}
+			}
+		}
+    fprintf(fh,"</DataArray>\n");
+
 
 
 	

@@ -21,7 +21,7 @@ constvolswitch=0
 constvolprecision=1e-14
 
 #Constant area constraint (0 disable constant area, 2 enable constant area with epsarea)
-constareaswitch=2
+constareaswitch=0
 
 ####### Polymer (brush) definitions ###########
 # npoly is a number of polymers attached to npoly distinct vertices on vesicle
@@ -37,7 +37,7 @@ nfil=2
 # nfono is a number of monomers in each filament
 nfono=300
 # Persistence lenght of the filaments (in units l_min)
-xi=0
+xi=100
 
 ####### Nucleus (inside the vesicle) ###########
 # Radius of an impenetrable hard sphere inside the vesicle
@@ -69,6 +69,8 @@ spherical_harmonics_coefficients=21
 
 #shut up if we are using cluster!!!
 quiet=false
+ 
+
 
 #what type of multiprocessing? (*none, smp, cluster, distributed, cuda, auto)
 #currently only none makes sense.
