@@ -55,7 +55,7 @@ nzmax=60
 mcsweeps=200
 #how many initial mcsweeps*inititer MC sweeps before recording to disk?
 #2
-inititer=0
+inititer=10
 #how many records do you want on the disk iteration are there in a run?
 #10000
 iterations=100

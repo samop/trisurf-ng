@@ -350,7 +350,7 @@ class Runner:
 		return int(status)
 
 	def isCompleted(self):
-		if (int(self.tape.getValue("iterations"))==self.getLastIteration()+1):
+		if int(self.tape.getValue("iterations"))+int(self.tape.getValue("inititer"))==self.getLastIteration()+1:
 			return True
 		else:
 			return False
@@ -493,7 +493,7 @@ class Runner:
 
 
 	def getLastVTU(self):
-		vtuidx=self.getLastIteration()
+		vtuidx=self.getLastIteration()-int(self.tape.getValue("inititer"))+1
 		if vtuidx<0:
 			return None
 		else:

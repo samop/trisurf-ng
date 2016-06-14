@@ -54,13 +54,13 @@ int main(int argv, char *argc[]){
 		if(fd!=NULL){
 			arguments_no=fscanf(fd,"%u", &start_iteration);
 			if(arguments_no==0){
-				ts_fprintf(stdout,"No information of start iteration in .status file");
+				ts_fprintf(stdout,"No information of start iteration in .status file\n");
 				}
 			fclose(fd);
-			start_iteration++;
+			start_iteration++; 
 		}
 		else
-			ts_fprintf(stdout,"No .status file. The iteration count will start from 0");
+			ts_fprintf(stdout,"No .status file. The iteration count will start from 0\n");
 /* Here you should read new tape file, reassign some values in vertex from the tape and assign read tape to vesicle->tape */
 //        tape=parsetape(command_line_args.tape_fullfilename);
   //      vesicle=vtk2vesicle(command_line_args.dump_from_vtk,tape);
