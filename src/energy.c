@@ -185,3 +185,25 @@ inline ts_bool energy_vertex(ts_vertex *vtx){
 
     return TS_SUCCESS;
 }
+
+
+
+ts_bool sweep_attraction_bond_energy(ts_vesicle *vesicle){
+	int i;
+	for(i=0;i<vesicle->blist->n;i++){
+		attraction_bond_energy(vesicle->blist->bond[i], vesicle->tape->w);
+	}
+	return TS_SUCCESS;
+}
+
+
+inline ts_bool attraction_bond_energy(ts_bond *bond, ts_double w){
+
+	if(fabs(bond->vtx1->c)>1e-16 && fabs(bond->vtx2->c)>1e-16){
+		bond->energy=w;
+	}
+	else {
+		bond->energy=0.0;
+	}
+	return TS_SUCCESS;
+}

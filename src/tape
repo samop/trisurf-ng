@@ -82,3 +82,13 @@ cluster_nodes=50
 #max number of processes in distributed (voluntary) environment
 distributed_processes=50
 #cuda options???
+
+
+#NirGov branch only!
+#number of vertices with spontaneous curvature (integer)
+number_of_vertices_with_c0=200
+#spontaneous curvature (float)
+c0=2.0
+#energy of attraction of vertices with spontaneous curvature
+w=1.0
+

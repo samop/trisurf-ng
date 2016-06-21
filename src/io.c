@@ -1140,6 +1140,9 @@ ts_tape *parsetapebuffer(char *buffer){
         CFG_SIMPLE_INT("cluster_nodes",&tape->brezveze1),
         CFG_SIMPLE_INT("distributed_processes",&tape->brezveze2),
 	CFG_SIMPLE_INT("spherical_harmonics_coefficients",&tape->shc),
+	CFG_SIMPLE_INT("number_of_vertices_with_c0", &tape->number_of_vertices_with_c0),
+	CFG_SIMPLE_FLOAT("c0",&tape->c0),
+	CFG_SIMPLE_FLOAT("w",&tape->w),
         CFG_END()
     };
     cfg_t *cfg;    

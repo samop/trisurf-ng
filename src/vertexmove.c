@@ -198,6 +198,7 @@ if(vesicle->R_nucleus>0.0){
 */
 //   fprintf(stderr, "DE=%f\n",delta_energy);
     //MONTE CARLOOOOOOOO
+//	if(vtx->c!=0.0) printf("DE=%f\n",delta_energy);
     if(delta_energy>=0){
 #ifdef TS_DOUBLE_DOUBLE
         if(exp(-delta_energy)< drand48())

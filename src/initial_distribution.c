@@ -110,6 +110,21 @@ ts_bool set_vesicle_values_from_tape(ts_vesicle *vesicle){
     else {
         vesicle->sphHarmonics=NULL;
     }
+
+	int rndvtx;
+	if(tape->number_of_vertices_with_c0>0){
+		ts_fprintf(stderr,"Setting values for spontaneous curvature as defined in tape\n");
+		for(i=0;i<tape->number_of_vertices_with_c0;i++){
+			rndvtx=rand() % vesicle->vlist->n;
+			vesicle->vlist->vtx[rndvtx]->c=tape->c0;
+		}
+		mean_curvature_and_energy(vesicle);
+		if(fabs(tape->w)>1e-16){ //if nonzero energy
+			ts_fprintf(stderr,"Setting attraction between vertices with spontaneous curvature\n");
+			sweep_attraction_bond_energy(vesicle);
+		}
+	}
+    
     return TS_SUCCESS;
 
 }

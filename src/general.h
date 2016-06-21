@@ -283,6 +283,9 @@ typedef struct {
 	long int mcsweeps;
 	long int quiet;
 	long int shc;
+	long int number_of_vertices_with_c0;
+	ts_double c0;
+	ts_double w;
 } ts_tape;
 
 
