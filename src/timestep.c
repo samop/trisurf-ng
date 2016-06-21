@@ -60,11 +60,6 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 /* RANDOM SEED SET BY CURRENT TIME */
 	epochtime=get_epoch();			
 	srand48(epochtime);
-/*Nir Gov: randomly add spontaneous curvature for some vertices */
-	for(i=0;i<200;i++){
-		int b=rand() % vesicle->vlist->n;
-		vesicle->vlist->vtx[b]->c=-0.1;
-	}
 	centermass(vesicle);
 	cell_occupation(vesicle);
 	vesicle_volume(vesicle); //needed for constant volume at this moment
