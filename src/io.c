@@ -888,32 +888,6 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 
     	fprintf(fh,"</DataArray>\n");
 	
-	//here comes additional data as needed. Currently only spontaneous curvature
-	fprintf(fh,"<DataArray type=\"Float64\" Name=\"spontaneous_curvature\" format=\"ascii\">");
-	for(i=0;i<vlist->n;i++){
-		fprintf(fh,"%.17e ",vtx[i]->c);
-	}
-		//polymeres
-		if(poly){
-			poly_idx=vlist->n;
-			for(i=0;i<vesicle->poly_list->n;i++){
-				for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++,poly_idx++){
-					fprintf(fh,"%.17e ", vesicle->poly_list->poly[i]->vlist->vtx[j]->c);
-				}
-			}
-		}
-		//filaments
-		if(fil){
-			poly_idx=vlist->n+monono*polyno;
-			for(i=0;i<vesicle->filament_list->n;i++){
-				for(j=0;j<vesicle->filament_list->poly[i]->vlist->n;j++,poly_idx++){
-		//	fprintf(stderr,"was here\n");
-					fprintf(fh,"%.17e ",  vesicle->filament_list->poly[i]->vlist->vtx[j]->c);
-				}
-			}
-		}
-    fprintf(fh,"</DataArray>\n");
-
 
 	
 	fprintf(fh,"</PointData>\n<CellData>\n</CellData>\n<Points>\n<DataArray type=\"Float64\" Name=\"Koordinate tock\" NumberOfComponents=\"3\" format=\"ascii\">\n");
