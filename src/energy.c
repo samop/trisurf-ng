@@ -200,7 +200,7 @@ ts_bool sweep_attraction_bond_energy(ts_vesicle *vesicle){
 inline ts_bool attraction_bond_energy(ts_bond *bond, ts_double w){
 
 	if(fabs(bond->vtx1->c)>1e-16 && fabs(bond->vtx2->c)>1e-16){
-		bond->energy=w;
+		bond->energy=-w;
 	}
 	else {
 		bond->energy=0.0;

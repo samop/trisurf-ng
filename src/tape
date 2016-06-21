@@ -54,7 +54,7 @@ nzmax=60
 ####### Program Control ############
 #how many MC sweeps between subsequent records of states to disk
 #200000
-mcsweeps=200
+mcsweeps=2000
 #how many initial mcsweeps*inititer MC sweeps before recording to disk?
 #2
 inititer=0
@@ -86,9 +86,9 @@ distributed_processes=50
 
 #NirGov branch only!
 #number of vertices with spontaneous curvature (integer)
-number_of_vertices_with_c0=1447
+number_of_vertices_with_c0=300
 #spontaneous curvature (float)
-c0=2.0
-#energy of attraction of vertices with spontaneous curvature
-w=1.0
+c0=0.5
+#energy of attraction of vertices with spontaneous curvature (float, positive value for attraction)
+w=10.0
 
