@@ -114,8 +114,17 @@ ts_bool set_vesicle_values_from_tape(ts_vesicle *vesicle){
 	int rndvtx;
 	if(tape->number_of_vertices_with_c0>0){
 		ts_fprintf(stderr,"Setting values for spontaneous curvature as defined in tape\n");
+		j=0;
 		for(i=0;i<tape->number_of_vertices_with_c0;i++){
 			rndvtx=rand() % vesicle->vlist->n;
+			if(fabs(vesicle->vlist->vtx[rndvtx]->c-tape->c0)<1e-15){
+				j++;
+				i--;
+				if(j>10*vesicle->vlist->n){
+					fatal("cannot populate vesicle with vertices with spontaneous curvature. Too many spontaneous curvature vertices?",100);
+				}
+				continue;
+			}
 			vesicle->vlist->vtx[rndvtx]->c=tape->c0;
 		}
 		mean_curvature_and_energy(vesicle);

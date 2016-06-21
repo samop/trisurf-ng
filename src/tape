@@ -86,7 +86,7 @@ distributed_processes=50
 
 #NirGov branch only!
 #number of vertices with spontaneous curvature (integer)
-number_of_vertices_with_c0=200
+number_of_vertices_with_c0=1447
 #spontaneous curvature (float)
 c0=2.0
 #energy of attraction of vertices with spontaneous curvature
