@@ -319,6 +319,18 @@ typedef struct {
 
 
 
+typedef struct{
+	ts_uint nvtx;
+	ts_uint idx;
+	ts_vertex **vtx;
+} ts_cluster;
+
+typedef struct{
+	ts_uint n;
+	ts_cluster **cluster;
+} ts_cluster_list;
+
+
 /* GLOBAL VARIABLES */
 
 int quiet;
