@@ -13,6 +13,7 @@
 //#include "frame.h"
 //#include "timestep.h"
 //#include "poly.h"
+#include "stats.h"
 #include "sh.h"
 #include "shcomplex.h"
 #include "dumpstate.h"
@@ -56,8 +57,13 @@ int main(){
 	ts_uint tstep,n;
     	ts_char *number;
 	struct dirent **list;
+	ts_double l1,l2,l3;
 	int count;
-	ts_fprintf(stdout,"TRISURF-NG v. %s, compiled on: %s %s.\n", TS_VERSION, __DATE__, __TIME__);
+	ts_fprintf(stderr,"TRISURF-NG v. %s, compiled on: %s %s.\n", TS_VERSION, __DATE__, __TIME__);
+
+	fprintf(stdout, "OuterLoop Volume Area lamdba1 lambda2 lambda3 Nb/Ncb\n");
+
+
 	count=scandir(".",&list,0,alphasort);
 	if(count<0){
 		fatal("Error, cannot open directory.",1);
@@ -76,10 +82,15 @@ int main(){
                     number=strndup(j+1,j-i); 
 			quiet=1;
                     ts_fprintf(stdout,"timestep: %u filename: %s\n",atoi(number),ent->d_name);
-			printf("%u ",atoi(number));
+//			printf("%u ",atoi(number));
 			vesicle=restoreVesicle(ent->d_name);
-			vesicle_calculate_ulm2(vesicle);
+//			vesicle_calculate_ulm2(vesicle);
+			vesicle_volume(vesicle);
+			vesicle_area(vesicle);
+			gyration_eigen(vesicle,&l1,&l2,&l3);
+			fprintf(stdout,"%d %.17e %.17e %.17e %.17e %.17e\n",atoi(number),vesicle->volume, vesicle->area,l1,l2,l3),
                     	tstep++;
+
                     free(number);
 			tape_free(vesicle->tape);
 			vesicle_free(vesicle);
