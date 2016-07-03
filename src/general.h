@@ -156,7 +156,8 @@ struct ts_vertex {
         ts_double projArea;
         ts_double relR;
         ts_double solAngle;
-	struct ts_poly *grafted_poly;
+		struct ts_poly *grafted_poly;
+		struct ts_cluster *cluster;
 };
 typedef struct ts_vertex ts_vertex;
 
@@ -319,11 +320,13 @@ typedef struct {
 
 
 
-typedef struct{
+struct ts_cluster{
 	ts_uint nvtx;
 	ts_uint idx;
 	ts_vertex **vtx;
-} ts_cluster;
+};
+
+typedef struct ts_cluster ts_cluster;
 
 typedef struct{
 	ts_uint n;
