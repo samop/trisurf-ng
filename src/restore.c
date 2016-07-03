@@ -85,6 +85,7 @@ ts_vesicle *parseDump(char *dumpfname) {
 
 	init_normal_vectors(vesicle->tlist);
 	mean_curvature_and_energy(vesicle);
+	sweep_attraction_bond_energy(vesicle);
 
 /* TODO: filaments */
 
@@ -186,7 +187,6 @@ ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
 
 	vesicle->tape=tape;
 	set_vesicle_values_from_tape(vesicle);
-
 	return vesicle;
 }
 

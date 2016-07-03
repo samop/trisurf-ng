@@ -51,6 +51,18 @@ void vesicle_calculate_ulm2(ts_vesicle *vesicle){
 
 }
 
+
+
+int count_bonds_with_energy(ts_bond_list *blist){
+
+	unsigned int i, cnt;
+	cnt=0;
+	for(i=0;i<blist->n;i++){
+		if(fabs(blist->bond[i]->energy)>1e-16) cnt++;
+	}
+	return cnt;
+}
+
 int main(){
 	ts_vesicle *vesicle;
 	ts_char *i,*j;
@@ -61,7 +73,7 @@ int main(){
 	int count;
 	ts_fprintf(stderr,"TRISURF-NG v. %s, compiled on: %s %s.\n", TS_VERSION, __DATE__, __TIME__);
 
-	fprintf(stdout, "OuterLoop Volume Area lamdba1 lambda2 lambda3 Nb/Ncb\n");
+	fprintf(stdout, "OuterLoop Volume Area lamdba1 lambda2 lambda3 Nbw/Nb\n");
 
 
 	count=scandir(".",&list,0,alphasort);
@@ -88,7 +100,7 @@ int main(){
 			vesicle_volume(vesicle);
 			vesicle_area(vesicle);
 			gyration_eigen(vesicle,&l1,&l2,&l3);
-			fprintf(stdout,"%d %.17e %.17e %.17e %.17e %.17e\n",atoi(number),vesicle->volume, vesicle->area,l1,l2,l3),
+			fprintf(stdout,"%d %.17e %.17e %.17e %.17e %.17e %.17e\n",atoi(number),vesicle->volume, vesicle->area,l1,l2,l3, (ts_double)count_bonds_with_energy(vesicle->blist)/(ts_double)vesicle->blist->n),
                     	tstep++;
 
                     free(number);
