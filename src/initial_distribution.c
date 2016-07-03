@@ -44,6 +44,7 @@ ts_vesicle *create_vesicle_from_tape(ts_tape *tape){
 	vesicle=initial_distribution_dipyramid(tape->nshell,tape->ncxmax,tape->ncymax,tape->nczmax,tape->stepsize);
     	vesicle->tape=tape;
 	set_vesicle_values_from_tape(vesicle);
+		initial_population_with_c0(vesicle,tape);
 	return vesicle;
 }
 
@@ -111,7 +112,14 @@ ts_bool set_vesicle_values_from_tape(ts_vesicle *vesicle){
         vesicle->sphHarmonics=NULL;
     }
 
-	int rndvtx;
+    
+    return TS_SUCCESS;
+
+}
+
+
+ts_bool initial_population_with_c0(ts_vesicle *vesicle, ts_tape *tape){
+	int rndvtx,i,j;
 	if(tape->number_of_vertices_with_c0>0){
 		ts_fprintf(stderr,"Setting values for spontaneous curvature as defined in tape\n");
 		j=0;
@@ -133,13 +141,8 @@ ts_bool set_vesicle_values_from_tape(ts_vesicle *vesicle){
 			sweep_attraction_bond_energy(vesicle);
 		}
 	}
-    
-    return TS_SUCCESS;
-
+	return TS_SUCCESS;
 }
-
-
-
 
 
 ts_bool pentagonal_dipyramid_vertex_distribution(ts_vertex_list *vlist){

@@ -58,6 +58,7 @@ int main(int argv, char *argc[]){
 				}
 			fclose(fd);
 			start_iteration++;
+			write_vertex_xml_file(vesicle,1000);
 		}
 		else
 			ts_fprintf(stdout,"No .status file. The iteration count will start from 0");
