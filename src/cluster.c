@@ -42,6 +42,7 @@ ts_bool cluster_list_compact(ts_cluster_list *cstlist){
 			do{
 				n--;
 			} while(cstlist->cluster[n]==NULL && n>i);
+			if(i<=n) break;
 			cstlist->cluster[i]=cstlist->cluster[n];
 			cstlist->cluster[n]=NULL;
 		}
