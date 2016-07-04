@@ -48,7 +48,7 @@ ts_bool cluster_list_compact(ts_cluster_list *cstlist){
 		}
 	}
 	cstlist->cluster=(ts_cluster **)realloc(cstlist->cluster,n*sizeof(ts_cluster *));
-
+	cstlist->n=n;
 	return TS_SUCCESS;
 }
 
