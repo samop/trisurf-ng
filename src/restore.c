@@ -54,6 +54,10 @@ ts_vesicle *parseDump(char *dumpfname) {
 				if ((!xmlStrcmp(cur1->name, (const xmlChar *)"Piece"))){
 					cur2=cur1->xmlChildrenNode;
 					while(cur2!=NULL){
+						if ((!xmlStrcmp(cur2->name, (const xmlChar *)"PointData"))){
+							if(vesicle!=NULL)
+								parseXMLPointData(vesicle,doc,cur2);
+						}
 						if ((!xmlStrcmp(cur2->name, (const xmlChar *)"Points"))){
 							//fprintf(stderr,"Found point data\n");
 							if(vesicle!=NULL)
@@ -81,6 +85,7 @@ ts_vesicle *parseDump(char *dumpfname) {
 
 	init_normal_vectors(vesicle->tlist);
 	mean_curvature_and_energy(vesicle);
+	sweep_attraction_bond_energy(vesicle);
 
 /* TODO: filaments */
 
@@ -182,7 +187,6 @@ ts_vesicle *parseTrisurfTag(xmlDocPtr doc, xmlNodePtr cur){
 
 	vesicle->tape=tape;
 	set_vesicle_values_from_tape(vesicle);
-
 	return vesicle;
 }
 
@@ -318,7 +322,48 @@ ts_bool parseTrisurfTristar(ts_vesicle *vesicle, xmlDocPtr doc, xmlNodePtr cur){
 	return TS_SUCCESS;
 }
 
-
+/* this parses the data for vertices (like spontaneous curvature, etc.) */
+ts_bool parseXMLPointData(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur){
+	xmlNodePtr child = cur->xmlChildrenNode;
+	xmlChar *property_name;
+	xmlChar *values;
+	char *vals;
+	char *token;
+	int idx, polyidx, monoidx, filidx, fonoidx;
+	while (child != NULL) {
+		if ((!xmlStrcmp(child->name, (const xmlChar *)"DataArray"))){
+			property_name=xmlGetProp(child, (xmlChar *)"Name");
+		//	fprintf(stderr,"Name: %s\n", property_name);
+			if(!xmlStrcmp(property_name,(const xmlChar *)"spontaneous_curvature")){
+				values=xmlNodeListGetString(doc,child->xmlChildrenNode,1);
+				vals=(char *)values;
+				token=strtok(vals," ");
+				idx=0;
+				while(token!=NULL){
+					if(idx<vesicle->vlist->n){
+						vesicle->vlist->vtx[idx]->c=atof(token);
+					} else if(vesicle->tape->nmono && vesicle->tape->npoly && idx<vesicle->vlist->n+vesicle->tape->nmono*vesicle->tape->npoly) {
+						polyidx=(idx-vesicle->vlist->n)/vesicle->tape->nmono;
+						monoidx=(idx-vesicle->vlist->n)%vesicle->tape->nmono;
+						vesicle->poly_list->poly[polyidx]->vlist->vtx[monoidx]->c=atof(token);
+					} else {
+						filidx=(idx-vesicle->vlist->n-vesicle->tape->nmono*vesicle->tape->npoly)/vesicle->tape->nfono;
+						fonoidx=(idx-vesicle->vlist->n-vesicle->tape->nmono*vesicle->tape->npoly)%vesicle->tape->nfono;
+						//fprintf(stderr,"filidx=%d, fonoidx=%d, coord=%s,%s,%s\n",filidx,fonoidx,token[0],token[1],token[2]);
+						vesicle->filament_list->poly[filidx]->vlist->vtx[fonoidx]->c=atof(token);
+					}
+					idx++;
+					token=strtok(NULL," ");
+				}
+				xmlFree(values);		
+			}
+			xmlFree(property_name);
+		}
+		
+		child=child->next;
+	}
+	return TS_SUCCESS;
+}
 /* this is a parser of vertex positions and bonds from main xml data */
 ts_bool parseXMLVertexPosition(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur){
 	xmlNodePtr child = cur->xmlChildrenNode;
