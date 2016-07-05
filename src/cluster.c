@@ -39,12 +39,14 @@ ts_bool cluster_list_compact(ts_cluster_list *cstlist){
 	
 	for(i=0;i<cstlist->n;i++){
 		if(cstlist->cluster[i]==NULL){
+			if(i>=n) break;
+			//printf("Have to do compacting n=%d\n ",n);
 			do{
 				n--;
 			} while(cstlist->cluster[n]==NULL && n>i);
-			if(i<=n) break;
 			cstlist->cluster[i]=cstlist->cluster[n];
 			cstlist->cluster[n]=NULL;
+			//printf("After compacting n=%d\n",n);
 		}
 	}
 	cstlist->cluster=(ts_cluster **)realloc(cstlist->cluster,n*sizeof(ts_cluster *));
@@ -53,7 +55,7 @@ ts_bool cluster_list_compact(ts_cluster_list *cstlist){
 }
 
 
-ts_bool cluster_join(ts_cluster *cluster1, ts_cluster *cluster2){
+ts_bool cluster_join(ts_cluster_list *cstlist, ts_cluster *cluster1, ts_cluster *cluster2){
 	ts_cluster *master_cluster,*slave_cluster;
 	ts_uint i;
 	if(cluster1->idx<cluster2->idx){
@@ -66,8 +68,13 @@ ts_bool cluster_join(ts_cluster *cluster1, ts_cluster *cluster2){
 	for(i=0;i<slave_cluster->nvtx;i++){
 		cluster_add_vertex(master_cluster,slave_cluster->vtx[i]);
 	}
-	cluster_free(slave_cluster);
-	slave_cluster=NULL;
+	//find cluster in the list and free the location of the cluster
+	for(i=0;i<cstlist->n;i++){
+		if(cstlist->cluster[i]==slave_cluster){
+			cluster_free(slave_cluster);
+			cstlist->cluster[i]=NULL;
+		}
+	}
 	return TS_SUCCESS;
 }
 
@@ -113,13 +120,13 @@ ts_cluster *cluster_vertex_neighbor(ts_vertex *vtx){
 	return NULL;
 }
 
-ts_bool cluster_vertex_neighbor_check(ts_vertex *vtx){
+ts_bool cluster_vertex_neighbor_check(ts_cluster_list *cstlist, ts_vertex *vtx){
 
 	int j;
 	for(j=0;j<vtx->neigh_no;j++){
 		if(vtx->neigh[j]->cluster!=NULL){
 			if(vtx->neigh[j]->cluster!=vtx->cluster){
-				cluster_join(vtx->cluster, vtx->neigh[j]->cluster);
+				cluster_join(cstlist, vtx->cluster, vtx->neigh[j]->cluster);
 			}
 		}
 	}
@@ -136,7 +143,7 @@ ts_bool clusterize_vesicle(ts_vesicle *vesicle, ts_cluster_list *cstlist){
 	//for each vertex
 		vtx=vesicle->vlist->vtx[i];
 		if(is_clusterable(vtx)){
-			if(vtx->cluster!=NULL){
+			if(vtx->cluster==NULL){
 				//find first neigbor with cluster index
 				cst=cluster_vertex_neighbor(vtx);
 				if(cst==NULL){
@@ -146,7 +153,7 @@ ts_bool clusterize_vesicle(ts_vesicle *vesicle, ts_cluster_list *cstlist){
 				} else {
 					//we are added to the first cluster found
 					cluster_add_vertex(cst,vtx);
-					cluster_vertex_neighbor_check(vtx);
+					cluster_vertex_neighbor_check(cstlist, vtx);
 					cluster_list_compact(cstlist);
 				}
 

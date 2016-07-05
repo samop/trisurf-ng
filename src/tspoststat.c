@@ -18,6 +18,7 @@
 #include "shcomplex.h"
 #include "dumpstate.h"
 #include "restore.h"
+#include "cluster.h"
 #include <string.h>
 #include <getopt.h>
 #include <sys/stat.h>
@@ -103,6 +104,10 @@ int main(){
 			fprintf(stdout,"%d %.17e %.17e %.17e %.17e %.17e %.17e\n",atoi(number),vesicle->volume, vesicle->area,l1,l2,l3, (ts_double)count_bonds_with_energy(vesicle->blist)/(ts_double)vesicle->blist->n),
                     	tstep++;
 
+			ts_cluster_list *cstlist=init_cluster_list();
+			clusterize_vesicle(vesicle,cstlist);
+			printf("No clusters=%d\n",cstlist->n);
+			cluster_list_free(cstlist);
                     free(number);
 			tape_free(vesicle->tape);
 			vesicle_free(vesicle);
