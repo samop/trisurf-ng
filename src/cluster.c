@@ -95,8 +95,12 @@ ts_bool cluster_list_free(ts_cluster_list *cstlist){
 
 /* This is a stub function. User should check whether the vertex is clustering or not. */
 ts_bool is_clusterable(ts_vertex *vtx){
-
-return 1;
+	if(fabs(vtx->c)>1e-6){
+		return 1;
+	}
+	else {
+		return 0;
+	}
 }
 
 
