@@ -820,7 +820,7 @@ ts_bool write_master_xml_file(ts_char *filename){
 	return TS_SUCCESS;
 }
 
-ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
+ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno, ts_cluster_list *cstlist){
 	ts_vertex_list *vlist=vesicle->vlist;
 	ts_bond_list *blist=vesicle->blist;
 	ts_vertex **vtx=vlist->vtx;
@@ -887,7 +887,40 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 	}
 
     	fprintf(fh,"</DataArray>\n");
-	
+	if(cstlist!=NULL){
+		fprintf(fh,"<DataArray type=\"Int64\" Name=\"vertices_in_cluster\" format=\"ascii\">");
+		for(i=0;i<vlist->n;i++){
+			if(vtx[i]->cluster!=NULL){
+				fprintf(fh,"%u ",vtx[i]->cluster->nvtx);
+			} else {
+				fprintf(fh,"-1 ");
+			}
+	    	}
+		//polymeres
+		if(poly){
+			poly_idx=vlist->n;
+			for(i=0;i<vesicle->poly_list->n;i++){
+				for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++,poly_idx++){
+					fprintf(fh,"-1 ");
+				}
+			}
+		}
+		//filaments
+		if(fil){
+			poly_idx=vlist->n+monono*polyno;
+			for(i=0;i<vesicle->filament_list->n;i++){
+				for(j=0;j<vesicle->filament_list->poly[i]->vlist->n;j++,poly_idx++){
+		//	fprintf(stderr,"was here\n");
+					fprintf(fh,"-1 ");
+				}
+			}
+		}
+
+		fprintf(fh,"</DataArray>\n");
+
+
+	}
+
 	//here comes additional data as needed. Currently only spontaneous curvature
 	fprintf(fh,"<DataArray type=\"Float64\" Name=\"spontaneous_curvature\" format=\"ascii\">");
 	for(i=0;i<vlist->n;i++){

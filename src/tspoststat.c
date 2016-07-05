@@ -70,7 +70,7 @@ ts_bool write_histogram_data(ts_uint timestep_no, ts_vesicle *vesicle){
 	ts_cluster_list *cstlist=init_cluster_list();
 	clusterize_vesicle(vesicle,cstlist);
 	//printf("No clusters=%d\n",cstlist->n);
-	int k,i,cnt;
+	int k,i,cnt, test=0;
 	int max_nvtx=0;
 	char filename[255];
 	sprintf(filename,"histogram_%.6u.csv",timestep_no);
@@ -84,12 +84,15 @@ ts_bool write_histogram_data(ts_uint timestep_no, ts_vesicle *vesicle){
 		for(k=0;k<cstlist->n;k++)
 			if(cstlist->cluster[k]->nvtx==i) cnt++;
 		fprintf(fd,"%d %d\n",i,cnt);
+		test+=cnt*i;
 	}
 	//for(k=0;k<cstlist->n;k++){
 //		printf("*Cluster %d has %d vertices\n",k,cstlist->cluster[k]->nvtx);
 //	}
 
 	fclose(fd);
+//	printf("*Sum of all vertices in clusters: %d\n", test);
+//	write_vertex_xml_file(vesicle,timestep_no,cstlist);
 	cluster_list_free(cstlist);
 	
 	return TS_SUCCESS;
