@@ -1,7 +1,7 @@
 import argparse
 import paramiko
 from . import Remote
-from trisurf import trisurf
+from . import trisurf
 import socket
 import sys
 import tabulate
@@ -9,9 +9,11 @@ import subprocess,re
 import psutil
 #import http.server
 #import socketserver
-from urllib.parse import urlparse
-
-from . import WebTrisurf
+if sys.version_info>=(3,0):
+	from urllib.parse import urlparse
+	from . import WebTrisurf
+else:
+	from urlparse import urlparse
 #import io
 
 
@@ -169,7 +171,10 @@ def delete_comments(args,host):
 
 def start_web_server(args,host):
 	print('Server listening on port {}'.format(args['web_server'][0]))
-	WebTrisurf.WebServer(port=args['web_server'][0])
+	if sys.version_info>=(3,0):
+		WebTrisurf.WebServer(port=args['web_server'][0])
+	else:
+		print("Cannot start WebServer in python 2.7")
 	exit(0)
 
 def perform_action(args,host):

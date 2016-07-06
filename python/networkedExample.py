@@ -4,7 +4,6 @@ from trisurf import tsmgr
 
 
 
-
 #Ok... Configure your keys:
 #ssh-keygen
 #and copy them to all the remote hosts

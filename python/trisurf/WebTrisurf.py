@@ -1,8 +1,11 @@
 import subprocess
-from urllib.parse import urlparse
+import sys, os
+if sys.version_info>=(3,0):
+	from urllib.parse import urlparse
+else:
+	from urlparse import urlparse
 import http.server
 import socketserver
-import sys, os
 
 #Web server
 class TsWEB(http.server.BaseHTTPRequestHandler):
