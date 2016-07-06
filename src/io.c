@@ -1182,6 +1182,7 @@ ts_tape *parsetapebuffer(char *buffer){
 	CFG_SIMPLE_INT("number_of_vertices_with_c0", &tape->number_of_vertices_with_c0),
 	CFG_SIMPLE_FLOAT("c0",&tape->c0),
 	CFG_SIMPLE_FLOAT("w",&tape->w),
+	CFG_SIMPLE_FLOAT("F",&tape->F),
         CFG_END()
     };
     cfg_t *cfg;    

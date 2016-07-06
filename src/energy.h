@@ -7,5 +7,5 @@ inline ts_bool bond_energy(ts_bond *bond,ts_poly *poly);
 
 ts_bool sweep_attraction_bond_energy(ts_vesicle *vesicle);
 inline ts_bool attraction_bond_energy(ts_bond *bond, ts_double w);
-
+ts_double direct_force_energy(ts_vesicle *vesicle, ts_vertex *vtx, ts_vertex *vtx_old);
 #endif

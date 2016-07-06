@@ -207,3 +207,30 @@ inline ts_bool attraction_bond_energy(ts_bond *bond, ts_double w){
 	}
 	return TS_SUCCESS;
 }
+
+ts_double direct_force_energy(ts_vesicle *vesicle, ts_vertex *vtx, ts_vertex *vtx_old){
+	if(fabs(vtx->c)<1e-15) return 0.0;
+//	printf("was here");
+	if(fabs(vesicle->tape->F)<1e-15) return 0.0;
+
+	ts_double norml,ddp=0.0;
+	ts_uint i;
+	ts_double xnorm=0.0,ynorm=0.0,znorm=0.0;
+	/*find normal of the vertex as average normal of all the triangles surrounding it. */
+	for(i=0;i<vtx->tristar_no;i++){
+			xnorm=vtx->tristar[i]->xnorm;
+			ynorm=vtx->tristar[i]->ynorm;
+			znorm=vtx->tristar[i]->znorm;
+	}
+	/*normalize*/
+	norml=sqrt(xnorm*xnorm+ynorm*ynorm+znorm*znorm);
+	xnorm/=norml;
+	ynorm/=norml;
+	znorm/=norml;
+	/*calculate ddp, perpendicular displacement*/
+	ddp=xnorm*(vtx->x-vtx_old->x)+xnorm*(vtx->y-vtx_old->y)+znorm*(vtx->z-vtx_old->z);
+	/*calculate dE*/
+//	printf("ddp=%e",ddp);
+	return vesicle->tape->F*ddp;		
+	
+}

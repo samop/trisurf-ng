@@ -287,6 +287,7 @@ typedef struct {
 	long int number_of_vertices_with_c0;
 	ts_double c0;
 	ts_double w;
+	ts_double F;
 } ts_tape;
 
 
