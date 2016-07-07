@@ -14,6 +14,7 @@ if sys.version_info>=(3,0):
 	from . import WebTrisurf
 else:
 	from urlparse import urlparse
+	from vtk import *
 #import io
 
 
@@ -42,6 +43,7 @@ def ParseCLIArguments(arguments):
 	action_group.add_argument('-s','--status',help='print status of the processes',action='store_true')
 	action_group.add_argument('-v','--version', help='print version information and exit', action='store_true')
 	action_group.add_argument('--web-server', type=int,metavar="PORT", nargs=1, help='EXPERIMENTAL: starts web server and never exist.')
+	action_group.add_argument('-p','--preview',help='preview last VTU shape',action='store_true')
 	parser.add_argument('--force', help='if dangerous operation (killing all the processes) is requested, this flag is required to execute the operation. Otherwise, the request will be ignored.', action="store_true")
 	parser.add_argument('-H', '--host', nargs=1, help='specifies which host is itended for the operation. Defauts to localhost for all operations except --status and --version, where all configured hosts are assumed.')
 	parser.add_argument('--html', help='Generate HTML output', action="store_true")
@@ -191,12 +193,59 @@ def perform_action(args,host):
 		delete_comments(args,host)
 	elif args['web_server']!=None:
 		start_web_server(args,host)
+	elif args['preview']:
+		preview_vtu(args,host)
 	else: #version requested
 		print(getTrisurfVersion())
 	return
 
 
-	
+
+def preview_vtu(args,host):
+	#only for localhost at the moment
+	filename=host['runs'][0].getLastVTU()
+	print(filename)
+	if sys.version_info>=(3,0):
+		print("Preview works only with python 2.7")
+		exit(1)
+	if host['name'] == socket.gethostname():
+		target_runs=getTargetRunIdxList(args)
+		#if target_runs==None:
+		#	target_runs=list(range(1,len(host['runs'])+1))
+		#for i in target_runs:
+		#	host['runs'][i-1].start()
+		reader=vtkXMLUnstructuredGridReader()
+		reader.SetFileName(filename)
+		reader.Update() # Needed because of GetScalarRange
+		output = reader.GetOutput()
+		scalar_range = output.GetScalarRange()
+
+		# Create the mapper that corresponds the objects of the vtk file
+		# into graphics elements
+		mapper = vtkDataSetMapper()
+		mapper.SetInput(output)
+		mapper.SetScalarRange(scalar_range)
+
+		# Create the Actor
+		actor = vtkActor()
+		actor.SetMapper(mapper)
+
+		# Create the Renderer
+		renderer = vtkRenderer()
+		renderer.AddActor(actor)
+		renderer.SetBackground(0, 0, 0) # Set background to white
+
+		# Create the RendererWindow
+		renderer_window = vtkRenderWindow()
+		renderer_window.AddRenderer(renderer)
+
+		# Create the RendererWindowInteractor and display the vtk_file
+		interactor = vtkRenderWindowInteractor()
+		interactor.SetRenderWindow(renderer_window)
+		interactor.Initialize()
+		interactor.Start()
+
+
 
 def getListOfHostConfigurationByHostname(hosts,host):
 	rhost=[]
