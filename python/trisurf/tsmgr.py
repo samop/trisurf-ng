@@ -3,7 +3,7 @@ import paramiko
 from . import Remote
 from . import trisurf
 import socket
-import sys
+import os,sys
 import tabulate
 import subprocess,re
 import psutil
@@ -203,7 +203,8 @@ def perform_action(args,host):
 
 def preview_vtu(args,host):
 	#only for localhost at the moment
-	filename=host['runs'][0].getLastVTU()
+	Dir=trisurf.Directory(maindir=host['runs'][0].maindir,simdir=host['runs'][0].subdir)
+	filename=os.path.join("./",Dir.fullpath(),host['runs'][0].getLastVTU())
 	print(filename)
 	if sys.version_info>=(3,0):
 		print("Preview works only with python 2.7")
