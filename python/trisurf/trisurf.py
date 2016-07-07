@@ -495,7 +495,7 @@ class Runner:
 
 
 	def getLastVTU(self):
-		vtuidx=self.getLastIteration() #-int(self.tape.getValue("inititer"))+1
+		vtuidx=self.getLastIteration()-int(self.tape.getValue("inititer"))
 		if vtuidx<0:
 			return None
 		else:
