@@ -2,7 +2,7 @@ import configobj
 import xml.etree.ElementTree as ET
 import base64
 import zlib
-import io
+import sys,io
 import os
 from itertools import islice
 import mmap
@@ -443,6 +443,8 @@ class Runner:
 		for p,v in zip(prefix,variables):
 			if(v=="xk0"):
 				tv=str(round(float(self.tape.config[v])))
+				if sys.version_info<(3,0):
+					tv=str(int(float(self.tape.config[v])))
 			else:
 				tv=self.tape.config[v]
 			maindir=maindir+p+tv
@@ -493,7 +495,7 @@ class Runner:
 
 
 	def getLastVTU(self):
-		vtuidx=self.getLastIteration()-int(self.tape.getValue("inititer"))+1
+		vtuidx=self.getLastIteration() #-int(self.tape.getValue("inititer"))+1
 		if vtuidx<0:
 			return None
 		else:
