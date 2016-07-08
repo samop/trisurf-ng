@@ -10,7 +10,9 @@ class Renderer:
 		self.args=args
 		self.renderer = vtkRenderer()
 		self.actor=self.lastActor()
+		self.textactor=self.textActor()
 		self.renderer.AddActor(self.actor)
+		self.renderer.AddActor(self.textactor)
 		self.renderer.SetBackground(0, 0, 0) # Set background to white
 
 		# Create the RendererWindow
@@ -33,6 +35,15 @@ class Renderer:
 		filename=os.path.join("./",Dir.fullpath(),self.host['runs'][0].getLastVTU())
 		return filename
 
+	def textActor(self):
+		textactor=vtkTextActor()
+		textactor.SetInput(self.filename)
+		tp=textactor.GetTextProperty()
+		tp.SetColor(1,1,1)
+		tp.SetFontSize(18)
+		textactor.SetDisplayPosition(20,30)
+		return textactor
+
 	def lastActor(self):
 		self.filename=self.lastVTU()
 		reader=vtkXMLUnstructuredGridReader()
@@ -52,10 +63,13 @@ class Renderer:
 
 	def RenderUpdate(self, obj, event):
 		if(self.lastVTU()!=self.filename):
-			print("updejt")
+			#print("updejt")
 			self.renderer.RemoveActor(self.actor)
+			self.renderer.RemoveActor(self.textactor)
 			self.actor=self.lastActor()
+			self.textactor=self.textActor()
 			self.renderer.AddActor(self.actor)
+			self.renderer.AddActor(self.textactor)
 			self.renderer_window.Render()
 		#self.render.RemoveActor(self.actor)
 		
