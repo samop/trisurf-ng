@@ -239,13 +239,28 @@ def preview_vtu(args,host):
 		# Create the RendererWindow
 		renderer_window = vtkRenderWindow()
 		renderer_window.AddRenderer(renderer)
-
+		
+# Set up a check for aborting rendering.
 		# Create the RendererWindowInteractor and display the vtk_file
 		interactor = vtkRenderWindowInteractor()
 		interactor.SetRenderWindow(renderer_window)
 		interactor.Initialize()
+# 		interactor.AddObserver("TimerEvent", RenderUpdate)
+#		timerIDR = interactor.CreateRepeatingTimer(1000)
 		interactor.Start()
 
+def RenderUpdate(obj, event):
+	# obj will be the object generating the event.  In this case it
+	# is renWin
+	window=obj.GetRenderWindow() #.GetRenderer()
+	renderer=window.GetRenderers()
+	try:
+		actor=renderer.GetActors()
+	except:
+		pass
+	actor=renderer.GetActors()
+	print(actor)
+	
 
 
 def getListOfHostConfigurationByHostname(hosts,host):
