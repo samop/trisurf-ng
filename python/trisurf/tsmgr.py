@@ -15,6 +15,7 @@ if sys.version_info>=(3,0):
 else:
 	from urlparse import urlparse
 	from vtk import *
+	from . import VTKRendering
 #import io
 
 
@@ -203,50 +204,11 @@ def perform_action(args,host):
 
 def preview_vtu(args,host):
 	#only for localhost at the moment
-	Dir=trisurf.Directory(maindir=host['runs'][0].maindir,simdir=host['runs'][0].subdir)
-	filename=os.path.join("./",Dir.fullpath(),host['runs'][0].getLastVTU())
-	print(filename)
 	if sys.version_info>=(3,0):
 		print("Preview works only with python 2.7")
 		exit(1)
 	if host['name'] == socket.gethostname():
-		target_runs=getTargetRunIdxList(args)
-		#if target_runs==None:
-		#	target_runs=list(range(1,len(host['runs'])+1))
-		#for i in target_runs:
-		#	host['runs'][i-1].start()
-		reader=vtkXMLUnstructuredGridReader()
-		reader.SetFileName(filename)
-		reader.Update() # Needed because of GetScalarRange
-		output = reader.GetOutput()
-		scalar_range = output.GetScalarRange()
-
-		# Create the mapper that corresponds the objects of the vtk file
-		# into graphics elements
-		mapper = vtkDataSetMapper()
-		mapper.SetInput(output)
-		mapper.SetScalarRange(scalar_range)
-
-		# Create the Actor
-		actor = vtkActor()
-		actor.SetMapper(mapper)
-
-		# Create the Renderer
-		renderer = vtkRenderer()
-		renderer.AddActor(actor)
-		renderer.SetBackground(0, 0, 0) # Set background to white
-
-		# Create the RendererWindow
-		renderer_window = vtkRenderWindow()
-		renderer_window.AddRenderer(renderer)
-
-		# Create the RendererWindowInteractor and display the vtk_file
-		interactor = vtkRenderWindowInteractor()
-		interactor.SetRenderWindow(renderer_window)
-		interactor.Initialize()
-		interactor.Start()
-
-
+		VTKRendering.Renderer(args,host)
 
 def getListOfHostConfigurationByHostname(hosts,host):
 	rhost=[]
