@@ -14,11 +14,16 @@ class Renderer:
 		self.renderer.AddActor(self.actor)
 		self.renderer.AddActor(self.textactor)
 		self.renderer.SetBackground(0, 0, 0) # Set background to white
-
 		# Create the RendererWindow
 		self.renderer_window = vtkRenderWindow()
 		self.renderer_window.AddRenderer(self.renderer)
-		
+		self.renderer_window.SetSize(1200,600)
+	
+		self.renderer.SetViewport(0.0,0.0,0.5,1.0)
+		rend=vtk.vtkRenderer()
+		rend.AddActor(self.actor)
+		rend.SetViewport(0.5,0.0,1.0,1.0)
+		self.renderer_window.AddRenderer(rend)	
 # Set up a check for aborting rendering.
 		# Create the RendererWindowInteractor and display the vtk_file
 		interactor = vtkRenderWindowInteractor()
@@ -40,7 +45,7 @@ class Renderer:
 		textactor.SetInput(self.filename)
 		tp=textactor.GetTextProperty()
 		tp.SetColor(1,1,1)
-		tp.SetFontSize(18)
+		tp.SetFontSize(11)
 		textactor.SetDisplayPosition(20,30)
 		return textactor
 
