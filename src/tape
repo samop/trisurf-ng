@@ -39,7 +39,7 @@ nfil=0
 # nfono is a number of monomers in each filament
 nfono=3
 # Persistence lenght of the filaments (in units l_min)
-xi=0
+xi=100
 
 ####### Nucleus (inside the vesicle) ###########
 # Radius of an impenetrable hard sphere inside the vesicle
@@ -71,6 +71,8 @@ spherical_harmonics_coefficients=21
 
 #shut up if we are using cluster!!!
 quiet=false
+ 
+
 
 #what type of multiprocessing? (*none, smp, cluster, distributed, cuda, auto)
 #currently only none makes sense.
