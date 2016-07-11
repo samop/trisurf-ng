@@ -83,6 +83,7 @@ ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vli
 
 	if (vlist!=NULL){
 	/* Make straight grafted poylmers normal to membrane (polymer brush). Dist. between poly vertices put to 1*/
+		ts_int intpoly=vesicle->tape->internal_poly;
 		for (i=0;i<poly_list->n;i++){
 	
 			xnorm=0.0;
@@ -94,6 +95,9 @@ ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vli
 				znorm-=poly_list->poly[i]->grafted_vtx->tristar[j]->znorm;	
 			}
 			normlength=sqrt(xnorm*xnorm+ynorm*ynorm+znorm*znorm);
+			if(intpoly && i%2){
+				normlength=-normlength;
+			}
 			xnorm=xnorm/normlength;
 			ynorm=ynorm/normlength;
 			znorm=znorm/normlength;

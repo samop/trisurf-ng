@@ -1066,6 +1066,7 @@ ts_tape *parsetapebuffer(char *buffer){
         CFG_SIMPLE_INT("nmono", &tape->nmono),
 	CFG_SIMPLE_INT("nfil",&tape->nfil),
 	CFG_SIMPLE_INT("nfono",&tape->nfono),
+	CFG_SIMPLE_INT("internal_poly",&tape->internal_poly),
 	CFG_SIMPLE_INT("R_nucleus",&tape->R_nucleus),
 	CFG_SIMPLE_FLOAT("R_nucleusX",&tape->R_nucleusX),
 	CFG_SIMPLE_FLOAT("R_nucleusY",&tape->R_nucleusY),
