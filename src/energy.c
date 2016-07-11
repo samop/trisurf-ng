@@ -216,11 +216,11 @@ ts_double direct_force_energy(ts_vesicle *vesicle, ts_vertex *vtx, ts_vertex *vt
 	ts_double norml,ddp=0.0;
 	ts_uint i;
 	ts_double xnorm=0.0,ynorm=0.0,znorm=0.0;
-	/*find normal of the vertex as average normal of all the triangles surrounding it. */
+	/*find normal of the vertex as sum of all the normals of the triangles surrounding it. */
 	for(i=0;i<vtx->tristar_no;i++){
-			xnorm=vtx->tristar[i]->xnorm;
-			ynorm=vtx->tristar[i]->ynorm;
-			znorm=vtx->tristar[i]->znorm;
+			xnorm+=vtx->tristar[i]->xnorm;
+			ynorm+=vtx->tristar[i]->ynorm;
+			znorm+=vtx->tristar[i]->znorm;
 	}
 	/*normalize*/
 	norml=sqrt(xnorm*xnorm+ynorm*ynorm+znorm*znorm);
