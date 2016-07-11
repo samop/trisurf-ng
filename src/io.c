@@ -861,8 +861,8 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 	fprintf(fh, "<?xml version=\"1.0\"?>\n<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\" compressor=\"vtkZLibDataCompressor\">\n");
 	xml_trisurf_data(fh,vesicle);
 	fprintf(fh, " <UnstructuredGrid>\n");
-    fprintf(fh, "<Piece NumberOfPoints=\"%u\" NumberOfCells=\"%u\">\n",vlist->n+monono*polyno+fonono*filno, blist->n+monono*polyno+filno*(fonono-1));
-    fprintf(fh,"<PointData Scalars=\"vertices_idx\">\n<DataArray type=\"Int64\" Name=\"vertices_idx\" format=\"ascii\">");
+    fprintf(fh, "<Piece NumberOfPoints=\"%u\" NumberOfCells=\"%u\">\n",vlist->n+monono*polyno+fonono*filno, blist->n+monono*polyno+filno*(fonono-1)+vesicle->tlist->n);
+    fprintf(fh,"<PointData Scalars=\"scalars\">\n<DataArray type=\"Int64\" Name=\"scalars\" format=\"ascii\">");
    	for(i=0;i<vlist->n;i++){
 		fprintf(fh,"%u ",vtx[i]->idx);
     }
@@ -887,61 +887,6 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 	}
 
     	fprintf(fh,"</DataArray>\n");
-	
-	//here comes additional data as needed. Currently only spontaneous curvature
-	fprintf(fh,"<DataArray type=\"Float64\" Name=\"spontaneous_curvature\" format=\"ascii\">");
-	for(i=0;i<vlist->n;i++){
-		fprintf(fh,"%.17e ",vtx[i]->c);
-	}
-		//polymeres
-		if(poly){
-			poly_idx=vlist->n;
-			for(i=0;i<vesicle->poly_list->n;i++){
-				for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++,poly_idx++){
-					fprintf(fh,"%.17e ", vesicle->poly_list->poly[i]->vlist->vtx[j]->c);
-				}
-			}
-		}
-		//filaments
-		if(fil){
-			poly_idx=vlist->n+monono*polyno;
-			for(i=0;i<vesicle->filament_list->n;i++){
-				for(j=0;j<vesicle->filament_list->poly[i]->vlist->n;j++,poly_idx++){
-		//	fprintf(stderr,"was here\n");
-					fprintf(fh,"%.17e ",  vesicle->filament_list->poly[i]->vlist->vtx[j]->c);
-				}
-			}
-		}
-    fprintf(fh,"</DataArray>\n");
-
-	//here comes additional data. Energy!
-	fprintf(fh,"<DataArray type=\"Float64\" Name=\"bending_energy\" format=\"ascii\">");
-	for(i=0;i<vlist->n;i++){
-		fprintf(fh,"%.17e ",vtx[i]->energy*vtx[i]->xk);
-	}
-		//polymeres
-		if(poly){
-			poly_idx=vlist->n;
-			for(i=0;i<vesicle->poly_list->n;i++){
-				for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++,poly_idx++){
-					fprintf(fh,"%.17e ", vesicle->poly_list->poly[i]->vlist->vtx[j]->energy* vesicle->poly_list->poly[i]->k);
-				}
-			}
-		}
-		//filaments
-		if(fil){
-			poly_idx=vlist->n+monono*polyno;
-			for(i=0;i<vesicle->filament_list->n;i++){
-				for(j=0;j<vesicle->filament_list->poly[i]->vlist->n;j++,poly_idx++){
-		//	fprintf(stderr,"was here\n");
-					fprintf(fh,"%.17e ",  vesicle->filament_list->poly[i]->vlist->vtx[j]->energy*  vesicle->filament_list->poly[i]->k);
-				}
-			}
-		}
-    fprintf(fh,"</DataArray>\n");
-
-
-
 	
 	fprintf(fh,"</PointData>\n<CellData>\n</CellData>\n<Points>\n<DataArray type=\"Float64\" Name=\"Koordinate tock\" NumberOfComponents=\"3\" format=\"ascii\">\n");
 	for(i=0;i<vlist->n;i++){
@@ -994,17 +939,24 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 		}
 
 	}
-
+	for(i=0;i<vesicle->tlist->n;i++){
+		fprintf(fh,"%u %u %u\n", vesicle->tlist->tria[i]->vertex[0]->idx, vesicle->tlist->tria[i]->vertex[1]->idx, vesicle->tlist->tria[i]->vertex[2]->idx);
+	}
     fprintf(fh,"</DataArray>\n<DataArray type=\"Int64\" Name=\"offsets\" format=\"ascii\">");
     for (i=2;i<(blist->n+monono*polyno+(fonono-1)*filno)*2+1;i+=2){
     fprintf(fh,"%u ",i);
     }
+	for(j=i+1;j<i+3*(vesicle->tlist->n);j+=3){ //let's continue counting from where we left of
+		fprintf(fh,"%u ", j);
+	}
     fprintf(fh,"\n");
     fprintf(fh,"</DataArray>\n<DataArray type=\"UInt8\" Name=\"types\" format=\"ascii\">\n");
-     for (i=0;i<blist->n+monono*polyno+fonono*filno;i++){
+     for (i=0;i<blist->n+monono*polyno+(fonono-1)*filno;i++){
         fprintf(fh,"3 ");
     }
-
+	for(i=0;i<vesicle->tlist->n;i++){
+		fprintf(fh,"5 ");
+	}
     fprintf(fh,"</DataArray>\n</Cells>\n</Piece>\n</UnstructuredGrid>\n</VTKFile>\n");
     fclose(fh);
     return TS_SUCCESS;
