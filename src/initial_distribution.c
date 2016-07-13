@@ -100,7 +100,7 @@ ts_bool set_vesicle_values_from_tape(ts_vesicle *vesicle){
 	vesicle->clist->ncmax[0]=tape->ncxmax;
 	vesicle->clist->ncmax[1]=tape->ncymax;
 	vesicle->clist->ncmax[2]=tape->nczmax;
-	vesicle->clist->max_occupancy=8; /* hard coded max occupancy? */
+	vesicle->clist->max_occupancy=16; /* hard coded max occupancy? */
 
 	vesicle->pressure= tape->pressure;
 	vesicle->pswitch=tape->pswitch;
