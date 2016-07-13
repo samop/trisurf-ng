@@ -53,44 +53,15 @@ ts_poly	*init_poly(ts_uint n, ts_vertex *grafted_vtx){
 }
 
 
-ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vlist, ts_vesicle *vesicle){
-	ts_poly_list *poly_list=(ts_poly_list *)calloc(1,sizeof(ts_poly_list));
-	poly_list->poly	= (ts_poly **)calloc(n_poly,sizeof(ts_poly *));
-	ts_uint i=0,j=0,k; //idx;
-	ts_uint gvtxi;
-	ts_double xnorm,ynorm,znorm,normlength;
-	ts_double dphi,dh;
-	cell_occupation(vesicle); //needed for evading the membrane
-	// Grafting polymers:
-	if (vlist!=NULL){
-		if (n_poly > vlist->n){fatal("Number of polymers larger than numbero f vertices on a vesicle.",310);}
-	
-		while(i<n_poly){
-			gvtxi = rand() % vlist->n;
-			if (vlist->vtx[gvtxi]->grafted_poly == NULL){
-			poly_list->poly[i] = init_poly(n_mono, vlist->vtx[gvtxi]);
-			i++;
-			}
-		}
-	}
-	else
-	{
-		for(i=0;i<n_poly;i++){
-			poly_list->poly[i] = init_poly(n_mono, NULL);
-		}
-	}
 
-	poly_list->n = n_poly;
-
-	if (vlist!=NULL){
+ts_bool poly_initial_distribution(ts_poly_list *poly_list, ts_int i, ts_vesicle *vesicle){
 	/* Make straight grafted poylmers normal to membrane (polymer brush). Dist. between poly vertices put to 1*/
+		ts_double xnorm,ynorm,znorm,normlength;
 		ts_int intpoly=vesicle->tape->internal_poly;
 		ts_int cellidx;
 		ts_double posX,posY,posZ,prevPosX,prevPosY,prevPosZ, phi,costheta,sintheta;
 		ts_bool retval;
-		ts_int l;
-		for (i=0;i<poly_list->n;i++){
-	
+		ts_int j,k,l,m;
 			xnorm=0.0;
 			ynorm=0.0;
 			znorm=0.0;
@@ -106,7 +77,6 @@ ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vli
 			xnorm=xnorm/normlength;
 			ynorm=ynorm/normlength;
 			znorm=znorm/normlength;
-
 			//prepare starting position for building the polymeres
 			prevPosX=poly_list->poly[i]->grafted_vtx->x;
 			prevPosY=poly_list->poly[i]->grafted_vtx->y;
@@ -123,91 +93,101 @@ ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vli
 				//}
 				//trying to go towards normal
 				k=0;
-				l=0;
 				while(1){
 					poly_list->poly[i]->vlist->vtx[j]->x = posX;
 					poly_list->poly[i]->vlist->vtx[j]->y = posY;
 					poly_list->poly[i]->vlist->vtx[j]->z = posZ;
 					cellidx=vertex_self_avoidance(vesicle, poly_list->poly[i]->vlist->vtx[j]);
 					retval=cell_occupation_number_and_internal_proximity(vesicle->clist,cellidx,poly_list->poly[i]->vlist->vtx[j]);
-
 					if(retval==TS_SUCCESS){
-						//retval=cell_add_vertex(vesicle->clist->cell[cellidx],poly_list->poly[i]->vlist->vtx[j]);
+						retval=cell_add_vertex(vesicle->clist->cell[cellidx],poly_list->poly[i]->vlist->vtx[j]);
 						break;
 					}
 					else{
 					//	printf("%d %d Cannot put the vertex here. Finding another position\n",i,j);
 						//randomly change the direction.
-						do{
-						costheta=2.0*drand48()-1.0;
-						sintheta=sqrt(1-pow(costheta,2));
-						phi=drand48()*2.0*M_PI;
-						if(j==0){
-						//for special cases, when we are on the edge of bipytamid  the distance od dmin_interspecies is not enough
-						posX=prevPosX+vesicle->dmax*sintheta*cos(phi);
-						posY=prevPosY+vesicle->dmax*sintheta*sin(phi);
-						posZ=prevPosZ+vesicle->dmax*costheta;
-
-
-						} else {
-						posX=prevPosX+vesicle->clist->dmin_interspecies*sintheta*cos(phi);
-						posY=prevPosY+vesicle->clist->dmin_interspecies*sintheta*sin(phi);
-						posZ=prevPosZ+vesicle->clist->dmin_interspecies*costheta;
-						}
-					//	if(j>0) break;
-					//	if((xnorm*sintheta*cos(phi)+ynorm*sintheta*sin(phi)+znorm*costheta)<0.0 && j==0) break;
-						}
-					//	while(j==0);
+						m=0;
 						//we must move first vertex into the vesicle if the normal is in or out of the vesicle if the normal is out
+						do{
+							costheta=2.0*drand48()-1.0;
+							sintheta=sqrt(1-pow(costheta,2));
+							phi=drand48()*2.0*M_PI;
+							if(j==0){
+						//for special cases, when we are on the edge of bipyramid  the distance od dmin_interspecies is not enough
+								posX=prevPosX+vesicle->dmax*sintheta*cos(phi);
+								posY=prevPosY+vesicle->dmax*sintheta*sin(phi);
+								posZ=prevPosZ+vesicle->dmax*costheta;
+
+							} else {
+								posX=prevPosX+vesicle->clist->dmin_interspecies*sintheta*cos(phi);
+								posY=prevPosY+vesicle->clist->dmin_interspecies*sintheta*sin(phi);
+								posZ=prevPosZ+vesicle->clist->dmin_interspecies*costheta;
+							}
+							m++;
+							if(m>1000) {
+								k=9999; //break also ot of the outer loop
+								printf("was here\n");
+								break;
+							}
+						}
 						while((xnorm*(poly_list->poly[i]->grafted_vtx->x-posX)+ynorm*(poly_list->poly[i]->grafted_vtx->y-posY)+znorm*(poly_list->poly[i]->grafted_vtx->z-posZ))>0.0 && j==0);
 					}
 					k++;
 					if(k>1000){
-						//lets choose another grafting vertex;
-						while(1){
-							gvtxi = rand() % vesicle->vlist->n;
-							if (vesicle->vlist->vtx[gvtxi]->grafted_poly == NULL){
-								ts_fprintf(stdout,"Found new potential grafting vertex %d for poly %d\n",gvtxi,i);
-								poly_list->poly[i]->grafted_vtx->grafted_poly=NULL;
-								poly_list->poly[i]->grafted_vtx = vesicle->vlist->vtx[gvtxi];
-								vesicle->vlist->vtx[gvtxi]->grafted_poly = poly_list->poly[i];
-								l++;
-								k=0;
-								xnorm=0.0;
-								ynorm=0.0;
-								znorm=0.0;
-								int o;
-								for (o=0;o<poly_list->poly[i]->grafted_vtx->tristar_no;o++){
-									xnorm-=poly_list->poly[i]->grafted_vtx->tristar[o]->xnorm;
-									ynorm-=poly_list->poly[i]->grafted_vtx->tristar[o]->ynorm;
-									znorm-=poly_list->poly[i]->grafted_vtx->tristar[o]->znorm;	
-								}
-								normlength=sqrt(xnorm*xnorm+ynorm*ynorm+znorm*znorm);
-								if(intpoly && i%2){
-									normlength=-normlength;
-								}
-								xnorm=xnorm/normlength;
-								ynorm=ynorm/normlength;
-								znorm=znorm/normlength;
-								prevPosX=poly_list->poly[i]->grafted_vtx->x;
-								prevPosY=poly_list->poly[i]->grafted_vtx->y;
-								prevPosZ=poly_list->poly[i]->grafted_vtx->z;
-								//prepare starting position for building the polymeres
-								posX=prevPosX+xnorm*(vesicle->clist->dmin_interspecies);
-								posY=prevPosY+ynorm*(vesicle->clist->dmin_interspecies);
-								posZ=prevPosZ+znorm*(vesicle->clist->dmin_interspecies);
-								break;
-							}
+						//undo changes to the cell
+						for(l=0;l<j-1;l++){
+							cellidx=vertex_self_avoidance(vesicle, poly_list->poly[i]->vlist->vtx[l]);
+							cell_remove_vertex(vesicle->clist->cell[cellidx],poly_list->poly[i]->vlist->vtx[l]);
 						}
-						if(l>1000)
-							fatal("Cannot make internal polymeres. No space inside the vesicle?",1001);
+						return TS_FAIL;
 					}
 				}
 				prevPosX=posX;
 				prevPosY=posY;
 				prevPosZ=posZ;
 			}
+	printf("did it\n");
+	return TS_SUCCESS;
+
+}
+
+
+ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vlist, ts_vesicle *vesicle){
+	ts_poly_list *poly_list=(ts_poly_list *)calloc(1,sizeof(ts_poly_list));
+	poly_list->poly	= (ts_poly **)calloc(n_poly,sizeof(ts_poly *));
+	ts_uint i=0,j=0; //idx;
+	ts_uint gvtxi;
+	ts_bool retval;
+	ts_double dphi,dh;
+	cell_occupation(vesicle); //needed for evading the membrane
+	// Grafting polymers:
+	if (vlist!=NULL){
+		if (n_poly > vlist->n){fatal("Number of polymers larger than numbero f vertices on a vesicle.",310);}
+	
+		while(i<n_poly){
+			gvtxi = rand() % vlist->n;
+			if (vlist->vtx[gvtxi]->grafted_poly == NULL){
+				poly_list->poly[i] = init_poly(n_mono, vlist->vtx[gvtxi]);
+				retval=poly_initial_distribution(poly_list, i, vesicle);
+				if(retval==TS_FAIL){
+					ts_fprintf(stdout,"Found new potential grafting vertex %d for poly %d\n",gvtxi,i);
+				}
+				else {
+					i++;
+				}
+			}
 		}
+	}
+	else
+	{
+		for(i=0;i<n_poly;i++){
+			poly_list->poly[i] = init_poly(n_mono, NULL);
+		}
+	}
+
+	poly_list->n = n_poly;
+
+	if (vlist!=NULL){
 	}
 	else
 	{
