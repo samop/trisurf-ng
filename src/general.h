@@ -257,6 +257,7 @@ typedef struct {
 	long int nczmax;
 	long int npoly;
 	long int nmono;
+	long int internal_poly;
 	long int nfil;
 	long int nfono;
 	long int R_nucleus;

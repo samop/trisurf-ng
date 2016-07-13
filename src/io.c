@@ -888,7 +888,6 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 
     	fprintf(fh,"</DataArray>\n");
 	
-	
 	fprintf(fh,"</PointData>\n<CellData>\n</CellData>\n<Points>\n<DataArray type=\"Float64\" Name=\"Koordinate tock\" NumberOfComponents=\"3\" format=\"ascii\">\n");
 	for(i=0;i<vlist->n;i++){
 		fprintf(fh,"%.17e %.17e %.17e\n",vtx[i]->x,vtx[i]->y, vtx[i]->z);
@@ -1066,6 +1065,7 @@ ts_tape *parsetapebuffer(char *buffer){
         CFG_SIMPLE_INT("nmono", &tape->nmono),
 	CFG_SIMPLE_INT("nfil",&tape->nfil),
 	CFG_SIMPLE_INT("nfono",&tape->nfono),
+	CFG_SIMPLE_INT("internal_poly",&tape->internal_poly),
 	CFG_SIMPLE_INT("R_nucleus",&tape->R_nucleus),
 	CFG_SIMPLE_FLOAT("R_nucleusX",&tape->R_nucleusX),
 	CFG_SIMPLE_FLOAT("R_nucleusY",&tape->R_nucleusY),
