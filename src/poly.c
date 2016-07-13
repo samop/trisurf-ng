@@ -135,7 +135,7 @@ ts_bool poly_initial_distribution(ts_poly_list *poly_list, ts_int i, ts_vesicle 
 					k++;
 					if(k>1000){
 						//undo changes to the cell
-						for(l=0;l<j-1;l++){
+						for(l=0;l<j;l++){
 							cellidx=vertex_self_avoidance(vesicle, poly_list->poly[i]->vlist->vtx[l]);
 							cell_remove_vertex(vesicle->clist->cell[cellidx],poly_list->poly[i]->vlist->vtx[l]);
 						}
@@ -161,9 +161,9 @@ ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vli
 	ts_double dphi,dh;
 	cell_occupation(vesicle); //needed for evading the membrane
 	// Grafting polymers:
+	int tries=0;
 	if (vlist!=NULL){
 		if (n_poly > vlist->n){fatal("Number of polymers larger than numbero f vertices on a vesicle.",310);}
-	
 		while(i<n_poly){
 			gvtxi = rand() % vlist->n;
 			if (vlist->vtx[gvtxi]->grafted_poly == NULL){
@@ -171,9 +171,15 @@ ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vli
 				retval=poly_initial_distribution(poly_list, i, vesicle);
 				if(retval==TS_FAIL){
 					ts_fprintf(stdout,"Found new potential grafting vertex %d for poly %d\n",gvtxi,i);
+					poly_free(poly_list->poly[i]);
+					tries++;
 				}
 				else {
+					tries=0;
 					i++;
+				}
+				if(tries>5000){
+					fatal("Cannot find space for inner polymeres",1001);
 				}
 			}
 		}
