@@ -25,9 +25,9 @@ constareaswitch=0
 
 ####### Polymer (brush) definitions ###########
 # npoly is a number of polymers attached to npoly distinct vertices on vesicle
-npoly=800
+npoly=400
 # nmono is a number of monomers in each polymer
-nmono=6
+nmono=10
 # Spring constant between monomers of the polymer
 k_spring=800
 #set to 1 if half of the polymeres are inside the vesicle
@@ -59,7 +59,7 @@ nzmax=60
 mcsweeps=200
 #how many initial mcsweeps*inititer MC sweeps before recording to disk?
 #2
-inititer=10
+inititer=1
 #how many records do you want on the disk iteration are there in a run?
 #10000
 iterations=100

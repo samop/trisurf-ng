@@ -6,7 +6,7 @@
 #include"bond.h"
 #include<math.h>
 #include"energy.h"
-
+#include"cell.h"
 ts_bool poly_assign_filament_xi(ts_vesicle *vesicle, ts_tape *tape){
 	ts_uint i;
 
@@ -55,7 +55,7 @@ ts_poly	*init_poly(ts_uint n, ts_vertex *grafted_vtx){
 ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vlist, ts_vesicle *vesicle){
 	ts_poly_list *poly_list=(ts_poly_list *)calloc(1,sizeof(ts_poly_list));
 	poly_list->poly	= (ts_poly **)calloc(n_poly,sizeof(ts_poly *));
-	ts_uint i=0,j=0; //idx;
+	ts_uint i=0,j=0,k; //idx;
 	ts_uint gvtxi;
 	ts_double xnorm,ynorm,znorm,normlength;
 	ts_double dphi,dh;
@@ -84,6 +84,10 @@ ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vli
 	if (vlist!=NULL){
 	/* Make straight grafted poylmers normal to membrane (polymer brush). Dist. between poly vertices put to 1*/
 		ts_int intpoly=vesicle->tape->internal_poly;
+		ts_int cellidx;
+		ts_double posX,posY,posZ,prevPosX,prevPosY,prevPosZ, phi,theta;
+		ts_bool retval;
+		ts_int l;
 		for (i=0;i<poly_list->n;i++){
 	
 			xnorm=0.0;
@@ -102,10 +106,101 @@ ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vli
 			ynorm=ynorm/normlength;
 			znorm=znorm/normlength;
 
+			//prepare starting position for building the polymeres
+			prevPosX=poly_list->poly[i]->grafted_vtx->x;
+			prevPosY=poly_list->poly[i]->grafted_vtx->y;
+			prevPosZ=poly_list->poly[i]->grafted_vtx->z;
 			for (j=0;j<poly_list->poly[i]->vlist->n;j++){
-				poly_list->poly[i]->vlist->vtx[j]->x = poly_list->poly[i]->grafted_vtx->x + xnorm*(ts_double)(j+1);
-				poly_list->poly[i]->vlist->vtx[j]->y = poly_list->poly[i]->grafted_vtx->y + ynorm*(ts_double)(j+1);
-				poly_list->poly[i]->vlist->vtx[j]->z = poly_list->poly[i]->grafted_vtx->z + znorm*(ts_double)(j+1);
+				//trying to go towards normal
+				posX=prevPosX+(ts_double)xnorm;
+				posY=prevPosY+(ts_double)ynorm;
+				posZ=prevPosZ+(ts_double)znorm;
+				k=0;
+				l=0;
+				while(1){
+					poly_list->poly[i]->vlist->vtx[j]->x = posX;
+					poly_list->poly[i]->vlist->vtx[j]->y = posY;
+					poly_list->poly[i]->vlist->vtx[j]->z = posZ;
+					cellidx=vertex_self_avoidance(vesicle, poly_list->poly[i]->vlist->vtx[j]);
+					//distance from neighbors
+					//retval=TS_SUCCESS;
+					/*for(k=0;k<poly_list->poly[i]->vlist->vtx[j]->neigh_no;k++){
+						dist=vtx_distance_sq(poly_list->poly[i]->vlist->vtx[j],poly_list->poly[i]->vlist->vtx[j]->neigh[k]);
+						if(dist<1.0 || dist>vesicle->dmax){
+							retval=TS_FAIL;
+							printf("dist_fail! %e\n", dist);
+						}
+					}*/
+					//if(retval!=TS_FAIL){
+						//check occupation number
+						retval=cell_occupation_number_and_internal_proximity(vesicle->clist,cellidx,poly_list->poly[i]->vlist->vtx[j]);
+					//}
+					if(retval==TS_SUCCESS){
+						retval=cell_add_vertex(vesicle->clist->cell[cellidx],poly_list->poly[i]->vlist->vtx[j]);
+						break;
+					}
+					else{
+				//		printf("%d %d Cannot put the vesicle here. Finding another position\n",i,j);
+						theta=drand48()*M_PI-M_PI/2;
+						phi=drand48()*2*M_PI;
+						posX=prevPosX+sin(phi)*cos(theta);
+						posY=prevPosY+sin(phi)*sin(theta);
+						posZ=prevPosZ+cos(theta);
+						//randomly change the normal.
+					}
+					k++;
+					if(k>1000){
+						//lets choose another grafting vertex;
+						while(1){
+							gvtxi = rand() % vesicle->vlist->n;
+							if (vesicle->vlist->vtx[gvtxi]->grafted_poly == NULL){
+								ts_fprintf(stdout,"Found new potential grafting vertex %d for poly %d\n",gvtxi,i);
+								poly_list->poly[i]->grafted_vtx->grafted_poly=NULL;
+								poly_list->poly[i]->grafted_vtx = vesicle->vlist->vtx[gvtxi];
+								vesicle->vlist->vtx[gvtxi]->grafted_poly = poly_list->poly[i];
+								l++;
+								k=0;
+
+
+
+
+			xnorm=0.0;
+			ynorm=0.0;
+			znorm=0.0;
+			int o;
+			for (o=0;o<poly_list->poly[i]->grafted_vtx->tristar_no;o++){
+				xnorm-=poly_list->poly[i]->grafted_vtx->tristar[o]->xnorm;
+				ynorm-=poly_list->poly[i]->grafted_vtx->tristar[o]->ynorm;
+				znorm-=poly_list->poly[i]->grafted_vtx->tristar[o]->znorm;	
+			}
+			normlength=sqrt(xnorm*xnorm+ynorm*ynorm+znorm*znorm);
+			if(intpoly && i%2){
+				normlength=-normlength;
+			}
+			xnorm=xnorm/normlength;
+			ynorm=ynorm/normlength;
+			znorm=znorm/normlength;
+
+			//prepare starting position for building the polymeres
+			posX=poly_list->poly[i]->grafted_vtx->x+xnorm;
+			posY=poly_list->poly[i]->grafted_vtx->y+ynorm;
+			posZ=poly_list->poly[i]->grafted_vtx->z+znorm;
+			
+
+
+
+
+
+								break;
+							}
+						}
+						if(l>1000)
+							fatal("Cannot make internal polymeres. No space inside the vesicle?",1001);
+					}
+				}
+				prevPosX=posX;
+				prevPosY=posY;
+				prevPosZ=posZ;
 			}
 		}
 	}
