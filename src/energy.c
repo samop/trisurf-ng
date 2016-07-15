@@ -228,7 +228,7 @@ ts_double direct_force_energy(ts_vesicle *vesicle, ts_vertex *vtx, ts_vertex *vt
 	ynorm/=norml;
 	znorm/=norml;
 	/*calculate ddp, perpendicular displacement*/
-	ddp=xnorm*(vtx->x-vtx_old->x)+xnorm*(vtx->y-vtx_old->y)+znorm*(vtx->z-vtx_old->z);
+	ddp=xnorm*(vtx->x-vtx_old->x)+ynorm*(vtx->y-vtx_old->y)+znorm*(vtx->z-vtx_old->z);
 	/*calculate dE*/
 //	printf("ddp=%e",ddp);
 	return vesicle->tape->F*ddp;		
