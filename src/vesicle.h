@@ -7,4 +7,5 @@ ts_bool vesicle_translate(ts_vesicle *vesicle,ts_double x, ts_double y, ts_doubl
 ts_bool vesicle_free(ts_vesicle *vesicle);
 ts_bool vesicle_volume(ts_vesicle *vesicle);
 ts_bool vesicle_area(ts_vesicle *vesicle);
+ts_double vesicle_meancurvature(ts_vesicle *vesicle);
 #endif

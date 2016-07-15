@@ -105,11 +105,11 @@ int main(){
 	ts_uint tstep,n;
     	ts_char *number;
 	struct dirent **list;
-	ts_double l1,l2,l3;
+	ts_double l1,l2,l3,hbar;
 	int count;
 	ts_fprintf(stderr,"TRISURF-NG v. %s, compiled on: %s %s.\n", TS_VERSION, __DATE__, __TIME__);
 
-	fprintf(stdout, "OuterLoop Volume Area lamdba1 lambda2 lambda3 Nbw/Nb\n");
+	fprintf(stdout, "OuterLoop Volume Area lamdba1 lambda2 lambda3 Nbw/Nb hbar\n");
 
 
 	count=scandir(".",&list,0,alphasort);
@@ -136,7 +136,8 @@ int main(){
 			vesicle_volume(vesicle);
 			vesicle_area(vesicle);
 			gyration_eigen(vesicle,&l1,&l2,&l3);
-			fprintf(stdout,"%d %.17e %.17e %.17e %.17e %.17e %.17e\n",atoi(number),vesicle->volume, vesicle->area,l1,l2,l3, (ts_double)count_bonds_with_energy(vesicle->blist)/(ts_double)vesicle->blist->n),
+			hbar=vesicle_meancurvature(vesicle)/vesicle->area;			
+			fprintf(stdout,"%d %.17e %.17e %.17e %.17e %.17e %.17e %.17e\n",atoi(number),vesicle->volume, vesicle->area,l1,l2,l3, (ts_double)count_bonds_with_energy(vesicle->blist)/(ts_double)vesicle->blist->n,hbar);
                     	tstep++;
 			write_histogram_data(atoi(number), vesicle);
                     free(number);
