@@ -72,20 +72,23 @@ ts_bool cell_occupation(ts_vesicle *vesicle){
     }
 
 //Add all polymers to cells
+if(vesicle->poly_list!=NULL){
     for(i=0;i<vesicle->poly_list->n;i++){
 	for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++){
     	cellidx=vertex_self_avoidance(vesicle, vesicle->poly_list->poly[i]->vlist->vtx[j]);
     	cell_add_vertex(vesicle->clist->cell[cellidx],vesicle->poly_list->poly[i]->vlist->vtx[j]);
 	}
     }
+}
 //Add all filaments to cells
+if(vesicle->filament_list!=NULL){
      for(i=0;i<vesicle->filament_list->n;i++){
 	for(j=0;j<vesicle->filament_list->poly[i]->vlist->n;j++){
     	cellidx=vertex_self_avoidance(vesicle, vesicle->filament_list->poly[i]->vlist->vtx[j]);
     	cell_add_vertex(vesicle->clist->cell[cellidx],vesicle->filament_list->poly[i]->vlist->vtx[j]);
 	}
     }
-   
+}   
 
     return TS_SUCCESS;
 }
