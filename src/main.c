@@ -48,6 +48,7 @@ int main(int argv, char *argc[]){
 		ts_fprintf(stdout,"**** Restoring vesicle from VTK points list ****\n");
 		ts_fprintf(stdout,"************************************************\n\n");
 		vesicle = parseDump(command_line_args.dump_from_vtk);
+//		write_vertex_xml_file(vesicle,9999); // here you can test if restoration and rewritting results in the same dump file. Only the date od creation of dump file must differ.
 		tape = vesicle->tape;
 		int arguments_no;
 		FILE *fd=fopen(".status","r");

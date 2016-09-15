@@ -372,6 +372,7 @@ ts_bool parseXMLBonds(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur){
 	char *b;
 	int idx, polyidx;
 	char *token[2];
+	int temp_cnt=0;
 	while (child != NULL) {
 		conname=xmlGetProp(child, (xmlChar *)"Name");
 		if ((!xmlStrcmp(child->name, (const xmlChar *)"DataArray")) && !xmlStrcmp(conname, (const xmlChar *)"connectivity") ){
@@ -383,11 +384,15 @@ ts_bool parseXMLBonds(ts_vesicle *vesicle,xmlDocPtr doc, xmlNodePtr cur){
 			while(token[0]!=NULL){
 				if(idx<3*(vesicle->vlist->n-2)){
 					bond_add(vesicle->blist, vesicle->vlist->vtx[atoi(token[0])], vesicle->vlist->vtx[atoi(token[1])]);
+					//fprintf(stderr,"Bonds in vesicle count idx=%d\n",idx);
 				}
 				else {
 				//find grafted vtx
 					if(vesicle->tape->npoly && vesicle->tape->nmono && (vesicle->tape->nmono-1)==(idx-3*(vesicle->vlist->n-2))%(vesicle->tape->nmono)
-						&& idx<(3*vesicle->vlist->n-2+vesicle->tape->nmono*vesicle->tape->npoly+vesicle->tape->npoly)){
+						&& idx<(3*vesicle->vlist->n-2+vesicle->tape->nmono*vesicle->tape->npoly)){
+						temp_cnt++;
+						//fprintf(stderr,"%d: Bonds in poly count idx=%d, t1=%s t2=%s\n",temp_cnt,idx, token[0], token[1]);
+						
 						polyidx=(idx-3*(vesicle->vlist->n-2))/(vesicle->tape->nmono);
 						//fprintf(stderr,"poly=%d, vertex=%d\n",polyidx,atoi(token[0]));
 						vesicle->poly_list->poly[polyidx]->grafted_vtx=vesicle->vlist->vtx[atoi(token[0])];

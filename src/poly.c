@@ -156,9 +156,9 @@ ts_poly_list *init_poly_list(ts_uint n_poly, ts_uint n_mono, ts_vertex_list *vli
 
 ts_bool poly_free(ts_poly *poly){
 
-	if (poly->grafted_vtx!=NULL){
-		poly->grafted_vtx->grafted_poly=NULL;
-	}
+//	if (poly->grafted_vtx!=NULL){
+//		poly->grafted_vtx->grafted_poly=NULL;
+//	}
 	vtx_list_free(poly->vlist);
 	bond_list_free(poly->blist);
 	free(poly);
@@ -168,8 +168,9 @@ ts_bool poly_free(ts_poly *poly){
 
 ts_bool poly_list_free(ts_poly_list *poly_list){
 	ts_uint i;
-
+	//fprintf(stderr,"no. of polys=%d\n", poly_list->n);
 	for(i=0;i<poly_list->n;i++){
+	//	fprintf(stderr,"%d poly address in mem=%ld\n",i+1,(long)&(poly_list->poly[i]));
 		poly_free(poly_list->poly[i]);
 	}
 	free(poly_list->poly);
