@@ -862,11 +862,7 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno, ts_cluste
 	xml_trisurf_data(fh,vesicle);
 	fprintf(fh, " <UnstructuredGrid>\n");
     fprintf(fh, "<Piece NumberOfPoints=\"%u\" NumberOfCells=\"%u\">\n",vlist->n+monono*polyno+fonono*filno, blist->n+monono*polyno+filno*(fonono-1)+vesicle->tlist->n);
-<<<<<<< HEAD
-    fprintf(fh,"<PointData Scalars=\"scalars\">\n<DataArray type=\"Int64\" Name=\"scalars\" format=\"ascii\">");
-=======
     fprintf(fh,"<PointData Scalars=\"vertices_idx\">\n<DataArray type=\"Int64\" Name=\"vertices_idx\" format=\"ascii\">");
->>>>>>> nirgov
    	for(i=0;i<vlist->n;i++){
 		fprintf(fh,"%u ",vtx[i]->idx);
     }
@@ -891,8 +887,6 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno, ts_cluste
 	}
 
     	fprintf(fh,"</DataArray>\n");
-<<<<<<< HEAD
-=======
 	if(cstlist!=NULL){
 		fprintf(fh,"<DataArray type=\"Int64\" Name=\"vertices_in_cluster\" format=\"ascii\">");
 		for(i=0;i<vlist->n;i++){
@@ -980,7 +974,6 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno, ts_cluste
     fprintf(fh,"</DataArray>\n");
 
 
->>>>>>> nirgov
 	
 	fprintf(fh,"</PointData>\n<CellData>\n</CellData>\n<Points>\n<DataArray type=\"Float64\" Name=\"Koordinate tock\" NumberOfComponents=\"3\" format=\"ascii\">\n");
 	for(i=0;i<vlist->n;i++){
