@@ -44,6 +44,7 @@ ts_vesicle *create_vesicle_from_tape(ts_tape *tape){
 	vesicle=initial_distribution_dipyramid(tape->nshell,tape->ncxmax,tape->ncymax,tape->nczmax,tape->stepsize);
     	vesicle->tape=tape;
 	set_vesicle_values_from_tape(vesicle);
+		initial_population_with_c0(vesicle,tape);
 	return vesicle;
 }
 
@@ -110,12 +111,38 @@ ts_bool set_vesicle_values_from_tape(ts_vesicle *vesicle){
     else {
         vesicle->sphHarmonics=NULL;
     }
+
+    
     return TS_SUCCESS;
 
 }
 
 
-
+ts_bool initial_population_with_c0(ts_vesicle *vesicle, ts_tape *tape){
+	int rndvtx,i,j;
+	if(tape->number_of_vertices_with_c0>0){
+		ts_fprintf(stderr,"Setting values for spontaneous curvature as defined in tape\n");
+		j=0;
+		for(i=0;i<tape->number_of_vertices_with_c0;i++){
+			rndvtx=rand() % vesicle->vlist->n;
+			if(fabs(vesicle->vlist->vtx[rndvtx]->c-tape->c0)<1e-15){
+				j++;
+				i--;
+				if(j>10*vesicle->vlist->n){
+					fatal("cannot populate vesicle with vertices with spontaneous curvature. Too many spontaneous curvature vertices?",100);
+				}
+				continue;
+			}
+			vesicle->vlist->vtx[rndvtx]->c=tape->c0;
+		}
+		mean_curvature_and_energy(vesicle);
+		if(fabs(tape->w)>1e-16){ //if nonzero energy
+			ts_fprintf(stderr,"Setting attraction between vertices with spontaneous curvature\n");
+			sweep_attraction_bond_energy(vesicle);
+		}
+	}
+	return TS_SUCCESS;
+}
 
 
 ts_bool pentagonal_dipyramid_vertex_distribution(ts_vertex_list *vlist){

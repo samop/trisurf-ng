@@ -189,6 +189,8 @@ if(vesicle->R_nucleus>0.0){
     delta_energy+=delta_energy_cv;
 //    fprintf(stderr,"Denergy after=%e\n",delta_energy);
     }
+/* Vertices with spontaneous curvature may have spontaneous force perpendicular to the surface of the vesicle. additional delta energy is calculated in this function */
+	delta_energy+=direct_force_energy(vesicle,vtx,backupvtx);
 /* No poly-bond energy for now!
 	if(vtx->grafted_poly!=NULL){
 		delta_energy+=
@@ -198,6 +200,7 @@ if(vesicle->R_nucleus>0.0){
 */
 //   fprintf(stderr, "DE=%f\n",delta_energy);
     //MONTE CARLOOOOOOOO
+//	if(vtx->c!=0.0) printf("DE=%f\n",delta_energy);
     if(delta_energy>=0){
 #ifdef TS_DOUBLE_DOUBLE
         if(exp(-delta_energy)< drand48())

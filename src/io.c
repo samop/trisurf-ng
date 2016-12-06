@@ -820,7 +820,7 @@ ts_bool write_master_xml_file(ts_char *filename){
 	return TS_SUCCESS;
 }
 
-ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
+ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno, ts_cluster_list *cstlist){
 	ts_vertex_list *vlist=vesicle->vlist;
 	ts_bond_list *blist=vesicle->blist;
 	ts_vertex **vtx=vlist->vtx;
@@ -862,7 +862,7 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 	xml_trisurf_data(fh,vesicle);
 	fprintf(fh, " <UnstructuredGrid>\n");
     fprintf(fh, "<Piece NumberOfPoints=\"%u\" NumberOfCells=\"%u\">\n",vlist->n+monono*polyno+fonono*filno, blist->n+monono*polyno+filno*(fonono-1)+vesicle->tlist->n);
-    fprintf(fh,"<PointData Scalars=\"scalars\">\n<DataArray type=\"Int64\" Name=\"scalars\" format=\"ascii\">");
+    fprintf(fh,"<PointData Scalars=\"vertices_idx\">\n<DataArray type=\"Int64\" Name=\"vertices_idx\" format=\"ascii\">");
    	for(i=0;i<vlist->n;i++){
 		fprintf(fh,"%u ",vtx[i]->idx);
     }
@@ -887,6 +887,93 @@ ts_bool write_vertex_xml_file(ts_vesicle *vesicle, ts_uint timestepno){
 	}
 
     	fprintf(fh,"</DataArray>\n");
+	if(cstlist!=NULL){
+		fprintf(fh,"<DataArray type=\"Int64\" Name=\"vertices_in_cluster\" format=\"ascii\">");
+		for(i=0;i<vlist->n;i++){
+			if(vtx[i]->cluster!=NULL){
+				fprintf(fh,"%u ",vtx[i]->cluster->nvtx);
+			} else {
+				fprintf(fh,"-1 ");
+			}
+	    	}
+		//polymeres
+		if(poly){
+			poly_idx=vlist->n;
+			for(i=0;i<vesicle->poly_list->n;i++){
+				for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++,poly_idx++){
+					fprintf(fh,"-1 ");
+				}
+			}
+		}
+		//filaments
+		if(fil){
+			poly_idx=vlist->n+monono*polyno;
+			for(i=0;i<vesicle->filament_list->n;i++){
+				for(j=0;j<vesicle->filament_list->poly[i]->vlist->n;j++,poly_idx++){
+		//	fprintf(stderr,"was here\n");
+					fprintf(fh,"-1 ");
+				}
+			}
+		}
+
+		fprintf(fh,"</DataArray>\n");
+
+
+	}
+
+	//here comes additional data as needed. Currently only spontaneous curvature
+	fprintf(fh,"<DataArray type=\"Float64\" Name=\"spontaneous_curvature\" format=\"ascii\">");
+	for(i=0;i<vlist->n;i++){
+		fprintf(fh,"%.17e ",vtx[i]->c);
+	}
+		//polymeres
+		if(poly){
+			poly_idx=vlist->n;
+			for(i=0;i<vesicle->poly_list->n;i++){
+				for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++,poly_idx++){
+					fprintf(fh,"%.17e ", vesicle->poly_list->poly[i]->vlist->vtx[j]->c);
+				}
+			}
+		}
+		//filaments
+		if(fil){
+			poly_idx=vlist->n+monono*polyno;
+			for(i=0;i<vesicle->filament_list->n;i++){
+				for(j=0;j<vesicle->filament_list->poly[i]->vlist->n;j++,poly_idx++){
+		//	fprintf(stderr,"was here\n");
+					fprintf(fh,"%.17e ",  vesicle->filament_list->poly[i]->vlist->vtx[j]->c);
+				}
+			}
+		}
+    fprintf(fh,"</DataArray>\n");
+
+	//here comes additional data. Energy!
+	fprintf(fh,"<DataArray type=\"Float64\" Name=\"bending_energy\" format=\"ascii\">");
+	for(i=0;i<vlist->n;i++){
+		fprintf(fh,"%.17e ",vtx[i]->energy*vtx[i]->xk);
+	}
+		//polymeres
+		if(poly){
+			poly_idx=vlist->n;
+			for(i=0;i<vesicle->poly_list->n;i++){
+				for(j=0;j<vesicle->poly_list->poly[i]->vlist->n;j++,poly_idx++){
+					fprintf(fh,"%.17e ", vesicle->poly_list->poly[i]->vlist->vtx[j]->energy* vesicle->poly_list->poly[i]->k);
+				}
+			}
+		}
+		//filaments
+		if(fil){
+			poly_idx=vlist->n+monono*polyno;
+			for(i=0;i<vesicle->filament_list->n;i++){
+				for(j=0;j<vesicle->filament_list->poly[i]->vlist->n;j++,poly_idx++){
+		//	fprintf(stderr,"was here\n");
+					fprintf(fh,"%.17e ",  vesicle->filament_list->poly[i]->vlist->vtx[j]->energy*  vesicle->filament_list->poly[i]->k);
+				}
+			}
+		}
+    fprintf(fh,"</DataArray>\n");
+
+
 	
 	fprintf(fh,"</PointData>\n<CellData>\n</CellData>\n<Points>\n<DataArray type=\"Float64\" Name=\"Koordinate tock\" NumberOfComponents=\"3\" format=\"ascii\">\n");
 	for(i=0;i<vlist->n;i++){
@@ -1093,6 +1180,10 @@ ts_tape *parsetapebuffer(char *buffer){
         CFG_SIMPLE_INT("cluster_nodes",&tape->brezveze1),
         CFG_SIMPLE_INT("distributed_processes",&tape->brezveze2),
 	CFG_SIMPLE_INT("spherical_harmonics_coefficients",&tape->shc),
+	CFG_SIMPLE_INT("number_of_vertices_with_c0", &tape->number_of_vertices_with_c0),
+	CFG_SIMPLE_FLOAT("c0",&tape->c0),
+	CFG_SIMPLE_FLOAT("w",&tape->w),
+	CFG_SIMPLE_FLOAT("F",&tape->F),
         CFG_END()
     };
     cfg_t *cfg;    

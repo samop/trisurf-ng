@@ -129,6 +129,8 @@ int main(int argv, char *argc[]){
 			//printf("nucleus coords: %.17e %.17e %.17e\n",vesicle->nucleus_center[0], vesicle->nucleus_center[1], vesicle->nucleus_center[2]);
 //	write_vertex_xml_file(vesicle,0);
 //	exit(1);
+
+			//write_vertex_xml_file(vesicle,1000);
 	run_simulation(vesicle, tape->mcsweeps, tape->inititer, tape->iterations, start_iteration);
 	write_master_xml_file(command_line_args.output_fullfilename);
 	write_dout_fcompat_file(vesicle,"dout");

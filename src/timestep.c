@@ -93,7 +93,7 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 		cell_occupation(vesicle);
             dump_state(vesicle,i);
 		if(i>=inititer){
-			write_vertex_xml_file(vesicle,i-inititer);
+			write_vertex_xml_file(vesicle,i-inititer,NULL);
 			write_master_xml_file(command_line_args.output_fullfilename);
 			epochtime=get_epoch();			
 			gyration_eigen(vesicle, &l1, &l2, &l3);
