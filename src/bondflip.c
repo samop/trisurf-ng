@@ -168,6 +168,7 @@ for(i=0;i<4;i++){
   oldenergy+=kp->xk* kp->energy;
   oldenergy+=km->xk* km->energy;
   oldenergy+=it->xk* it->energy;
+  oldenergy+=bond->energy; /* attraction with neighboring vertices, that have spontaneous curvature */
   //Neigbours of k, it, km, kp don't change its energy.
 
 	if(vesicle->pswitch == 1 || vesicle->tape->constvolswitch>0){dvol = -lm->volume - lp->volume;}
@@ -177,7 +178,7 @@ for(i=0;i<4;i++){
 */
 
 /* fix data structure for flipped bond */
-    ts_flip_bond(k,it,km,kp, bond,lm, lp, lm2, lp1);
+    ts_flip_bond(k,it,km,kp, bond,lm, lp, lm2, lp1, vesicle->tape->w);
 
 
 /* Calculating the new energy */
@@ -186,6 +187,7 @@ for(i=0;i<4;i++){
   delta_energy+=kp->xk* kp->energy;
   delta_energy+=km->xk* km->energy;
   delta_energy+=it->xk* it->energy;
+  delta_energy+=bond->energy; /* attraction with neighboring vertices, that have spontaneous curvature */
   //Neigbours of k, it, km, kp don't change its energy.
 
     delta_energy-=oldenergy;
@@ -369,7 +371,7 @@ for(i=0;i<4;i++){
 
 
 ts_bool ts_flip_bond(ts_vertex *k,ts_vertex *it,ts_vertex *km, ts_vertex *kp,
-ts_bond *bond, ts_triangle *lm, ts_triangle *lp, ts_triangle *lm2, ts_triangle *lp1){
+ts_bond *bond, ts_triangle *lm, ts_triangle *lp, ts_triangle *lm2, ts_triangle *lp1, ts_double w_energy){
 
     ts_uint i; //lmidx, lpidx;
 if(k==NULL || it==NULL || km==NULL || kp==NULL){
@@ -435,6 +437,7 @@ if(k==NULL || it==NULL || km==NULL || kp==NULL){
   energy_vertex(kp);
   energy_vertex(km);
   energy_vertex(it);
+  attraction_bond_energy(bond, w_energy);
 // END modifications to data structure!
     return TS_SUCCESS;
 }

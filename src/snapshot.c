@@ -24,7 +24,7 @@ ts_uint ts_sprintf(ts_string *str, char *fmt, ...){
 ts_bool xml_trisurf_data(FILE *fh, ts_vesicle *vesicle){
 
 	ts_string *data=(ts_string *)malloc(sizeof(ts_sprintf));
-	data->string=(char *)malloc(512000*sizeof(char)); /*TODO: warning, can break if the string is to long */
+	data->string=(char *)malloc(5120000*sizeof(char)); /*TODO: warning, can break if the string is to long */
 	data->beg=0;
 	
 	xml_trisurf_header(fh, vesicle);

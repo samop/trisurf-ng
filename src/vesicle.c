@@ -79,3 +79,15 @@ ts_bool vesicle_area(ts_vesicle *vesicle){
     vesicle->area=area;
     return TS_SUCCESS;
 }
+
+ts_double vesicle_meancurvature(ts_vesicle *vesicle){
+// Integrates (H dA) over vesicle area A, where H=(C1+C2)/2.
+// (To be devided by A outside of function)
+	ts_double mc;
+	ts_uint i;
+	mc=0;
+	for(i=0;i<vesicle->vlist->n;i++){
+		mc=mc+vesicle->vlist->vtx[i]->curvature;
+	}
+	return mc/2.0;
+}

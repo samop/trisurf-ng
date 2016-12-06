@@ -1,6 +1,10 @@
 ####### Vesicle definitions ###########
 # nshell is a number of divisions of dipyramid
+<<<<<<< HEAD
 nshell=17
+=======
+nshell=10
+>>>>>>> nirgov
 # dmax is the max. bond length (in units l_min)
 dmax=1.7
 # dmin_interspecies in the min. dist. between different vertex species (in units l_min)
@@ -56,7 +60,7 @@ nzmax=60
 ####### Program Control ############
 #how many MC sweeps between subsequent records of states to disk
 #200000
-mcsweeps=200
+mcsweeps=2000
 #how many initial mcsweeps*inititer MC sweeps before recording to disk?
 #2
 inititer=10
@@ -84,3 +88,14 @@ cluster_nodes=50
 #max number of processes in distributed (voluntary) environment
 distributed_processes=50
 #cuda options???
+
+
+#NirGov branch only!
+#number of vertices with spontaneous curvature (integer)
+number_of_vertices_with_c0=100
+#spontaneous curvature (float)
+c0=0.5
+#energy of attraction of vertices with spontaneous curvature (float, positive value for attraction)
+w=10.0
+#direct force on vesicles with spontaneous curvature (float)
+F=2.0
