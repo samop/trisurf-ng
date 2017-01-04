@@ -315,7 +315,7 @@ class Runner:
 	def __init__(self, subdir='run0', tape=None, snapshot=None, runArgs=[]):
 		self.subdir=subdir
 		self.runArgs=runArgs
-		self.fromSnapshot=False
+		self.isFromSnapshot=False
 		if(tape!=None):
 			self.initFromTape(tape)
 		if(snapshot!=None):
@@ -334,7 +334,7 @@ class Runner:
 		except:
 			print("Error reading snapshot file")
 			exit(1)
-		self.fromSnapshot=True
+		self.isFromSnapshot=True
 		self.snapshotFile=snapshotfile
 		root = tree.getroot()
 		tapetxt=root.find('tape')
@@ -399,7 +399,7 @@ class Runner:
 				exit(1)
 #Symlinks tape file to the directory or create tape file from snapshot in the direcory...
 			if(self.Dir.makeifnotexist()):
-				if(self.fromSnapshot==False):
+				if(self.isFromSnapshot==False):
 					try:
 						os.symlink(os.path.abspath(self.tapeFilename), self.Dir.fullpath()+"/tape")
 					except:
@@ -427,7 +427,7 @@ class Runner:
 			lastVTU=self.getLastVTU() #we get last VTU file in case we need to continue the simulation from last snapshot. Need to be done before the Dir.goto() call.
 			self.Dir.goto()
 			print("Starting trisurf-ng executable in "+self.Dir.fullpath())
-			if(self.fromSnapshot==True):
+			if(self.isFromSnapshot==True):
 				#here we try to determine whether we should continue the simulation or start from last known VTU snapshot.
 				if(lastVTU==None):
 					initSnap="initial_snapshot.vtu"
