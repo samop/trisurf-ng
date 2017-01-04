@@ -245,6 +245,11 @@ class Statistics:
 			return(False)
 		return(True)
 
+	def readText(self):
+		with open(self.fullname, 'r+') as fin:
+			cont=fin.read()
+		return cont
+
 	def read_old(self):
 		'''
 		Method read() reads the statistics if it exists. It sets local variable dT storing the time differential between two intervals of simulation (outer loops). It also stores last simulation loop and the start of the run.
@@ -297,6 +302,16 @@ class Runner:
 	'''
 	Class Runner consists of a single running or terminated instance of the trisurf. It manages starting, stopping, verifying the running process and printing the reports of the configured instances.
 	'''
+
+	@property
+	def Dir(self):
+		return Directory(maindir=self.maindir,simdir=self.subdir)
+
+
+	@property
+	def Statistics(self):
+		return Statistics(self.Dir.fullpath(), "statistics.csv")
+
 	def __init__(self, subdir='run0', tape=None, snapshot=None, runArgs=[]):
 		self.subdir=subdir
 		self.runArgs=runArgs
@@ -328,7 +343,7 @@ class Runner:
 		self.tape.setTape(tapetxt.text)
 
 	def getPID(self):
-		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
+#		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
 		#self.Dir.makeifnotexist()
 		try:
 			fp = open(os.path.join(self.Dir.fullpath(),'.lock'))
@@ -339,7 +354,7 @@ class Runner:
 		return int(pid)
 
 	def getLastIteration(self):
-		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
+#		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
 		#self.Dir.makeifnotexist()
 		try:
 			fp = open(os.path.join(self.Dir.fullpath(),'.status'))
@@ -386,7 +401,7 @@ class Runner:
 			if(shutil.which('trisurf')==None):
 				print("Error. Trisurf executable not found in PATH. Please install trisurf prior to running trisurf manager.")
 				exit(1)
-			self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
+#			self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
 #Symlinks tape file to the directory or create tape file from snapshot in the direcory...
 			if(self.Dir.makeifnotexist()):
 				if(self.fromSnapshot==False):
@@ -456,13 +471,13 @@ class Runner:
 		return
 
 	def getStatistics(self, statfile="statistics.csv"):
-		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
-		self.statistics=Statistics(self.Dir.fullpath(), statfile)
+#		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
+#		self.statistics=Statistics(self.Dir.fullpath(), statfile)
 		self.Comment=FileContent(os.path.join(self.Dir.fullpath(),".comment"))
 		pid=self.getPID()
 		status=self.getStatus()
-		if(self.statistics.fileOK):
-			ETA=str(datetime.timedelta(microseconds=(int(self.tape.config['iterations'])-int(self.statistics.last))*self.statistics.dT)*1000000)
+		if(self.Statistics.fileOK):
+			ETA=str(datetime.timedelta(microseconds=(int(self.tape.config['iterations'])-int(self.Statistics.last))*self.Statistics.dT)*1000000)
 		if(status==TS_NONEXISTANT or status==TS_NOLOCK):
 			statustxt="Not running"
 			pid=""
@@ -477,19 +492,23 @@ class Runner:
 		else:
 			statustxt="Running"
 
-		if(self.statistics.fileOK):
-			report=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(self.statistics.startDate))),ETA, statustxt, pid, str(self.Dir.fullpath()), self.Comment.getText()]
+		if(self.Statistics.fileOK):
+			report=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(self.Statistics.startDate))),ETA, statustxt, pid, str(self.Dir.fullpath()), self.Comment.getText()]
 		else:
 			report=["N/A","N/A",statustxt, pid, str(self.Dir.fullpath()), self.Comment.getText()]
 		return report
 
 
 	def stop(self):
-		p=psutil.Process(self.getPID())
-		p.kill()
+		try:
+			p=psutil.Process(self.getPID())
+			p.kill()
+		except:
+			print("Could not stop the process. Is the process running? Do you have sufficient privileges?")
+
 
 	def writeComment(self, data, mode='w'):
-		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
+#		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
 		self.Comment=FileContent(os.path.join(self.Dir.fullpath(),".comment"))
 		self.Comment.writefile(data,mode=mode)
 
