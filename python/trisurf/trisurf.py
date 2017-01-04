@@ -324,9 +324,9 @@ class Runner:
 
 
 	def initFromTape(self, tape):
-		self.tape=Tape()
-		self.tape.readTape(tape)
-		self.tapeFile=tape
+		self.Tape=Tape()
+		self.Tape.readTape(tape)
+		self.tapeFilename=tape
 
 	def initFromSnapshot(self, snapshotfile):
 		try:
@@ -339,12 +339,10 @@ class Runner:
 		root = tree.getroot()
 		tapetxt=root.find('tape')
 		version=root.find('trisurfversion')
-		self.tape=Tape()
-		self.tape.setTape(tapetxt.text)
+		self.Tape=Tape()
+		self.Tape.setTape(tapetxt.text)
 
 	def getPID(self):
-#		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
-		#self.Dir.makeifnotexist()
 		try:
 			fp = open(os.path.join(self.Dir.fullpath(),'.lock'))
 		except IOError as e:
@@ -354,8 +352,6 @@ class Runner:
 		return int(pid)
 
 	def getLastIteration(self):
-#		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
-		#self.Dir.makeifnotexist()
 		try:
 			fp = open(os.path.join(self.Dir.fullpath(),'.status'))
 		except IOError as e:
@@ -365,7 +361,7 @@ class Runner:
 		return int(status)
 
 	def isCompleted(self):
-		if int(self.tape.getValue("iterations"))+int(self.tape.getValue("inititer"))==self.getLastIteration()+1:
+		if int(self.Tape.getValue("iterations"))+int(self.Tape.getValue("inititer"))==self.getLastIteration()+1:
 			return True
 		else:
 			return False
@@ -401,20 +397,19 @@ class Runner:
 			if(shutil.which('trisurf')==None):
 				print("Error. Trisurf executable not found in PATH. Please install trisurf prior to running trisurf manager.")
 				exit(1)
-#			self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
 #Symlinks tape file to the directory or create tape file from snapshot in the direcory...
 			if(self.Dir.makeifnotexist()):
 				if(self.fromSnapshot==False):
 					try:
-						os.symlink(os.path.abspath(self.tapeFile), self.Dir.fullpath()+"/tape")
+						os.symlink(os.path.abspath(self.tapeFilename), self.Dir.fullpath()+"/tape")
 					except:
-						print("Error while symlinking "+os.path.abspath(self.tapeFile)+" to "+self.Dir.fullpath()+"/tape")
+						print("Error while symlinking "+os.path.abspath(self.tapeFilename)+" to "+self.Dir.fullpath()+"/tape")
 						exit(1)
 				else:
 					try:
 						with open (os.path.join(self.Dir.fullpath(),"tape"), "w") as myfile:
 							#myfile.write("#This is automatically generated tape file from snapshot")
-							myfile.write(str(self.tape.rawText))
+							myfile.write(str(self.Tape.rawText))
 					except:
 						print("Error -- cannot make tapefile  "+ os.path.join(self.Dir.fullpath(),"tape")+" from the snapshot in the running directory")
 						exit(1)
@@ -457,11 +452,11 @@ class Runner:
 		maindir=""
 		for p,v in zip(prefix,variables):
 			if(v=="xk0"):
-				tv=str(round(float(self.tape.config[v])))
+				tv=str(round(float(self.Tape.config[v])))
 				if sys.version_info<(3,0):
-					tv=str(int(float(self.tape.config[v])))
+					tv=str(int(float(self.Tape.config[v])))
 			else:
-				tv=self.tape.config[v]
+				tv=self.Tape.config[v]
 			maindir=maindir+p+tv
 		self.maindir=maindir
 		return
@@ -471,13 +466,11 @@ class Runner:
 		return
 
 	def getStatistics(self, statfile="statistics.csv"):
-#		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
-#		self.statistics=Statistics(self.Dir.fullpath(), statfile)
 		self.Comment=FileContent(os.path.join(self.Dir.fullpath(),".comment"))
 		pid=self.getPID()
 		status=self.getStatus()
 		if(self.Statistics.fileOK):
-			ETA=str(datetime.timedelta(microseconds=(int(self.tape.config['iterations'])-int(self.Statistics.last))*self.Statistics.dT)*1000000)
+			ETA=str(datetime.timedelta(microseconds=(int(self.Tape.config['iterations'])-int(self.Statistics.last))*self.Statistics.dT)*1000000)
 		if(status==TS_NONEXISTANT or status==TS_NOLOCK):
 			statustxt="Not running"
 			pid=""
@@ -508,13 +501,12 @@ class Runner:
 
 
 	def writeComment(self, data, mode='w'):
-#		self.Dir=Directory(maindir=self.maindir,simdir=self.subdir)
 		self.Comment=FileContent(os.path.join(self.Dir.fullpath(),".comment"))
 		self.Comment.writefile(data,mode=mode)
 
 
 	def getLastVTU(self):
-		vtuidx=self.getLastIteration()-int(self.tape.getValue("inititer"))
+		vtuidx=self.getLastIteration()-int(self.Tape.getValue("inititer"))
 		if vtuidx<0:
 			return None
 		else:
