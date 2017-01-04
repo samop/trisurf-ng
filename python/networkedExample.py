@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from trisurf import trisurf
 from trisurf import tsmgr
 
@@ -21,7 +22,7 @@ run3.setSubdir("run2")
 
 Runs=[run2, run3]
 
-hosts=({'name':'natalie','address':'kabinet.penic.eu', 'runs':Runs, 'username':'samo'},
+hosts=({'name':'Hestia','address':'kabinet.penic.eu', 'runs':Runs, 'username':'samo'},
 	{'name':'altea','address':'127.0.0.1', 'runs':Runs, 'username':'samo'})
 
 tsmgr.start(hosts)

@@ -18,7 +18,7 @@ class MultiRender:
 		interactor = vtkRenderWindowInteractor()
 		interactor.SetRenderWindow(self.renderer_window)
 		interactor.Initialize()
- 		interactor.AddObserver("TimerEvent", self.RenderUpdate)
+		interactor.AddObserver("TimerEvent", self.RenderUpdate)
 		timerIDR = interactor.CreateRepeatingTimer(1000)
 		self.filename=[]
 		self.renderer=[]
