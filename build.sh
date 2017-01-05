@@ -8,6 +8,6 @@ autoconf
 make clean
 make
 sudo make install
-cd python
-sudo python3 setup.py install
-cd ..
+echo "Warning!"
+echo "Python scripts for running the trisurf-ng have been moved to separate package"
+
