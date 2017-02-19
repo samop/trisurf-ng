@@ -1,27 +1,20 @@
 bin_PROGRAMS = trisurf tsmeasure tspoststat
-trisurf_SOURCES = general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c dumpstate.c frame.c energy.c timestep.c vertexmove.c bondflip.c main.c poly.c stats.c sh.c shcomplex.c constvol.c snapshot.c restore.c cluster.c
+trisurf_SOURCES = main.c
 GITVERSION:=$(shell git --no-pager describe --tags --always --dirty)
 AM_CFLAGS = -Wall -Werror -DTS_VERSION=\"$(GITVERSION)\" -fgnu89-inline
 AM_CPPFLAGS = ${libxml2_CFLAGS} -fgnu89-inline
-trisurf_LDADD = ${libcurl_LIBS} ${libxml2_LIBS}
-#shdiscoverdir=../
-#shdiscover_PROGRAMS= shdiscover
-#shdiscover_SOURCES= general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c energy.c sh.c shdiscover.c poly.c stats.c shcomplex.c
-#co_testdir=../
-#co_test_PROGRAMS=co_test
-#co_test_SOURCES= general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c energy.c sh.c co_test.c frame.c bondflip.c poly.c stats.c shcomplex.c
-#spherical_trisurfdir=../
-#spherical_trisurf_PROGRAMS = spherical_trisurf
-#spherical_trisurf_SOURCES = general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c frame.c energy.c timestep.c vertexmove.c spherical_trisurf.c sh.c bondflip.c poly.c stats.c shcomplex.c
-#spherical_trisurf_ffdir=../
-#spherical_trisurf_ff_PROGRAMS = spherical_trisurf_ff
-#spherical_trisurf_ff_SOURCES = general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c frame.c energy.c timestep.c vertexmove.c spherical_trisurf_ff.c sh.c bondflip.c poly.c stats.c shcomplex.c
+trisurf_LDADD = libtrisurf.la ${libcurl_LIBS} ${libxml2_LIBS}
 
+tsmeasure_SOURCES = tsmeasure.c 
+tsmeasure_LDADD = libtrisurf.la ${libcurl_LIBS} ${libxml2_LIBS}
 
-tsmeasure_SOURCES = general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c dumpstate.c frame.c energy.c timestep.c vertexmove.c bondflip.c tsmeasure.c poly.c stats.c sh.c shcomplex.c constvol.c snapshot.c restore.c cluster.c
-tsmeasure_LDADD = ${libcurl_LIBS} ${libxml2_LIBS}
+tspoststat_SOURCES = tspoststat.c
+tspoststat_LDADD = libtrisurf.la ${libcurl_LIBS} ${libxml2_LIBS}
 
-tspoststat_SOURCES = general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c dumpstate.c frame.c energy.c timestep.c vertexmove.c bondflip.c tspoststat.c poly.c stats.c sh.c shcomplex.c constvol.c snapshot.c restore.c cluster.c
-tspoststat_LDADD = ${libcurl_LIBS} ${libxml2_LIBS}
-#gitversion.c: .git/HEAD .git/index
-#    echo "const char *gitversion = \"$(shell git rev-parse HEAD)\";" > $@
+#------------- LIBS ----------
+
+lib_LTLIBRARIES= libtrisurf.la
+libtrisurf_la_SOURCES= general.c vertex.c bond.c triangle.c cell.c vesicle.c initial_distribution.c io.c dumpstate.c frame.c energy.c timestep.c vertexmove.c bondflip.c poly.c stats.c sh.c shcomplex.c constvol.c snapshot.c restore.c cluster.c
+#libtrisurf_la_CPPFLAGS = ${libxml2_CFLAGS}
+#libtrisurf_LIBADD=${libcurl_LIBS} ${libxml2_LIBS}
+pkginclude_HEADERS=general.h vertex.h bond.h triangle.h cell.h vesicle.h initial_distribution.h io.h dumpstate.h frame.h energy.h timestep.h vertexmove.h bondflip.h poly.h stats.h sh.h shcomplex.h constvol.h snapshot.h restore.h cluster.h

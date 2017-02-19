@@ -57,4 +57,7 @@ Prepare tape file, storing the definition for the simulation. You can use the sa
 
 Run simulations with ``trisurf-ng --force-from-tape`` for initial run, or ``trisurf-ng`` for continuing aborted simulations.
 
+======== LIBRARY VERSION ================
 
+THis line seemed to fixed everything:
+libtoolize --force
