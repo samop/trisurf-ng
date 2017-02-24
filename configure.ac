@@ -9,7 +9,7 @@ AM_INIT_AUTOMAKE
 # Checks for programs.
 AC_PROG_CC
 LT_INIT
-#AC_PROG_LIBTOOL
+AC_PROG_LIBTOOL
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lconfuse':
 AC_CHECK_LIB([confuse], [cfg_parse])
@@ -30,7 +30,7 @@ AC_C_INLINE
 
 dnl Check if we have enable debug support.
 AC_MSG_CHECKING(whether to enable debugging)
-debug_default="yes"
+debug_default="no"
 AC_ARG_ENABLE(debug, [ --enable-debug=[no/yes] turn on debugging
 [default=$debug_default]],, enable_debug=$debug_default)
 dnl Yes, shell scripts can be used
