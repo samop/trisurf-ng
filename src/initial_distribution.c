@@ -121,7 +121,7 @@ ts_bool set_vesicle_values_from_tape(ts_vesicle *vesicle){
 ts_bool initial_population_with_c0(ts_vesicle *vesicle, ts_tape *tape){
 	int rndvtx,i,j;
 	if(tape->number_of_vertices_with_c0>0){
-		ts_fprintf(stderr,"Setting values for spontaneous curvature as defined in tape\n");
+//		ts_fprintf(stderr,"Setting values for spontaneous curvature as defined in tape\n");
 		j=0;
 		for(i=0;i<tape->number_of_vertices_with_c0;i++){
 			rndvtx=rand() % vesicle->vlist->n;
@@ -137,7 +137,7 @@ ts_bool initial_population_with_c0(ts_vesicle *vesicle, ts_tape *tape){
 		}
 		mean_curvature_and_energy(vesicle);
 		if(fabs(tape->w)>1e-16){ //if nonzero energy
-			ts_fprintf(stderr,"Setting attraction between vertices with spontaneous curvature\n");
+//			ts_fprintf(stderr,"Setting attraction between vertices with spontaneous curvature\n");
 			sweep_attraction_bond_energy(vesicle);
 		}
 	}
