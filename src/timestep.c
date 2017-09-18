@@ -49,12 +49,11 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 		fd2=fopen(filename,"w");
 	else
 		fd2=fopen(filename,"a");
-		if(fd2==NULL){
-			fatal("Cannot open ulm2.csv file for writing",1);
-		}
-		if(start_iteration==0) //file does not exist
-			fprintf(fd2, "Timestep u_00^2 u_10^2 u_11^2 u_20^2 ...\n");	
-
+	if(fd2==NULL){
+		fatal("Cannot open ulm2.csv file for writing",1);
+	}
+	if(start_iteration==0) //file does not exist
+		fprintf(fd2, "Timestep u_00^2 u_10^2 u_11^2 u_20^2 ...\n");	
 	}
 
 /* RANDOM SEED SET BY CURRENT TIME */
@@ -69,7 +68,7 @@ ts_bool run_simulation(ts_vesicle *vesicle, ts_uint mcsweeps, ts_uint inititer, 
 	ts_fprintf(stdout,"Setting volume V0=%.17f\n",V0);
 	if(A0<0.000001)
 		A0=vesicle->area;
-		ts_fprintf(stdout,"Setting area A0=%.17f\n",A0);
+	ts_fprintf(stdout,"Setting area A0=%.17f\n",A0);
 	epsvol=4.0*sqrt(2.0*M_PI)/pow(3.0,3.0/4.0)*V0/pow(vesicle->tlist->n,3.0/2.0);
     epsarea=A0/(ts_double)vesicle->tlist->n;
   //  fprintf(stderr, "DVol=%1.16f (%1.16f), V0=%1.16f\n", epsvol,0.003e-2*V0,V0);

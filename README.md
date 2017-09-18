@@ -41,6 +41,8 @@ If you are experiencing difficulties due to different automake versions, proceed
 
 ``autoconf``
 
+``autoreconf -if``
+
 ``./configure``
 
 ``make``

@@ -1,3 +1,4 @@
+
 /* vim: set ts=4 sts=4 sw=4 noet : */
 #include "general.h"
 #include<stdio.h>
@@ -1174,8 +1175,8 @@ ts_tape *parsetapebuffer(char *buffer){
         CFG_SIMPLE_INT("iterations",&tape->iterations),
 	CFG_SIMPLE_INT("mcsweeps",&tape->mcsweeps),
 	CFG_SIMPLE_INT("inititer", &tape->inititer),
-        CFG_SIMPLE_BOOL("quiet",&tape->quiet),
-        CFG_SIMPLE_STR("multiprocessing",tape->multiprocessing),
+				CFG_SIMPLE_BOOL("quiet",(cfg_bool_t *)&tape->quiet),
+        CFG_SIMPLE_STR("multiprocessing",&tape->multiprocessing),
         CFG_SIMPLE_INT("smp_cores",&tape->brezveze0),
         CFG_SIMPLE_INT("cluster_nodes",&tape->brezveze1),
         CFG_SIMPLE_INT("distributed_processes",&tape->brezveze2),
