@@ -86,10 +86,9 @@ distributed_processes=50
 #cuda options???
 
 
-#NirGov branch only!
 #number of vertices with spontaneous curvature (integer)
 number_of_vertices_with_c0=100
-#spontaneous curvature (float)
+#c0/2 is spontaneous curvature. c0 is used as (c1+c1-c0)^2 in energy term (float)
 c0=0.5
 #energy of attraction of vertices with spontaneous curvature (float, positive value for attraction)
 w=10.0

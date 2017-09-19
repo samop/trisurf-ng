@@ -44,9 +44,12 @@ inline ts_bool bond_energy(ts_bond *bond,ts_poly *poly){
 	return TS_SUCCESS;
 };
 
-/** @brief Calculation of energy of the vertex
+/** @brief Calculation of the bending energy of the vertex.
  *  
- *  Main function that calculates energy of the vertex \f$i\f$. Nearest neighbors (NN) must be ordered in counterclockwise direction for this function to work.
+ *  Main function that calculates energy of the vertex \f$i\f$. Function returns \f$\frac{1}{2}(c_1+c_2-c)^2 s\f$, where \f$(c_1+c_2)/2\f$ is mean curvature,
+ * \f$c/2\f$ is spontaneous curvature and \f$s\f$ is area per vertex \f$i\f$.
+ *
+ * Nearest neighbors (NN) must be ordered in counterclockwise direction for this function to work.
  *  Firstly NNs that form two neighboring triangles are found (\f$j_m\f$, \f$j_p\f$ and common \f$j\f$). Later, the scalar product of vectors \f$x_1=(\mathbf{i}-\mathbf{j_p})\cdot (\mathbf{i}-\mathbf{j_p})(\mathbf{i}-\mathbf{j_p})\f$, \f$x_2=(\mathbf{j}-\mathbf{j_p})\cdot  (\mathbf{j}-\mathbf{j_p})\f$  and \f$x_3=(\mathbf{j}-\mathbf{j_p})\cdot (\mathbf{i}-\mathbf{j_p})\f$  are calculated. From these three vectors the \f$c_{tp}=\frac{1}{\tan(\varphi_p)}\f$ is calculated, where \f$\varphi_p\f$ is the inner angle at vertex \f$j_p\f$. The procedure is repeated for \f$j_m\f$ instead of \f$j_p\f$ resulting in \f$c_{tn}\f$.
  *  
 \begin{tikzpicture}{
@@ -181,6 +184,7 @@ inline ts_bool energy_vertex(ts_vertex *vtx){
 #endif
 // c is forced curvature energy for each vertex. Should be set to zero for
 // normal circumstances.
+/* the following statement is an expression for $\frac{1}{2}\int(c_1+c_2-c_0^\prime)^2\mathrm{d}A$, where $c_0^\prime=2c_0$ (twice the spontaneous curvature)  */
     vtx->energy=0.5*s*(vtx->curvature/s-vtx->c)*(vtx->curvature/s-vtx->c);
 
     return TS_SUCCESS;
