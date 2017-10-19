@@ -1219,6 +1219,8 @@ ts_bool tape_free(ts_tape *tape){
 ts_bool getcmdline_tape(cfg_t *cfg, char *opts){
 
 	char *commands, *backup, *saveptr, *saveopptr, *command, *operator[2];
+	operator[0]=0;
+	operator[1]=0;
 	ts_uint i,j;
 	commands=(char *)malloc(10000*sizeof(char));
     backup=commands; //since the pointer to commands will be lost, we acquire a pointer that will serve as backup.
