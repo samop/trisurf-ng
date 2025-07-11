@@ -1,12 +1,12 @@
 ####### Vesicle definitions ###########
 # nshell is a number of divisions of dipyramid
-nshell=17
+nshell=8
 # dmax is the max. bond length (in units l_min)
 dmax=1.7
 # dmin_interspecies in the min. dist. between different vertex species (in units l_min)
 dmin_interspecies=1.2
 # bending rigidity of the membrane (in units kT)
-xk0=10.0
+xk0=20.0
 # max step size (in units l_min)
 stepsize=0.15
 
@@ -56,7 +56,7 @@ nzmax=60
 ####### Program Control ############
 #how many MC sweeps between subsequent records of states to disk
 #200000
-mcsweeps=2000
+mcsweeps=4000
 #how many initial mcsweeps*inititer MC sweeps before recording to disk?
 #2
 inititer=1

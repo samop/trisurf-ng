@@ -341,11 +341,11 @@ typedef struct{
 
 /* GLOBAL VARIABLES */
 
-int quiet;
-ts_double V0;
-ts_double A0;
-ts_double epsvol;
-ts_double epsarea;
+extern int quiet;
+extern ts_double V0;
+extern ts_double A0;
+extern ts_double epsvol;
+extern ts_double epsarea;
 /* FUNCTIONS */
 
 /** Non-fatal error function handler:

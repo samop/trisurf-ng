@@ -20,7 +20,7 @@ and python libraries for running tsmgr:
 
 On Debian based systems, install prerequisities by typing the following command in the command line:
 
-``sudo apt-get install libconfuse-dev libgsl0-dev libxml2-dev zlib1g-dev automake gcc python3-psutil python3 python3-pip``
+``sudo apt-get install libconfuse-dev libgsl0-dev libxml2-dev zlib1g-dev automake gcc python3-psutil python3 python3-pip pkgconf libtool``
 ``sudo pip3 install tabulate configobj``
 
 Move to the project root directory and compile with:

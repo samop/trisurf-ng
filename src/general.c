@@ -13,6 +13,12 @@
 #include <errno.h>
 #include <string.h>
 
+int quiet;
+ts_double V0;
+ts_double A0;
+ts_double epsvol;
+ts_double epsarea;
+
 ts_uint ts_fprintf(FILE *fd, char *fmt, ...){
 if(quiet) return TS_SUCCESS;
 	va_list ap;

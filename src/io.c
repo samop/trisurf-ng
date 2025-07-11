@@ -18,7 +18,20 @@
 #include <dirent.h>
 #include <errno.h>
 #include <snapshot.h>
+
+
+
+
+ts_args command_line_args;
+int force_from_tape;
+char tapetxt[128000];
+
+
+
 /** DUMP STATE TO DISK DRIVE **/
+
+
+
 
 ts_bool dump_state(ts_vesicle *vesicle, ts_uint iteration){
 
@@ -815,7 +828,7 @@ ts_bool write_master_xml_file(ts_char *filename){
             }  
 		}
 	}
-    free(dir);
+    closedir(dir);
 	fprintf(fh,"</Collection>\n</VTKFile>\n");
 	fclose(fh);
 	return TS_SUCCESS;
