@@ -1,5 +1,5 @@
 /* vim: set ts=4 sts=4 sw=4 noet : */
-#include<general.h>
+#include "general.h"
 #include "vesicle.h"
 #include "vertex.h"
 #include "triangle.h"

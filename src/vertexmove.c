@@ -377,6 +377,8 @@ ts_bool single_filament_vertex_move(ts_vesicle *vesicle,ts_poly *poly,ts_vertex 
 	//This will hold all the information of vtx and its neighbours
 	ts_vertex backupvtx,backupneigh[2];
 	ts_bond backupbond[2];
+	ts_uint bond_no;
+	//=(ts_bond *)calloc(vtx->bond_no,sizeof(ts_bond));
 
 	//backup vertex:		
 	memcpy((void *)&backupvtx,(void *)vtx,sizeof(ts_vertex));
@@ -418,7 +420,13 @@ ts_bool single_filament_vertex_move(ts_vesicle *vesicle,ts_poly *poly,ts_vertex 
 	} 
 
 	//backup bonds
-	for(i=0;i<vtx->bond_no;i++){
+	//in reality vtx->bond_no can be only 1 or 2... However compiler does not know that, so we do this to avoid error
+	bond_no=vtx->bond_no;
+	if(bond_no>2){
+		fatal("There shouldn't be more than 2 bonds in filament",999);
+		bond_no=2;
+	}
+	for(i=0;i<bond_no;i++){
 		memcpy(&backupbond[i],vtx->bond[i], sizeof(ts_bond));
 		vtx->bond[i]->bond_length=sqrt(dist[i]);
 		bond_vector(vtx->bond[i]);

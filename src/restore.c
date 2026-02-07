@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
-#include <general.h>
-#include <restore.h>
-#include <snapshot.h>
+#include "general.h"
+#include "restore.h"
+#include "snapshot.h"
 #include <zlib.h>
 #include "vesicle.h"
 #include "vertex.h"

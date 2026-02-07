@@ -1,13 +1,13 @@
 /* vim: set ts=4 sts=4 sw=4 noet : */
 /* vim: set ts=4 sts=4 sw=4 noet : */	
-#include<stdio.h>
-#include<general.h>
-#include<snapshot.h>
-#include<stdlib.h>
-#include<stdarg.h>
+#include <stdio.h>
+#include "general.h"
+#include "snapshot.h"
+#include <stdlib.h>
+#include <stdarg.h>
 #include <zlib.h>
-#include<inttypes.h>
-#include<config.h>
+#include <inttypes.h>
+//#include "config.h"
 #include <time.h>
 #include "io.h"
 /* a helper function that utilizes ts_string data structure and performs same as sprintf */
@@ -23,7 +23,7 @@ ts_uint ts_sprintf(ts_string *str, char *fmt, ...){
 /* outputs additional data into paraview xml file */
 ts_bool xml_trisurf_data(FILE *fh, ts_vesicle *vesicle){
 
-	ts_string *data=(ts_string *)malloc(sizeof(ts_sprintf));
+	ts_string *data=(ts_string *)malloc(sizeof(ts_string));
 	data->string=(char *)malloc(5120000*sizeof(char)); /*TODO: warning, can break if the string is to long */
 	data->beg=0;
 	

@@ -23,7 +23,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <errno.h>
-#include <snapshot.h>
+#include "snapshot.h"
 #include<gsl/gsl_complex.h>
 #include<gsl/gsl_complex_math.h>
 
