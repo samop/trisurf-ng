@@ -31,7 +31,7 @@ find_library(M_LIB m REQUIRED)
 find_library(CONFUSE_LIB confuse REQUIRED)
 
 # GSL: try find_package first, fallback to find_library
-find_package(GSL QUIET)
+find_package(GSL REQUIRED)
 if (GSL_FOUND)
   set(GSL_LIBS GSL::gsl GSL::gslcblas)
 else()
@@ -41,10 +41,10 @@ else()
 endif()
 
 find_package(ZLIB REQUIRED)
-find_package(CURL REQUIRED)
+#find_package(CURL REQUIRED)
 
 # libxml2: prefer CMake package, fallback to pkg-config
-find_package(LibXml2 QUIET)
+find_package(LibXml2 REQUIRED)
 if (LibXml2_FOUND)
   set(LIBXML2_TARGET LibXml2::LibXml2)
   set(LIBXML2_INCLUDE_DIRS "")
@@ -61,7 +61,7 @@ set(TRISURF_COMMON_LIBS
   ${M_LIB}
   ${GSL_LIBS}
   ZLIB::ZLIB
-  CURL::libcurl
+  #  CURL::libcurl
   ${LIBXML2_TARGET}
 )
 

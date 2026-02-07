@@ -4,4 +4,6 @@ ulm2.csv
 sph2out.dat
 dump.bin
 dout
-
+build
+debug
+release
