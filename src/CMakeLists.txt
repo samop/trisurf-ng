@@ -15,6 +15,10 @@ endif()
 set(TRISURF_COMMON_CFLAGS
   -Wall
   -fgnu89-inline
+  -march=native
+  -fopenmp
+  -fopt-info-vec-optimized
+  -fopt-info-vec-missed
 )
 
 # Define TS_VERSION="..."
@@ -55,6 +59,49 @@ target_include_directories(trisurf PRIVATE ${TRISURF_COMMON_INCLUDES})
 
 target_link_libraries(trisurf PRIVATE ${TRISURF_COMMON_LIBS})
 
+
+
+# -- static library ---
+
+if(ENABLE_STATIC)
+# Static library
+add_library(trisurf_static STATIC
+  general.c
+  vertex.c
+  bond.c
+  triangle.c
+  cell.c
+  vesicle.c
+  initial_distribution.c
+  io.c
+  dumpstate.c
+  frame.c
+  energy.c
+  timestep.c
+  vertexmove.c
+  bondflip.c
+  poly.c
+  stats.c
+  sh.c
+  shcomplex.c
+  constvol.c
+  snapshot.c
+  restore.c
+  cluster.c
+)
+
+set_target_properties(trisurf_static PROPERTIES
+  OUTPUT_NAME trisurf
+)
+
+target_compile_options(trisurf_static PRIVATE ${TRISURF_COMMON_CFLAGS})
+target_include_directories(trisurf_static PRIVATE ${LIBXML2_INCLUDES})
+target_link_libraries(trisurf_static PRIVATE ${TRISURF_COMMON_LIBS})
+endif()
+
+
+
+
 # --- Executables ---
 add_executable(trisurf_bin main.c)
 set_target_properties(trisurf_bin PROPERTIES OUTPUT_NAME "trisurf")
@@ -71,6 +118,8 @@ add_executable(tspoststat tspoststat.c)
 target_compile_options(tspoststat PRIVATE ${TRISURF_COMMON_CFLAGS})
 target_include_directories(tspoststat PRIVATE ${TRISURF_COMMON_INCLUDES})
 target_link_libraries(tspoststat PRIVATE trisurf ${TRISURF_COMMON_LIBS})
+
+
 
 # --- Install (Automake bin_PROGRAMS + lib_LTLIBRARIES) ---
 install(TARGETS trisurf_bin tsmeasure tspoststat

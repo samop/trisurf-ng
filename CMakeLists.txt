@@ -18,6 +18,37 @@ else()
   add_compile_options(-O3 -ffast-math)
 endif()
 
+option(ENABLE_LTO "Enable link-time optimization" ON)
+
+if (ENABLE_LTO)
+  add_compile_options(-flto=auto)
+  add_link_options(-flto=auto)
+endif()
+
+option(ENABLE_PROFILING "Enable GCC profiling build" OFF)
+
+if(ENABLE_PROFILING)
+	add_compile_options(-fprofile-generate=${CMAKE_SOURCE_DIR}/profdata)
+	add_link_options(-fprofile-generate=${CMAKE_SOURCE_DIR}/profdata)
+endif()
+
+option(USE_PROFILE "Enable GCC profile data for faster build" OFF)
+
+if(USE_PROFILE)
+	add_compile_options(-fprofile-use=${CMAKE_SOURCE_DIR}/profdata -fprofile-correction)
+	add_link_options(-fprofile-generate=${CMAKE_SOURCE_DIR}/profdata)
+endif()
+
+
+option(ENABLE_STATIC "Build mostly-static trisurf executable" ON)
+
+
+if (ENABLE_STATIC)
+	add_link_options(-Bstatic)
+endif()
+
+
+
 # --- config.h (AC_CONFIG_HEADERS) ---
 #configure_file(
 #  ${CMAKE_SOURCE_DIR}/config.h.in
